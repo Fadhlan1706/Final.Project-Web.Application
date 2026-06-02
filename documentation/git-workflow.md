@@ -49,7 +49,7 @@ Buruk:
 
 ## Committing
 
-Ikuti pedoman commit pada [Conventional Commits](conventionalCommits.md)
+Ikuti pedoman commit pada [Conventional Commits](conventional-commits.md)
 
 ## Workflow
 
