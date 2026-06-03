@@ -6,7 +6,7 @@ namespace App\Helpers;
 class Validator
 {
     private array $errors = [];
-    private array $data   = [];
+    private array $data = [];
 
     public function __construct(array $data)
     {
@@ -31,16 +31,16 @@ class Validator
 
             match ($ruleName) {
                 'required' => $this->required($field, $value),
-                'email'    => $this->email($field, $value),
-                'min'      => $this->min($field, $value, (int)$param),
-                'max'      => $this->max($field, $value, (int)$param),
-                'in'       => $this->in($field, $value, explode(',', $param)),
-                'numeric'  => $this->numeric($field, $value),
-                'integer'  => $this->integer($field, $value),
-                'between'  => $this->between($field, $value, $param),
-                'url'      => $this->url($field, $value),
-                'confirmed'=> $this->confirmed($field, $value),
-                default    => null,
+                'email' => $this->email($field, $value),
+                'min' => $this->min($field, $value, (int) $param),
+                'max' => $this->max($field, $value, (int) $param),
+                'in' => $this->in($field, $value, explode(',', $param)),
+                'numeric' => $this->numeric($field, $value),
+                'integer' => $this->integer($field, $value),
+                'between' => $this->between($field, $value, $param),
+                'url' => $this->url($field, $value),
+                'confirmed' => $this->confirmed($field, $value),
+                default => null,
             };
         }
     }
@@ -61,14 +61,14 @@ class Validator
 
     private function min(string $field, mixed $value, int $min): void
     {
-        if ($value !== null && strlen((string)$value) < $min) {
+        if ($value !== null && strlen((string) $value) < $min) {
             $this->errors[$field][] = "$field must be at least $min characters.";
         }
     }
 
     private function max(string $field, mixed $value, int $max): void
     {
-        if ($value !== null && strlen((string)$value) > $max) {
+        if ($value !== null && strlen((string) $value) > $max) {
             $this->errors[$field][] = "$field may not exceed $max characters.";
         }
     }
@@ -116,9 +116,18 @@ class Validator
         }
     }
 
-    public function fails(): bool   { return !empty($this->errors); }
-    public function passes(): bool  { return empty($this->errors); }
-    public function errors(): array { return $this->errors; }
+    public function fails(): bool
+    {
+        return !empty($this->errors);
+    }
+    public function passes(): bool
+    {
+        return empty($this->errors);
+    }
+    public function errors(): array
+    {
+        return $this->errors;
+    }
 
     /** Return sanitized value */
     public function get(string $field, mixed $default = null): mixed

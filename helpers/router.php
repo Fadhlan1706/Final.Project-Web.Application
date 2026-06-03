@@ -34,8 +34,8 @@ class Router
     private static function add(string $method, string $path, callable|array $handler): void
     {
         self::$routes[] = [
-            'method'  => strtoupper($method),
-            'path'    => $path,
+            'method' => strtoupper($method),
+            'path' => $path,
             'handler' => $handler,
         ];
     }

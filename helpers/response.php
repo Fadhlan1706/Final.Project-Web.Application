@@ -22,7 +22,7 @@ class Response
         self::json([
             'success' => true,
             'message' => $message,
-            'data'    => $data,
+            'data' => $data,
         ], $status);
     }
 

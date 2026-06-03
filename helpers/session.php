@@ -13,8 +13,8 @@ class Session
             session_name('SKILLSWAP_SESS');
             session_set_cookie_params([
                 'lifetime' => 0,
-                'path'     => '/',
-                'secure'   => false,      // set true on HTTPS
+                'path' => '/',
+                'secure' => false,      // set true on HTTPS
                 'httponly' => true,
                 'samesite' => 'Lax',
             ]);
