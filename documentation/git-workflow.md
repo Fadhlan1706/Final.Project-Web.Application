@@ -18,7 +18,7 @@ Aturan:
 
 ### Buat Branch Terpisah
 
-**Format penamaan**: `<name-user>/<description>`<br>
+**Format penamaan**: `<user-name>/<SCOPE>-<description>`<br>
 Github :<br>
 ![branching from github](https://gitprotect.io/blog/wp-content/uploads/2024/02/how-to-vreate-a-new-GitHub-branch.png)<br>
 Git Bash:
@@ -36,10 +36,10 @@ git switch -c new-branch
 
 Baik:
 
-- `fadh/bigger-api-keys`
-- `jong/sftp-row-validation-error`
-- `teo/clever-js-deps-update`
-- `iqbal/INFRA-101-update-node-package`
+- `fadh/BE-bigger-api-keys`
+- `jong/BE-sftp-row-validation-error`
+- `teo/FE-clever-js-deps-update`
+- `iqbal/FE-update-node-package`
 
 Buruk:
 
