@@ -54,6 +54,11 @@ class AuthController
             Response::validationError($v2->errors());
         }
 
+        // Restrict registration to the specific student domain
+        if (isset($body['email']) && !str_ends_with($body['email'], '@student.unsrat.ac.id')) {
+            Response::validationError(['email' => ['Please use your unsrat email to register.']]);
+        }
+
         $result = $this->auth->register($body);
 
         if (!$result['success']) {
@@ -79,6 +84,11 @@ class AuthController
 
         if ($v->fails()) {
             Response::validationError($v->errors());
+        }
+
+        // Restrict login to the specific student domain
+        if (isset($body['email']) && !str_ends_with($body['email'], '@student.unsrat.ac.id')) {
+            Response::validationError(['email' => ['Please use your unsrat email to login.']]);
         }
 
         $result = $this->auth->login($body['email'], $body['password']);
