@@ -15,39 +15,39 @@ class AuthService
         $this->users = new UserRepository();
     }
 
-    // ----------------------------------------------------------------
-    // Register
-    // ----------------------------------------------------------------
-
-    /**
-     * @return array{success: bool, message: string, data?: array}
-     */
     public function register(array $data): array
     {
-        // Check duplicate email
         if ($this->users->findByEmail($data['email'])) {
             return ['success' => false, 'message' => 'Email already registered.'];
         }
 
+        $verificationCode = (string) rand(100000, 999999);
+
         $id = $this->users->create([
-            'name'     => trim($data['name']),
-            'email'    => strtolower(trim($data['email'])),
-            'password' => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]),
-            'role'     => 'user',
+            'name'              => trim($data['name']),
+            'email'             => strtolower(trim($data['email'])),
+            'password'          => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]),
+            'is_verified'       => 0,
+            'verification_code' => $verificationCode,
         ]);
 
         $user = $this->users->findById($id);
 
+        $emailSent = \App\Services\MailService::sendVerificationCode($data['email'], $verificationCode);
+
+        if (!$emailSent) {
+            return [
+                'success' => false,
+                'message' => 'User registered, but verification email failed to send. Please check your SMTP configuration.',
+            ];
+        }
+
         return [
             'success' => true,
-            'message' => 'Registration successful.',
+            'message' => 'Registration successful. Please check your email for the verification code.',
             'data'    => $this->publicUser($user),
         ];
     }
-
-    // ----------------------------------------------------------------
-    // Login
-    // ----------------------------------------------------------------
 
     public function login(string $email, string $password): array
     {
@@ -57,20 +57,23 @@ class AuthService
             return ['success' => false, 'message' => 'Invalid email or password.'];
         }
 
-        if (!$user['is_active']) {
+        $status = $user['status'] ?? 'active';
+        if ($status === 'suspended') {
             return ['success' => false, 'message' => 'Your account has been suspended.'];
+        }
+
+        if (isset($user['is_verified']) && $user['is_verified'] == 0) {
+            return ['success' => false, 'message' => 'Please verify your email first before logging in.'];
         }
 
         if (!password_verify($password, $user['password'])) {
             return ['success' => false, 'message' => 'Invalid email or password.'];
         }
 
-        // Start session
         Session::start();
-        session_regenerate_id(true); // prevent session fixation
+        session_regenerate_id(true);
 
         Session::set('user_id',   $user['id']);
-        Session::set('user_role', $user['role']);
         Session::set('user_name', $user['name']);
 
         return [
@@ -80,18 +83,31 @@ class AuthService
         ];
     }
 
-    // ----------------------------------------------------------------
-    // Logout
-    // ----------------------------------------------------------------
+    public function verifyEmail(string $email, string $code): array
+    {
+        $user = $this->users->findByEmail(strtolower(trim($email)));
+
+        if (!$user) {
+            return ['success' => false, 'message' => 'User not found.'];
+        }
+
+        if (isset($user['is_verified']) && $user['is_verified'] == 1) {
+            return ['success' => false, 'message' => 'Email is already verified.'];
+        }
+
+        if (($user['verification_code'] ?? null) !== $code) {
+            return ['success' => false, 'message' => 'Invalid verification code.'];
+        }
+
+        $this->users->verifyEmail((int)$user['id']);
+
+        return ['success' => true, 'message' => 'Email verified successfully. You can now login.'];
+    }
 
     public function logout(): void
     {
         Session::destroy();
     }
-
-    // ----------------------------------------------------------------
-    // Change password
-    // ----------------------------------------------------------------
 
     public function changePassword(int $userId, string $current, string $newPassword): array
     {
@@ -111,10 +127,6 @@ class AuthService
         return ['success' => true, 'message' => 'Password changed successfully.'];
     }
 
-    // ----------------------------------------------------------------
-    // Current user (from session)
-    // ----------------------------------------------------------------
-
     public function currentUser(): ?array
     {
         $id = Session::get('user_id');
@@ -122,11 +134,6 @@ class AuthService
         return $this->users->findById((int)$id);
     }
 
-    // ----------------------------------------------------------------
-    // Internal helpers
-    // ----------------------------------------------------------------
-
-    /** Strip password hash before sending to client */
     private function publicUser(array $user): array
     {
         unset($user['password']);

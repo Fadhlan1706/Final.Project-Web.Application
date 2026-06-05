@@ -11,6 +11,8 @@ bio TEXT,
 profilePicture VARCHAR(255),
 reputationScore DECIMAL(3,2) DEFAULT 0,
 STATUS ENUM('active', 'suspended') DEFAULT 'active',
+is_verified TINYINT(1) DEFAULT 0,
+verification_code VARCHAR(10) NULL,
 create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
 DESC users;
