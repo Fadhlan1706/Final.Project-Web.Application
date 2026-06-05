@@ -143,6 +143,7 @@ class AuthController
         $body = $this->jsonBody();
 
         $v = Validator::make($body, [
+            'email'            => 'required|email',
             'current_password' => 'required',
             'new_password'     => 'required|min:8|max:72',
         ]);
@@ -155,8 +156,14 @@ class AuthController
             Response::validationError(['new_password_confirmation' => ['Passwords do not match.']]);
         }
 
-        $userId = (int)\App\Helpers\Session::get('user_id');
-        $result = $this->auth->changePassword($userId, $body['current_password'], $body['new_password']);
+        $currentUser = $this->auth->currentUser();
+        $sessionEmail = $currentUser['email'] ?? $currentUser['EMAIL'] ?? '';
+
+        if (strtolower(trim($body['email'])) !== strtolower(trim($sessionEmail))) {
+            Response::error('You can only change the password for your own logged-in account.', 403);
+        }
+
+        $result = $this->auth->changePassword($body['email'], $body['current_password'], $body['new_password']);
 
         if (!$result['success']) {
             Response::error($result['message'], 422);

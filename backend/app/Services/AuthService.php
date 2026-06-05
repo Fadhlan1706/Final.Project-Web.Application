@@ -57,7 +57,7 @@ class AuthService
             return ['success' => false, 'message' => 'Invalid email or password.'];
         }
 
-        $status = $user['status'] ?? 'active';
+        $status = $user['STATUS'] ?? 'active';
         if ($status === 'suspended') {
             return ['success' => false, 'message' => 'Your account has been suspended.'];
         }
@@ -66,7 +66,7 @@ class AuthService
             return ['success' => false, 'message' => 'Please verify your email first before logging in.'];
         }
 
-        if (!password_verify($password, $user['password'])) {
+        if (!password_verify($password, $user['PASSWORD'])) {
             return ['success' => false, 'message' => 'Invalid email or password.'];
         }
 
@@ -74,7 +74,7 @@ class AuthService
         session_regenerate_id(true);
 
         Session::set('user_id',   $user['id']);
-        Session::set('user_name', $user['name']);
+        Session::set('user_name', $user['name'] ?? $user['NAME'] ?? '');
 
         return [
             'success' => true,
@@ -109,18 +109,16 @@ class AuthService
         Session::destroy();
     }
 
-    public function changePassword(int $userId, string $current, string $newPassword): array
+    public function changePassword(string $email, string $current, string $newPassword): array
     {
-        $user = $this->users->findByEmail(
-            $this->users->findById($userId)['email'] ?? ''
-        );
+        $user = $this->users->findByEmail(strtolower(trim($email)));
 
-        if (!$user || !password_verify($current, $user['password'])) {
-            return ['success' => false, 'message' => 'Current password is incorrect.'];
+        if (!$user || !password_verify($current, $user['PASSWORD'])) {
+            return ['success' => false, 'message' => 'Current password is incorrect or user not found.'];
         }
 
         $this->users->updatePassword(
-            $userId,
+            (int)$user['id'],
             password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 12])
         );
 
@@ -136,7 +134,7 @@ class AuthService
 
     private function publicUser(array $user): array
     {
-        unset($user['password']);
+        unset($user['password'], $user['PASSWORD']);
         return $user;
     }
 }
