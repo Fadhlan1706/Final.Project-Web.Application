@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kategori Skill — SkillSwap Admin</title>
+<link rel="stylesheet" href="../../assets/css/variables.css">
+<link rel="stylesheet" href="../../assets/css/global.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+<link rel="stylesheet" href="../../assets/css/components.css">
+<link rel="stylesheet" href="../../assets/css/icons.css">
+<link rel="stylesheet" href="../../assets/css/modal-kanban.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell">
+
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-icon"><i class="icon icon-sm" data-icon="refresh-cw" data-color="primary"></i></div>
+      <span class="brand-text"><span>Skill<span>Swap</span></span> <span style="font-size:0.6rem;background:var(--red);color:#fff;padding:2px 6px;border-radius:5px;margin-left:4px">ADMIN</span></span>
+    </div>
+    <button class="navbar-toggle" id="sidebar-toggle"><i class="icon" data-icon="menu" data-color="secondary"></i></button>
+    <div class="navbar-search"><span class="search-icon"><i class="icon icon-sm c-muted" data-icon="search"></i></span><input type="text" id="cat-search" placeholder="Cari kategori..."></div>
+    <div class="navbar-actions">
+      <button class="nav-btn" id="theme-toggle"><i class="icon icon-sm c-muted" data-icon="sun"></i></button>
+      <div class="profile-dropdown">
+        <div class="profile-btn" id="profile-btn">
+          <div class="profile-avatar" style="background:linear-gradient(135deg,var(--red),#ff8787)">AD</div>
+          <div><div class="profile-name">Admin</div><div class="profile-role">Administrator</div></div>▾
+        </div>
+        <div class="dropdown-menu" id="profile-menu">
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" onclick="mockLogout()"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <aside class="sidebar">
+    <span class="sidebar-section-label">Panel Admin</span>
+    <a class="nav-link" href="dashboard.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="bar-chart-2"></i></span><span class="nav-label">Overview</span></a>
+    <a class="nav-link" href="manage-users.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="users"></i></span><span class="nav-label">Kelola User</span></a>
+    <a class="nav-link active" href="categories.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="tag"></i></span><span class="nav-label">Kategori Skill</span></a>
+    <a class="nav-link" href="reports.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="flag"></i></span><span class="nav-label">Laporan</span><span class="nav-badge" style="background:var(--red)">3</span></a>
+    </aside>
+
+  <main class="main-content page-enter">
+    <div class="page-header-row" style="margin-bottom:24px">
+      <div class="page-header" style="margin-bottom:0">
+        <h1><i class="icon icon-sm" data-icon="tag"></i> Kategori Skill</h1>
+        <p>Kelola kategori skill yang tersedia di platform</p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('cat-modal');resetCatModal()">+ Tambah Kategori</button>
+    </div>
+
+    <div class="cards-grid" id="categories-grid"></div>
+  </main>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-overlay" id="cat-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title" id="cat-modal-title">+ Tambah Kategori</span>
+      <button class="modal-close" data-close-modal="cat-modal"><i class="icon icon-sm" data-icon="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="saveCategory(event)">
+        <input type="hidden" id="cat-edit-id">
+        <div class="form-group">
+          <label class="form-label">Nama Kategori <span>*</span></label>
+          <input class="form-control" id="cat-name" placeholder="Contoh: Machine Learning" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Emoji / Icon</label>
+          <input class="form-control" id="cat-icon" placeholder="Contoh: <i class="icon icon-sm" data-icon="cpu"></i>" maxlength="4">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deskripsi</label>
+          <textarea class="form-control" id="cat-desc" rows="2" placeholder="Deskripsi singkat kategori ini..."></textarea>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button type="button" class="btn btn-secondary" data-close-modal="cat-modal">Batal</button>
+          <button type="submit" class="btn btn-primary" id="cat-submit-btn">+ Tambah</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/icons.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script>
+let categories = [
+  { id:1, name:'Frontend',     icon:'<i class="icon icon-sm" data-icon="palette"></i>', desc:'HTML, CSS, JavaScript, React, Vue, Angular', count:142 },
+  { id:2, name:'Backend',      icon:'<i class="icon icon-sm" data-icon="settings"></i>', desc:'PHP, Node.js, Python, Java, Laravel, Express', count:118 },
+  { id:3, name:'Mobile',       icon:'<i class="icon icon-sm" data-icon="smartphone"></i>', desc:'Android, iOS, Flutter, React Native, Kotlin', count:87 },
+  { id:4, name:'Design',       icon:'<i class="icon icon-sm" data-icon="edit"></i>', desc:'Figma, Adobe XD, UI/UX, Illustrator, Photoshop', count:203 },
+  { id:5, name:'Data Science', icon:'<i class="icon icon-sm" data-icon="bar-chart-2"></i>', desc:'Python, R, Pandas, Machine Learning, Tableau', count:64 },
+  { id:6, name:'Database',     icon:'<i class="icon icon-sm" data-icon="database"></i>', desc:'MySQL, PostgreSQL, MongoDB, Redis, SQL Server', count:96 },
+  { id:7, name:'Framework',    icon:'<i class="icon icon-sm" data-icon="grid-2x2"></i>', desc:'Laravel, Django, Spring Boot, Next.js, Nuxt.js', count:77 },
+  { id:8, name:'DevOps',       icon:'<i class="icon icon-sm" data-icon="terminal"></i>', desc:'Docker, Kubernetes, CI/CD, AWS, Git', count:43 },
+  { id:9, name:'Motion',       icon:'<i class="icon icon-sm" data-icon="briefcase"></i>', desc:'After Effects, Premiere, Motion Graphics, 3D', count:31 },
+];
+let editingCatId = null;
+
+function renderCategories(list) {
+  const grid = document.getElementById('categories-grid');
+  const q = document.getElementById('cat-search')?.value.toLowerCase() || '';
+  const filtered = list.filter(c => c.name.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q));
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon"><i class="icon icon-sm" data-icon="tag"></i></div><h3>Tidak ada kategori</h3></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(c => `
+    <div class="card" style="cursor:default">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:2rem">${c.icon}</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-secondary btn-sm" onclick="editCategory(${c.id})"><i class="icon icon-sm" data-icon="edit"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})"><i class="icon icon-sm" data-icon="trash-2"></i></button>
+        </div>
+      </div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:6px">${c.name}</div>
+      <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:14px;line-height:1.5">${c.desc}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span class="badge badge-blue">${c.count} skill</span>
+        <span style="font-size:0.72rem;color:var(--text-muted)">Aktif</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function resetCatModal() {
+  editingCatId = null;
+  document.getElementById('cat-modal-title').textContent = '+ Tambah Kategori';
+  document.getElementById('cat-submit-btn').textContent  = '+ Tambah';
+  document.getElementById('cat-edit-id').value = '';
+  document.getElementById('cat-name').value    = '';
+  document.getElementById('cat-icon').value    = '';
+  document.getElementById('cat-desc').value    = '';
+}
+
+function editCategory(id) {
+  const c = categories.find(x => x.id === id);
+  if (!c) return;
+  editingCatId = id;
+  document.getElementById('cat-modal-title').textContent = '<i class="icon icon-sm" data-icon="edit"></i> Edit Kategori';
+  document.getElementById('cat-submit-btn').textContent  = 'Simpan Simpan';
+  document.getElementById('cat-edit-id').value = id;
+  document.getElementById('cat-name').value    = c.name;
+  document.getElementById('cat-icon').value    = c.icon;
+  document.getElementById('cat-desc').value    = c.desc;
+  openModal('cat-modal');
+}
+
+function deleteCategory(id) {
+  const c = categories.find(x => x.id === id);
+  if (!c) return;
+  categories = categories.filter(x => x.id !== id);
+  renderCategories(categories);
+  showToast('Kategori Dihapus', `${c.name} telah dihapus.`, 'warning');
+}
+
+function saveCategory(e) {
+  e.preventDefault();
+  const name = document.getElementById('cat-name').value.trim();
+  const icon = document.getElementById('cat-icon').value.trim() || 'Lainnya';
+  const desc = document.getElementById('cat-desc').value.trim();
+
+  if (editingCatId) {
+    const c = categories.find(x => x.id === editingCatId);
+    if (c) { c.name = name; c.icon = icon; c.desc = desc; }
+    showToast('Kategori Diperbarui <i class="icon icon-sm c-green" data-icon="check-circle"></i>', `${name} berhasil diperbarui.`, 'success');
+  } else {
+    categories.push({ id: Date.now(), name, icon, desc, count: 0 });
+    showToast('Kategori Ditambahkan Tambah', `${name} berhasil ditambahkan.`, 'success');
+  }
+  closeModal('cat-modal');
+  renderCategories(categories);
+}
+
+document.getElementById('cat-search').addEventListener('input', () => renderCategories(categories));
+document.addEventListener('DOMContentLoaded', () => renderCategories(categories));
+</script>
+</body>
+</html>
