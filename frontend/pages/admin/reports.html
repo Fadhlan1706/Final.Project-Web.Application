@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan — SkillSwap Admin</title>
+<link rel="stylesheet" href="../../assets/css/variables.css">
+<link rel="stylesheet" href="../../assets/css/global.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+<link rel="stylesheet" href="../../assets/css/components.css">
+<link rel="stylesheet" href="../../assets/css/icons.css">
+<link rel="stylesheet" href="../../assets/css/modal-kanban.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell">
+
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-icon"><i class="icon icon-sm" data-icon="refresh-cw" data-color="primary"></i></div>
+      <span class="brand-text"><span>Skill<span>Swap</span></span> <span style="font-size:0.6rem;background:var(--red);color:#fff;padding:2px 6px;border-radius:5px;margin-left:4px">ADMIN</span></span>
+    </div>
+    <button class="navbar-toggle" id="sidebar-toggle"><i class="icon" data-icon="menu" data-color="secondary"></i></button>
+    <div class="navbar-search"><span class="search-icon"><i class="icon icon-sm c-muted" data-icon="search"></i></span><input type="text" id="report-search" placeholder="Cari laporan..."></div>
+    <div class="navbar-actions">
+      <button class="nav-btn" id="theme-toggle"><i class="icon icon-sm c-muted" data-icon="sun"></i></button>
+      <div class="profile-dropdown">
+        <div class="profile-btn" id="profile-btn">
+          <div class="profile-avatar" style="background:linear-gradient(135deg,var(--red),#ff8787)">AD</div>
+          <div><div class="profile-name">Admin</div><div class="profile-role">Administrator</div></div>▾
+        </div>
+        <div class="dropdown-menu" id="profile-menu">
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" onclick="mockLogout()"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <aside class="sidebar">
+    <span class="sidebar-section-label">Panel Admin</span>
+    <a class="nav-link" href="dashboard.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="bar-chart-2"></i></span><span class="nav-label">Overview</span></a>
+    <a class="nav-link" href="manage-users.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="users"></i></span><span class="nav-label">Kelola User</span></a>
+    <a class="nav-link" href="categories.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="tag"></i></span><span class="nav-label">Kategori Skill</span></a>
+    <a class="nav-link active" href="reports.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="flag"></i></span><span class="nav-label">Laporan</span><span class="nav-badge" style="background:var(--red)">3</span></a>
+    </aside>
+
+  <main class="main-content page-enter">
+    <div class="page-header-row" style="margin-bottom:24px">
+      <div class="page-header" style="margin-bottom:0">
+        <h1><i class="icon icon-sm" data-icon="flag"></i> Laporan Pelanggaran</h1>
+        <p>Tinjau dan tangani laporan yang masuk dari pengguna</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <select class="form-control" id="filter-report-status" style="width:auto;font-size:0.82rem">
+          <option value="">Semua Status</option>
+          <option value="pending">Menunggu</option>
+          <option value="resolved">Diselesaikan</option>
+          <option value="dismissed">Diabaikan</option>
+        </select>
+        <select class="form-control" id="filter-report-type" style="width:auto;font-size:0.82rem">
+          <option value="">Semua Jenis</option>
+          <option value="spam">Spam</option>
+          <option value="fake">Profil Palsu</option>
+          <option value="harassment">Pelecehan</option>
+          <option value="other">Lainnya</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+      <div style="background:var(--red-glow);border:1px solid rgba(250,82,82,0.25);border-radius:var(--radius);padding:10px 18px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px"><i class="icon icon-sm" data-icon="clock" data-color="amber"></i></span>
+        <div><div id="count-pending-r" style="font-family:var(--font-display);font-weight:800;font-size:1.2rem">0</div><div style="font-size:0.72rem;color:var(--text-muted)">Menunggu Tinjauan</div></div>
+      </div>
+      <div style="background:var(--green-glow);border:1px solid rgba(64,192,87,0.25);border-radius:var(--radius);padding:10px 18px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px"><i class="icon icon-sm c-green" data-icon="check-circle"></i></span>
+        <div><div id="count-resolved-r" style="font-family:var(--font-display);font-weight:800;font-size:1.2rem">0</div><div style="font-size:0.72rem;color:var(--text-muted)">Diselesaikan</div></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 18px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px"><i class="icon icon-sm c-muted" data-icon="eye-off"></i></span>
+        <div><div id="count-dismissed-r" style="font-family:var(--font-display);font-weight:800;font-size:1.2rem">0</div><div style="font-size:0.72rem;color:var(--text-muted)">Diabaikan</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr><th>#</th><th>Pelapor</th><th>Dilaporkan</th><th>Jenis</th><th>Keterangan</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr>
+          </thead>
+          <tbody id="reports-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Report Detail Modal -->
+<div class="modal-overlay" id="report-detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title"><i class="icon icon-sm" data-icon="flag"></i> Detail Laporan</span>
+      <button class="modal-close" data-close-modal="report-detail-modal"><i class="icon icon-sm" data-icon="x"></i></button>
+    </div>
+    <div class="modal-body" id="report-detail-body"></div>
+    <div class="modal-footer" id="report-detail-footer"></div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/icons.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script>
+let reports = [
+  { id:1, reporter:'Nasya Putri',    reporterInitials:'NP', reported:'Bram Susanto',    reportedInitials:'BS', type:'spam',       desc:'Mengirim request kolaborasi berulang kali dengan pesan yang sama.', date:'2 jam lalu',   status:'pending'   },
+  { id:2, reporter:'Arief Pratama',  reporterInitials:'AP', reported:'Akun X',           reportedInitials:'AX', type:'fake',       desc:'Profil menggunakan foto dan bio yang terlihat tidak asli/fiktif.',   date:'1 hari lalu',  status:'pending'   },
+  { id:3, reporter:'Laura Sitanggang',reporterInitials:'LS',reported:'Sinta Dewi',       reportedInitials:'SD', type:'harassment', desc:'Mengirim pesan tidak pantas setelah request kolaborasi ditolak.',    date:'3 hari lalu',  status:'pending'   },
+  { id:4, reporter:'Teo Hardianto',  reporterInitials:'TH', reported:'User Anonim',      reportedInitials:'UA', type:'other',      desc:'Mengklaim memiliki skill yang tidak sesuai dengan kenyataan.',       date:'1 minggu lalu',status:'resolved'  },
+  { id:5, reporter:'Sinta Dewi',     reporterInitials:'SD', reported:'Arief Pratama',    reportedInitials:'AP', type:'spam',       desc:'Mengirim banyak pesan promosi di luar konteks kolaborasi.',          date:'2 minggu lalu',status:'dismissed' },
+];
+
+const typeLabels = { spam:'Spam', fake:'Profil Palsu', harassment:'Pelecehan', other:'Lainnya' };
+const typeColors = { spam:'amber', fake:'red', harassment:'red', other:'gray' };
+
+function updateCounts() {
+  document.getElementById('count-pending-r').textContent   = reports.filter(r=>r.status==='pending').length;
+  document.getElementById('count-resolved-r').textContent  = reports.filter(r=>r.status==='resolved').length;
+  document.getElementById('count-dismissed-r').textContent = reports.filter(r=>r.status==='dismissed').length;
+}
+
+function renderReports() {
+  const q  = document.getElementById('report-search').value.toLowerCase();
+  const st = document.getElementById('filter-report-status').value;
+  const tp = document.getElementById('filter-report-type').value;
+
+  const filtered = reports.filter(r => {
+    const matchQ  = !q  || r.reporter.toLowerCase().includes(q) || r.reported.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q);
+    const matchSt = !st || r.status === st;
+    const matchTp = !tp || r.type   === tp;
+    return matchQ && matchSt && matchTp;
+  });
+
+  const statusBadge = { pending:'<span class="badge badge-amber"><i class="icon icon-xs" data-icon="clock"></i> Menunggu</span>', resolved:'<span class="badge badge-green">Selesai</span>', dismissed:'<span class="badge badge-gray">Diabaikan</span>' };
+
+  const tbody = document.getElementById('reports-tbody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state" style="padding:28px">Tidak ada laporan ditemukan</div></td></tr>`;
+    updateCounts(); return;
+  }
+  tbody.innerHTML = filtered.map(r => `
+    <tr>
+      <td style="color:var(--text-muted);font-size:0.78rem">#${r.id}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--accent),var(--purple))">${r.reporterInitials}</div>
+          <span style="font-size:0.875rem;font-weight:500">${r.reporter}</span>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--red),#ff8787)">${r.reportedInitials}</div>
+          <span style="font-size:0.875rem;font-weight:500">${r.reported}</span>
+        </div>
+      </td>
+      <td><span class="badge badge-${typeColors[r.type]}">${typeLabels[r.type]}</span></td>
+      <td style="max-width:200px;font-size:0.8rem;color:var(--text-secondary)">
+        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.desc}</div>
+      </td>
+      <td style="font-size:0.78rem;color:var(--text-muted)">${r.date}</td>
+      <td>${statusBadge[r.status] || ''}</td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-secondary btn-sm" onclick="viewReport(${r.id})" title="Detail"><i class="icon icon-sm" data-icon="eye"></i></button>
+          ${r.status === 'pending' ? `
+            <button class="btn btn-success btn-sm" onclick="resolveReport(${r.id})" title="Selesaikan"><i class="icon icon-sm c-green" data-icon="check-circle"></i></button>
+            <button class="btn btn-ghost btn-sm" onclick="dismissReport(${r.id})" title="Abaikan" style="color:var(--text-muted)"><i class="icon icon-sm c-muted" data-icon="eye-off"></i></button>
+          ` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  updateCounts();
+}
+
+function viewReport(id) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  const statusBadge = { pending:'<span class="badge badge-amber"><i class="icon icon-xs" data-icon="clock"></i> Menunggu Tinjauan</span>', resolved:'<span class="badge badge-green">Diselesaikan</span>', dismissed:'<span class="badge badge-gray">Diabaikan</span>' };
+  document.getElementById('report-detail-body').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      ${statusBadge[r.status]}
+      <span class="badge badge-${typeColors[r.type]}">${typeLabels[r.type]}</span>
+      <span style="font-size:0.78rem;color:var(--text-muted);margin-left:auto">${r.date}</span>
+    </div>
+    <div style="display:flex;gap:16px;margin-bottom:20px">
+      <div style="flex:1;background:var(--surface-2);border-radius:var(--radius);padding:14px">
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px">PELAPOR</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:linear-gradient(135deg,var(--accent),var(--purple))">${r.reporterInitials}</div>
+          <strong>${r.reporter}</strong>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;font-size:20px;color:var(--text-muted)">→</div>
+      <div style="flex:1;background:var(--red-glow);border:1px solid rgba(250,82,82,0.2);border-radius:var(--radius);padding:14px">
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px">DILAPORKAN</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:linear-gradient(135deg,var(--red),#ff8787)">${r.reportedInitials}</div>
+          <strong>${r.reported}</strong>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--surface-2);border-radius:var(--radius);padding:16px">
+      <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px">KETERANGAN LAPORAN</div>
+      <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7">${r.desc}</p>
+    </div>
+  `;
+  document.getElementById('report-detail-footer').innerHTML = r.status === 'pending' ? `
+    <button class="btn btn-secondary" data-close-modal="report-detail-modal">Tutup</button>
+    <button class="btn btn-ghost" onclick="dismissReport(${r.id});closeModal('report-detail-modal')">Abaikan</button>
+    <button class="btn btn-success" onclick="resolveReport(${r.id});closeModal('report-detail-modal')"><i class="icon icon-sm c-green" data-icon="check-circle"></i> Selesaikan</button>
+  ` : `<button class="btn btn-secondary" data-close-modal="report-detail-modal">Tutup</button>`;
+  openModal('report-detail-modal');
+}
+
+function resolveReport(id) {
+  const r = reports.find(x => x.id === id);
+  if (r) { r.status = 'resolved'; renderReports(); showToast('Laporan Diselesaikan <i class="icon icon-sm c-green" data-icon="check-circle"></i>', `Laporan #${id} telah ditangani.`, 'success'); }
+}
+function dismissReport(id) {
+  const r = reports.find(x => x.id === id);
+  if (r) { r.status = 'dismissed'; renderReports(); showToast('Laporan Diabaikan', `Laporan #${id} diabaikan.`, 'warning'); }
+}
+
+document.getElementById('report-search').addEventListener('input', renderReports);
+document.getElementById('filter-report-status').addEventListener('change', renderReports);
+document.getElementById('filter-report-type').addEventListener('change', renderReports);
+document.addEventListener('DOMContentLoaded', renderReports);
+</script>
+</body>
+</html>

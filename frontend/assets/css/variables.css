@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  /* Core Palette */
+  --bg:           #0a0b0e;
+  --bg-2:         #11131a;
+  --bg-3:         #161922;
+  --surface:      #1a1d26;
+  --surface-2:    #212532;
+  --border:       #272c3d;
+  --border-2:     #353c52;
+
+  /* Brand */
+  --accent:       #4c6ef5;
+  --accent-2:     #748ffc;
+  --accent-glow:  rgba(76, 110, 245, 0.3);
+  --green:        #38d9a9;
+  --green-glow:   rgba(56, 217, 169, 0.2);
+  --amber:        #fcc419;
+  --amber-glow:   rgba(252, 196, 25, 0.2);
+  --red:          #ff6b6b;
+  --red-glow:     rgba(255, 107, 107, 0.2);
+  --purple:       #cc5de8;
+
+  /* Text */
+  --text-primary:   #f8f9fa;
+  --text-secondary: #adb5bd;
+  --text-muted:     #868e96;
+
+  /* Fonts */
+  --font-display: 'Outfit', sans-serif;
+  --font-body:    'Inter', sans-serif;
+
+  /* Sizes */
+  --radius:    12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  /* Sidebar */
+  --sidebar-w: 240px;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --fast: 200ms;
+  --med:  350ms;
+  --slow: 500ms;
+
+  /* Shadows */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px var(--accent-glow);
+}
+
+[data-theme="light"] {
+  --bg:           #f8f9fa;
+  --bg-2:         #f1f3f5;
+  --bg-3:         #e9ecef;
+  --surface:      #ffffff;
+  --surface-2:    #f4f6f8;
+  --border:       #dee2e6;
+  --border-2:     #ced4da;
+  --text-primary:   #212529;
+  --text-secondary: #495057;
+  --text-muted:     #868e96;
+  --accent-glow:  rgba(76, 110, 245, 0.15);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
+}

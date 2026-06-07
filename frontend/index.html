@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SkillSwap adalah platform kolaborasi mahasiswa untuk saling bertukar skill dan membangun portofolio bersama.">
+<meta name="theme-color" content="#0d0f14">
+<title>SkillSwap — Platform Kolaborasi Skill Mahasiswa</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link rel="stylesheet" href="assets/css/variables.css">
+<link rel="stylesheet" href="assets/css/global.css">
+<link rel="stylesheet" href="assets/css/icons.css">
+<link rel="stylesheet" href="assets/css/landing.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="landing-nav">
+  <a class="landing-brand" href="index.html">
+    <div class="brand-icon"><i class="icon icon-sm" data-icon="refresh-cw" data-color="primary"></i></div>
+    <span>Skill<span style="color:var(--accent)">Swap</span></span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-pill" href="#fitur">Fitur</a>
+    <a class="nav-pill" href="#cara-kerja">Cara Kerja</a>
+    <a class="nav-pill" href="pages/team.html">Tim Kami</a>
+    <button class="nav-icon-btn" id="theme-toggle" title="Ganti Tema">
+      <i class="icon icon-sm" data-icon="moon"></i>
+    </button>
+    <a class="nav-pill outline" href="pages/auth/login.html">Masuk</a>
+    <a class="nav-pill primary" href="pages/auth/register.html">Daftar Gratis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <i class="icon icon-sm" data-icon="award" data-color="accent2"></i>
+      Platform Kolaborasi Mahasiswa #1
+    </div>
+    <h1>Tukar Skill,<br><span class="g">Bangun Bersama</span></h1>
+    <p>SkillSwap menghubungkan mahasiswa lintas jurusan untuk saling belajar dan berkolaborasi. Punya skill desain? Tukar dengan kemampuan coding teman.</p>
+    <div class="hero-cta">
+      <a class="cta-btn cta-primary" href="pages/auth/register.html">
+        <i class="icon icon-sm" data-icon="refresh-cw" data-color="primary"></i> Mulai Gratis Sekarang
+      </a>
+      <a class="cta-btn cta-secondary" href="pages/auth/login.html">
+        <i class="icon icon-sm c-secondary" data-icon="log-out"></i> Sudah Punya Akun?
+      </a>
+    </div>
+    <div class="trust-row">
+      <span class="trust-item"><i class="icon icon-xs c-green" data-icon="check-circle"></i> Gratis untuk mahasiswa</span>
+      <span class="trust-item"><i class="icon icon-xs c-green" data-icon="check-circle"></i> Tanpa biaya tersembunyi</span>
+      <span class="trust-item"><i class="icon icon-xs c-green" data-icon="check-circle"></i> Komunitas terpercaya</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="strip-stat"><div class="strip-num">1,240+</div><div class="strip-label">Mahasiswa Aktif</div></div>
+  <div class="strip-stat"><div class="strip-num">3,800+</div><div class="strip-label">Kolaborasi Berhasil</div></div>
+  <div class="strip-stat"><div class="strip-num">95+</div><div class="strip-label">Kategori Skill</div></div>
+  <div class="strip-stat"><div class="strip-num">4.8</div><div class="strip-label">Rating Rata-rata</div></div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="fitur">
+  <div class="section-label">Kenapa SkillSwap?</div>
+  <div class="section-title">Semua yang Kamu Butuhkan</div>
+  <p class="section-desc">Dari menemukan partner hingga menyelesaikan proyek bersama — semua terstruktur dalam satu platform.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon-wrap" style="background:var(--accent-glow)"><i class="icon icon-lg" data-icon="search" data-color="accent"></i></div>
+      <h3>Temukan Partner Tepat</h3>
+      <p>Cari mahasiswa berdasarkan skill, jurusan, atau tingkat keahlian. Filter canggih memastikan kamu menemukan partner yang cocok.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap" style="background:var(--green-glow)"><i class="icon icon-lg" data-icon="handshake" data-color="green"></i></div>
+      <h3>Kolaborasi Terstruktur</h3>
+      <p>Kirim request, negosiasikan pertukaran skill, dan kelola progress lewat Kanban board interaktif.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap" style="background:var(--amber-glow)"><i class="icon icon-lg" data-icon="star" data-color="amber"></i></div>
+      <h3>Sistem Reputasi</h3>
+      <p>Rating dan ulasan membangun kepercayaan. Semakin banyak kolaborasi, semakin tinggi reputasimu.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap" style="background:var(--accent-glow)"><i class="icon icon-lg" data-icon="bar-chart-2" data-color="accent"></i></div>
+      <h3>Dashboard Lengkap</h3>
+      <p>Pantau aktivitas, statistik kolaborasi, dan perkembangan skill dalam satu tampilan yang intuitif.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap" style="background:rgba(190,75,219,0.15)"><i class="icon icon-lg" data-icon="bell" data-color="purple"></i></div>
+      <h3>Notifikasi Real-time</h3>
+      <p>Dapatkan notifikasi instan saat ada request masuk, kolaborasi diterima, atau ulasan baru.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap" style="background:var(--green-glow)"><i class="icon icon-lg" data-icon="shield" data-color="green"></i></div>
+      <h3>Komunitas Aman</h3>
+      <p>Sistem moderasi admin memastikan semua anggota adalah mahasiswa terpercaya.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div style="background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <section class="section" id="cara-kerja">
+    <div style="text-align:center">
+      <div class="section-label">Mudah &amp; Cepat</div>
+      <div class="section-title">Cara Kerja SkillSwap</div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h3>Buat Profil</h3><p>Daftar akun, lengkapi profil, dan tambahkan skill yang kamu kuasai beserta tingkat keahliannya.</p></div>
+      <div class="step"><div class="step-num">2</div><h3>Cari Partner</h3><p>Gunakan fitur Explore untuk menemukan mahasiswa dengan skill yang kamu butuhkan.</p></div>
+      <div class="step"><div class="step-num">3</div><h3>Ajukan Request</h3><p>Kirim proposal kolaborasi: jelaskan skill yang dibutuhkan dan apa yang bisa kamu tawarkan.</p></div>
+      <div class="step"><div class="step-num">4</div><h3>Kolaborasi &amp; Ulasan</h3><p>Kerjakan proyek bersama, tandai selesai, dan beri ulasan untuk membangun reputasi.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- CTA -->
+<div style="max-width:1200px;margin:80px auto 0">
+  <div class="cta-section">
+    <h2>Siap Tukar Skill?</h2>
+    <p>Bergabunglah dengan 1,240+ mahasiswa yang sudah merasakan manfaat SkillSwap.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a class="cta-btn cta-primary" href="pages/auth/register.html">
+        <i class="icon icon-sm" data-icon="refresh-cw" data-color="primary"></i> Daftar Sekarang — Gratis!
+      </a>
+      <a class="cta-btn cta-secondary" href="pages/auth/login.html">
+        <i class="icon icon-sm c-secondary" data-icon="log-out"></i> Masuk ke Akun
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div style="display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;color:var(--text-secondary)">
+    <div style="width:26px;height:26px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff">
+      <i class="icon icon-sm" data-icon="refresh-cw" data-color="primary"></i>
+    </div>
+    SkillSwap
+  </div>
+  <span>© 2025 SkillSwap — Platform Kolaborasi Skill Mahasiswa</span>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <a href="pages/team.html" style="color:var(--text-muted);text-decoration:none">Tim Kami</a>
+    <a href="#fitur" style="color:var(--text-muted);text-decoration:none">Fitur</a>
+    <a href="pages/auth/login.html" style="color:var(--text-muted);text-decoration:none">Masuk</a>
+    <a href="pages/auth/register.html" style="color:var(--text-muted);text-decoration:none">Daftar</a>
+  </div>
+</footer>
+
+<script src="assets/js/theme.js" defer></script>
+<script src="assets/js/icons.js" defer></script>
+<script>
+(function(){
+  // Apply saved theme immediately before render
+  const saved = localStorage.getItem('ss-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('theme-toggle');
+  const updateThemeIcon = () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.innerHTML = `<i class="icon icon-sm" data-icon="${isDark ? 'sun' : 'moon'}"></i>`;
+    hydrateIcons(btn);
+  };
+  updateThemeIcon();
+  btn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('ss-theme', next);
+    updateThemeIcon();
+  });
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+    });
+  });
+});
+</script>
+</body>
+</html>

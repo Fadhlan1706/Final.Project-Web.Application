@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kolaborasi Saya — SkillSwap</title>
+<link rel="stylesheet" href="../../assets/css/variables.css">
+<link rel="stylesheet" href="../../assets/css/global.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+<link rel="stylesheet" href="../../assets/css/components.css">
+<link rel="stylesheet" href="../../assets/css/modal-kanban.css">
+<link rel="stylesheet" href="../../assets/css/icons.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-icon"><i class="icon icon-lg" data-icon="refresh-cw" data-color="primary"></i></div>
+      <span class="brand-text">Skill<span>Swap</span></span>
+    </div>
+    <button class="navbar-toggle" id="sidebar-toggle"><i class="icon" data-icon="menu" data-color="secondary"></i></button>
+    <div class="navbar-search">
+      <span class="search-icon"><i class="icon icon-sm c-muted" data-icon="search"></i></span>
+      <input type="text" placeholder="Cari kolaborasi..." id="kanban-search">
+    </div>
+    <div class="navbar-actions">
+      <button class="nav-btn" id="theme-toggle"><i class="icon icon-sm c-muted" data-icon="moon"></i></button>
+      <button class="nav-btn"><i class="icon icon-sm c-muted" data-icon="bell"></i><span class="notif-badge">3</span></button>
+      <div class="profile-dropdown">
+        <div class="profile-btn" id="profile-btn">
+          <div class="profile-avatar">RA</div>
+          <div><div class="profile-name">Reza Anugrah</div><div class="profile-role">Mahasiswa</div></div>
+          <i class="icon icon-sm c-muted" data-icon="chevron-down"></i>
+        </div>
+        <div class="dropdown-menu" id="profile-menu">
+          <a class="dropdown-item" href="profile.html"><i class="icon icon-sm" data-icon="user"></i> Profil Saya</a>
+          <a class="dropdown-item" href="dashboard.html"><i class="icon icon-sm" data-icon="home"></i> Dashboard</a>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" onclick="mockLogout()"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <aside class="sidebar">
+    <span class="sidebar-section-label">Menu Utama</span>
+    <a class="nav-link" href="dashboard.html"><span class="nav-icon"><i class="icon" data-icon="home"></i></span><span class="nav-label">Dashboard</span></a>
+    <a class="nav-link" href="explore.html"><span class="nav-icon"><i class="icon" data-icon="search"></i></span><span class="nav-label">Jelajahi Partner</span></a>
+    <a class="nav-link active" href="collaborations.html"><span class="nav-icon"><i class="icon" data-icon="handshake"></i></span><span class="nav-label">Kolaborasi Saya</span><span class="nav-badge">2</span></a>
+    <a class="nav-link" href="profile.html"><span class="nav-icon"><i class="icon" data-icon="user"></i></span><span class="nav-label">Profil &amp; Skill</span></a>
+    </aside>
+
+  <main class="main-content page-enter" style="overflow-x:hidden">
+    <div class="page-header-row" style="margin-bottom:20px">
+      <div>
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:10px">
+          <i class="icon icon-xl c-accent" data-icon="handshake"></i> Kolaborasi Saya
+        </h1>
+        <p style="color:var(--text-secondary);font-size:0.9rem">Kelola semua request dan proyek kolaborasi skill-mu</p>
+      </div>
+      <a href="explore.html" class="btn btn-primary" style="gap:6px">
+        <i class="icon icon-sm" data-icon="plus" data-color="primary"></i> Cari Partner Baru
+      </a>
+    </div>
+
+    <!-- Summary strip -->
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+      <div style="background:var(--amber-glow);border:1px solid rgba(250,176,5,0.25);border-radius:var(--radius);padding:10px 18px;display:flex;align-items:center;gap:10px">
+        <i class="icon icon-lg" data-icon="clock" data-color="amber"></i>
+        <div><div style="font-family:var(--font-display);font-weight:800;font-size:1.2rem" id="count-pending">0</div><div style="font-size:0.72rem;color:var(--text-muted)">Menunggu</div></div>
+      </div>
+      <div style="background:var(--accent-glow);border:1px solid rgba(92,124,250,0.25);border-radius:var(--radius);padding:10px 18px;display:flex;align-items:center;gap:10px">
+        <i class="icon icon-lg" data-icon="cpu" data-color="accent"></i>
+        <div><div style="font-family:var(--font-display);font-weight:800;font-size:1.2rem" id="count-inprogress">0</div><div style="font-size:0.72rem;color:var(--text-muted)">Sedang Berjalan</div></div>
+      </div>
+      <div style="background:var(--green-glow);border:1px solid rgba(64,192,87,0.25);border-radius:var(--radius);padding:10px 18px;display:flex;align-items:center;gap:10px">
+        <i class="icon icon-lg" data-icon="check-circle" data-color="green"></i>
+        <div><div style="font-family:var(--font-display);font-weight:800;font-size:1.2rem" id="count-completed">0</div><div style="font-size:0.72rem;color:var(--text-muted)">Selesai</div></div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <select class="form-control" id="filter-role" style="width:auto;min-width:160px;font-size:0.82rem">
+          <option value="">Semua Role</option>
+          <option value="initiator">Sebagai Pengirim</option>
+          <option value="receiver">Sebagai Penerima</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- KANBAN BOARD -->
+    <div class="kanban-board" id="kanban-board">
+      <div class="kanban-col" data-status="pending">
+        <div class="kanban-col-header">
+          <div class="kanban-col-title"><span class="kanban-col-dot"></span> Menunggu</div>
+          <span class="kanban-col-count">0</span>
+        </div>
+        <div class="kanban-cards" id="col-pending"></div>
+      </div>
+      <div class="kanban-col" data-status="in-progress">
+        <div class="kanban-col-header">
+          <div class="kanban-col-title"><span class="kanban-col-dot"></span> Sedang Berjalan</div>
+          <span class="kanban-col-count">0</span>
+        </div>
+        <div class="kanban-cards" id="col-in-progress"></div>
+      </div>
+      <div class="kanban-col" data-status="completed">
+        <div class="kanban-col-header">
+          <div class="kanban-col-title"><span class="kanban-col-dot"></span> Selesai</div>
+          <span class="kanban-col-count">0</span>
+        </div>
+        <div class="kanban-cards" id="col-completed"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="modal-overlay" id="review-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title" style="display:flex;align-items:center;gap:8px">
+        <i class="icon icon-sm c-amber" data-icon="star"></i> Beri Ulasan
+      </span>
+      <button class="modal-close" data-close-modal="review-modal"><i class="icon icon-sm" data-icon="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:4px">Bagaimana pengalamanmu berkolaborasi dengan</div>
+        <div style="font-family:var(--font-display);font-weight:800;font-size:1.1rem" id="review-partner-name">Partner</div>
+      </div>
+      <form id="form-review">
+        <div class="form-group" style="align-items:center">
+          <label class="form-label">Rating <span>*</span></label>
+          <div class="star-rating" id="star-rating" style="justify-content:center;gap:8px">
+            <span class="star" style="font-size:36px"><i class="icon icon-xs c-amber" data-icon="star"></i></span>
+            <span class="star" style="font-size:36px"><i class="icon icon-xs c-amber" data-icon="star"></i></span>
+            <span class="star" style="font-size:36px"><i class="icon icon-xs c-amber" data-icon="star"></i></span>
+            <span class="star" style="font-size:36px"><i class="icon icon-xs c-amber" data-icon="star"></i></span>
+            <span class="star" style="font-size:36px"><i class="icon icon-xs c-amber" data-icon="star"></i></span>
+          </div>
+          <div style="text-align:center;font-size:0.78rem;color:var(--text-muted);margin-top:6px" id="rating-label">Pilih rating bintang</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ulasan <span>*</span></label>
+          <textarea class="form-control" id="review-text" rows="4" placeholder="Ceritakan pengalamanmu..."></textarea>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button type="button" class="btn btn-secondary" data-close-modal="review-modal">Lewati</button>
+          <button type="submit" class="btn btn-primary" style="gap:6px">
+            <i class="icon icon-sm" data-icon="send" data-color="primary"></i> Kirim Ulasan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/mock-data.js"></script>
+<script src="../../assets/js/icons.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/collaboration.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const labels = ['','Mengecewakan','Kurang Memuaskan','Cukup Baik','Bagus!','Luar Biasa!'];
+  document.getElementById('star-rating')?.querySelectorAll('.star').forEach((star, i) => {
+    star.addEventListener('click', () => {
+      const label = document.getElementById('rating-label');
+      if (label) label.textContent = labels[i+1];
+    });
+  });
+  document.getElementById('kanban-search')?.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.kanban-card').forEach(card => {
+      card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+  document.getElementById('filter-role')?.addEventListener('change', (e) => {
+    const val = e.target.value;
+    document.querySelectorAll('.kanban-card').forEach(card => {
+      if (!val) { card.style.display=''; return; }
+      const isPengirim = card.querySelector('.badge')?.textContent.includes('Pengirim');
+      card.style.display = (val==='initiator' ? isPengirim : !isPengirim) ? '' : 'none';
+    });
+  });
+  const observer = new MutationObserver(() => {
+    document.getElementById('count-pending').textContent   = document.querySelectorAll('.kanban-col[data-status="pending"] .kanban-card').length;
+    document.getElementById('count-inprogress').textContent = document.querySelectorAll('.kanban-col[data-status="in-progress"] .kanban-card').length;
+    document.getElementById('count-completed').textContent = document.querySelectorAll('.kanban-col[data-status="completed"] .kanban-card').length;
+  });
+  observer.observe(document.getElementById('kanban-board'), {childList:true,subtree:true});
+});
+</script>
+</body>
+</html>
