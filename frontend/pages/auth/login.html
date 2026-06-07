@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masuk — SkillSwap</title>
+<link rel="stylesheet" href="../../assets/css/variables.css">
+<link rel="stylesheet" href="../../assets/css/global.css">
+<link rel="stylesheet" href="../../assets/css/components.css">
+<link rel="stylesheet" href="../../assets/css/icons.css">
+<style>
+  body{display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .auth-bg{position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 30% 40%,rgba(92,124,250,0.12),transparent 60%),radial-gradient(ellipse 50% 40% at 75% 70%,rgba(190,75,219,0.1),transparent 60%);pointer-events:none}
+  .auth-container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 420px;width:900px;max-width:calc(100vw - 32px);margin:16px;animation:pageEnter 0.5s ease both;box-shadow:0 32px 80px rgba(0,0,0,0.4);border-radius:var(--radius-xl)}
+  .auth-side{background:linear-gradient(135deg,rgba(92,124,250,0.18),rgba(190,75,219,0.12));border:1px solid rgba(92,124,250,0.25);border-right:none;border-radius:var(--radius-xl) 0 0 var(--radius-xl);padding:48px;display:flex;flex-direction:column;justify-content:center}
+  .auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:36px}
+  .auth-logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff}
+  .auth-logo-text{font-family:var(--font-display);font-size:1.4rem;font-weight:800}
+  .auth-logo-text span{color:var(--accent)}
+  .auth-feature{display:flex;align-items:center;gap:12px;padding:10px 0;color:var(--text-secondary);font-size:0.875rem}
+  .auth-feature-icon{width:32px;height:32px;border-radius:8px;background:var(--accent-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .auth-form-wrap{background:var(--bg-2);border:1px solid var(--border);border-radius:0 var(--radius-xl) var(--radius-xl) 0;padding:48px 36px;display:flex;flex-direction:column;justify-content:center}
+  .auth-form-wrap h1{font-size:1.6rem;font-weight:800;margin-bottom:6px}
+  .auth-form-wrap .subtitle{color:var(--text-secondary);font-size:0.875rem;margin-bottom:28px}
+  .auth-form-wrap .subtitle a{color:var(--accent);font-weight:500}
+  .divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text-muted);font-size:0.8rem}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+  .demo-btns{display:flex;flex-direction:column;gap:8px}
+  .demo-btn{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:0.82rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);transition:all 0.2s;text-align:left}
+  .demo-btn:hover{border-color:var(--border-2);background:var(--surface-2);color:var(--text-primary)}
+  .demo-btn .demo-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  @media(max-width:768px){.auth-container{grid-template-columns:1fr}.auth-side{display:none}.auth-form-wrap{border-radius:var(--radius-xl);padding:36px 24px}}
+</style>
+</head>
+<body>
+<div class="auth-bg"></div>
+<div class="auth-container">
+  <div class="auth-side">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><i class="icon icon-lg" data-icon="refresh-cw" data-color="primary"></i></div>
+      <div class="auth-logo-text">Skill<span>Swap</span></div>
+    </div>
+    <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:12px">Selamat Datang Kembali!</h2>
+    <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.7;margin-bottom:32px">Masuk untuk melanjutkan kolaborasi dan menemukan partner skill barumu.</p>
+    <div class="auth-feature">
+      <div class="auth-feature-icon"><i class="icon icon-sm" data-icon="search" data-color="accent"></i></div>
+      Jelajahi ratusan mahasiswa berbakat
+    </div>
+    <div class="auth-feature">
+      <div class="auth-feature-icon"><i class="icon icon-sm" data-icon="handshake" data-color="accent"></i></div>
+      Kelola kolaborasi dengan mudah
+    </div>
+    <div class="auth-feature">
+      <div class="auth-feature-icon"><i class="icon icon-sm" data-icon="award" data-color="accent"></i></div>
+      Bangun reputasi akademismu
+    </div>
+    <div style="margin-top:auto;padding-top:32px">
+      <a href="../../index.html" style="font-size:0.82rem;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:6px">
+        <i class="icon icon-sm c-muted" data-icon="arrow-right" style="transform:rotate(180deg)"></i> Kembali ke halaman utama
+      </a>
+    </div>
+  </div>
+
+  <div class="auth-form-wrap">
+    <h1>Masuk</h1>
+    <p class="subtitle">Belum punya akun? <a href="register.html">Daftar gratis</a></p>
+
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email <span>*</span></label>
+        <div class="input-group">
+          <span class="input-icon"><i class="icon icon-sm c-muted" data-icon="mail"></i></span>
+          <input type="email" class="form-control" id="email" placeholder="email@mahasiswa.ac.id" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password <span>*</span></label>
+        <div class="input-group">
+          <span class="input-icon"><i class="icon icon-sm c-muted" data-icon="lock"></i></span>
+          <input type="password" class="form-control" id="password" placeholder="Password kamu" required>
+          <button type="button" class="input-action" id="toggle-pw"><i class="icon icon-sm c-muted" data-icon="eye"></i></button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--text-secondary);cursor:pointer">
+          <input type="checkbox" style="accent-color:var(--accent)"> Ingat saya
+        </label>
+        <a href="#" style="font-size:0.85rem;color:var(--accent)">Lupa password?</a>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg" style="width:100%;gap:8px">
+        <i class="icon icon-sm" data-icon="log-out" data-color="primary"></i> Masuk
+      </button>
+    </form>
+
+    <div class="divider">akses cepat (demo frontend)</div>
+    <div class="demo-btns">
+      <button class="demo-btn" onclick="loginAs('user')">
+        <div class="demo-icon" style="background:var(--accent-glow)"><i class="icon icon-sm" data-icon="user" data-color="accent"></i></div>
+        <div><div style="font-weight:600;color:var(--text-primary)">Masuk sebagai User</div><div style="font-size:0.75rem">Akses dashboard mahasiswa</div></div>
+      </button>
+      <button class="demo-btn" onclick="loginAs('admin')">
+        <div class="demo-icon" style="background:var(--red-glow)"><i class="icon icon-sm" data-icon="settings" data-color="red"></i></div>
+        <div><div style="font-weight:600;color:var(--text-primary)">Masuk sebagai Admin</div><div style="font-size:0.75rem">Akses panel administrator</div></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/icons.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('toggle-pw')?.addEventListener('click', function() {
+    const input = document.getElementById('password');
+    const icon  = this.querySelector('i.icon');
+    input.type  = input.type === 'password' ? 'text' : 'password';
+    icon.dataset.icon = input.type === 'password' ? 'eye' : 'eye-off';
+    hydrateIcons(this);
+  });
+});
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const btn = e.target.querySelector('[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="icon icon-sm spin" data-icon="refresh-cw" data-color="primary"></i> Memverifikasi...';
+  hydrateIcons(btn);
+  // Determine role from email prefix (demo logic — akan diganti PHP)
+  const role = email.startsWith('admin') ? 'admin' : 'user';
+  setTimeout(() => { loginAs(role); }, 1000);
+}
+
+function loginAs(role) {
+  mockLogin(role);
+  const dest = role === 'admin' ? '../admin/dashboard.html' : '../user/dashboard.html';
+  window.location.href = dest;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+/* icons.css — Styling sistem icon SVG Lucide untuk SkillSwap */
+
+i.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  vertical-align: middle;
+  /* default 16px, overridden by size classes */
+  width:  16px;
+  height: 16px;
+}
+
+/* Size variants */
+i.icon.icon-xs  { width: 12px; height: 12px; }
+i.icon.icon-sm  { width: 14px; height: 14px; }
+/* default = 16px */
+i.icon.icon-lg  { width: 20px; height: 20px; }
+i.icon.icon-xl  { width: 26px; height: 26px; }
+i.icon.icon-2xl { width: 38px; height: 38px; }
+
+/* SVG stroke inherits from parent color by default */
+i.icon svg {
+  display: block;
+  width:  100%;
+  height: 100%;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  transition: stroke var(--fast, 150ms) ease;
+}
+
+/* Color utility classes — applied on <i> element */
+i.icon.c-accent    { color: var(--accent);         }
+i.icon.c-accent2   { color: var(--accent-2);        }
+i.icon.c-green     { color: var(--green);           }
+i.icon.c-amber     { color: var(--amber);           }
+i.icon.c-red       { color: var(--red);             }
+i.icon.c-purple    { color: var(--purple);          }
+i.icon.c-muted     { color: var(--text-muted);      }
+i.icon.c-secondary { color: var(--text-secondary);  }
+i.icon.c-primary   { color: var(--text-primary);    }
+
+/* Loading placeholder — prevents layout shift */
+i.icon:not(.icon-loaded):not(.icon-error) {
+  background: var(--border);
+  border-radius: 3px;
+  opacity: 0.4;
+}
+
+/* Error state */
+i.icon.icon-error {
+  background: var(--red-glow);
+  border-radius: 3px;
+  opacity: 0.5;
+}
+
+/* Spin animation (loading spinner) */
+i.icon.spin svg {
+  animation: iconSpin 0.9s linear infinite;
+}
+@keyframes iconSpin { to { transform: rotate(360deg); } }
+
+/* Inside .btn — disable pointer events on icon */
+.btn i.icon    { pointer-events: none; }
+
+/* Inside .nav-link */
+.nav-link .nav-icon i.icon {
+  width:  18px;
+  height: 18px;
+}
+
+/* Stat icon containers */
+.stat-icon i.icon {
+  width:  24px;
+  height: 24px;
+}
