@@ -18,7 +18,12 @@ class MailService
         $password = $_ENV['SMTP_PASS'] ?? getenv('SMTP_PASS');
 
         if (!$username || !$password) {
-            return false;
+            // Development fallback: Log the code to PHP error log so it can be seen in console
+            error_log("=============================================");
+            error_log("MOCK EMAIL SENT TO: $toEmail");
+            error_log("VERIFICATION CODE: $code");
+            error_log("=============================================");
+            return true;
         }
 
         $mail = new PHPMailer(true);
@@ -54,6 +59,7 @@ class MailService
             $mail->send();
             return true;
         } catch (Exception $e) {
+            error_log("PHPMailer Error: " . $mail->ErrorInfo);
             return false;
         }
     }

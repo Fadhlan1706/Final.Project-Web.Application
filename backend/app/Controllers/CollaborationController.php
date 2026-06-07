@@ -59,7 +59,6 @@ class CollaborationController
 
         $v = Validator::make($body, [
             'receiver_id' => 'required|integer',
-            'skill_id'    => 'required|integer',
             'message'     => 'max:1000',
         ]);
 
@@ -71,14 +70,13 @@ class CollaborationController
         Response::success($result['data'], $result['message'], 201);
     }
 
-    // PATCH /api/collaborations/{id}/status
     public function updateStatus(array $params): void
     {
         AuthMiddleware::handle();
         $userId = (int)Session::get('user_id');
         $body   = $this->jsonBody();
 
-        $allowed = ['accepted', 'rejected', 'in_progress', 'completed'];
+        $allowed = ['accepted', 'rejected', 'completed'];
         $v = Validator::make($body, [
             'status' => 'required|in:' . implode(',', $allowed),
         ]);

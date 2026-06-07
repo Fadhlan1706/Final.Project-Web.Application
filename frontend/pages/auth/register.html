@@ -134,6 +134,7 @@
             <input
               type="text"
               class="form-control"
+              id="reg-fname"
               placeholder="Reza"
               required
               oninput="updateDots(1)"
@@ -144,6 +145,7 @@
             <input
               type="text"
               class="form-control"
+              id="reg-lname"
               placeholder="Anugrah"
               required
             />
@@ -158,6 +160,7 @@
             <input
               type="email"
               class="form-control"
+              id="reg-email"
               placeholder="email@mahasiswa.ac.id"
               required
               oninput="updateDots(2)"
@@ -333,26 +336,42 @@
           document.getElementById("ps" + i).style.background =
             i <= strength ? colors[strength] : "var(--border)";
       }
-      function handleRegister(e) {
+      async function handleRegister(e) {
         e.preventDefault();
+        const fname = document.getElementById("reg-fname").value;
+        const lname = document.getElementById("reg-lname").value;
+        const email = document.getElementById("reg-email").value;
         const pw1 = document.getElementById("reg-pw").value;
         const pw2 = document.getElementById("reg-pw2").value;
+
         if (pw1 !== pw2) {
-          showToast(
-            "Password tidak cocok",
-            "Pastikan kedua password sama.",
-            "error",
-          );
+          showToast("Error", "Pastikan kedua password sama.", "danger");
           return;
         }
+
         const btn = e.target.querySelector('[type="submit"]');
         btn.disabled = true;
-        btn.innerHTML =
-          '<i class="icon spin" data-icon="refresh-cw" data-color="primary"></i> Membuat akun...';
+        btn.innerHTML = '<i class="icon spin" data-icon="refresh-cw" data-color="primary"></i> Membuat akun...';
         hydrateIcons(btn);
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1500);
+
+        try {
+          await API.Auth.register({
+            name: fname + " " + lname,
+            email: email,
+            password: pw1,
+            password_confirmation: pw2
+          });
+          
+          showToast("Berhasil", "Akun berhasil dibuat. Silakan periksa email Anda.", "success");
+          setTimeout(() => {
+            window.location.href = `verify-email.html?email=${encodeURIComponent(email)}`;
+          }, 1500);
+        } catch (error) {
+          showToast("Gagal", error.message || "Terjadi kesalahan saat mendaftar", "danger");
+          btn.disabled = false;
+          btn.innerHTML = '<i class="icon" data-icon="refresh-cw" data-color="primary"></i> Buat Akun — Gratis!';
+          hydrateIcons(btn);
+        }
       }
     </script>
   </body>

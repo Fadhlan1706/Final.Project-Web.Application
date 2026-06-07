@@ -22,10 +22,10 @@ class SkillRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT s.*, c.name AS category_name, u.name AS user_name
+            'SELECT s.*, c.categoryName AS category_name, u.NAME AS user_name, s.skillName AS name, s.skillLevel AS level
              FROM skills s
-             JOIN categories c ON c.id = s.category_id
-             JOIN users      u ON u.id = s.user_id
+             JOIN categories c ON c.id = s.categoryId
+             JOIN users      u ON u.id = s.userId
              WHERE s.id = ? LIMIT 1'
         );
         $stmt->execute([$id]);
@@ -34,17 +34,14 @@ class SkillRepository
 
     public function findByUser(int $userId, ?string $type = null): array
     {
-        $sql      = 'SELECT s.*, c.name AS category_name FROM skills s
-                     JOIN categories c ON c.id = s.category_id
-                     WHERE s.user_id = ? AND s.is_active = 1';
+        $sql      = 'SELECT s.*, c.categoryName AS category_name, s.skillName AS name, s.skillLevel AS level FROM skills s
+                     JOIN categories c ON c.id = s.categoryId
+                     WHERE s.userId = ?';
         $bindings = [$userId];
 
-        if ($type) {
-            $sql      .= ' AND s.type = ?';
-            $bindings[] = $type;
-        }
+        // Type is not in schema.sql, we ignore it or handle it if we want
 
-        $sql .= ' ORDER BY s.created_at DESC';
+        $sql .= ' ORDER BY s.create_at DESC';
         $stmt = $this->db->prepare($sql);
         $stmt->execute($bindings);
         return $stmt->fetchAll();
@@ -52,35 +49,31 @@ class SkillRepository
 
     public function findAll(array $filters = [], int $page = 1, int $perPage = 20): array
     {
-        $conditions = ['s.is_active = 1'];
+        $conditions = ['1 = 1'];
         $bindings   = [];
 
         if (!empty($filters['search'])) {
-            $conditions[] = 's.name LIKE ?';
+            $conditions[] = 's.skillName LIKE ?';
             $bindings[]   = '%' . $filters['search'] . '%';
         }
         if (!empty($filters['category_id'])) {
-            $conditions[] = 's.category_id = ?';
+            $conditions[] = 's.categoryId = ?';
             $bindings[]   = (int)$filters['category_id'];
         }
         if (!empty($filters['level'])) {
-            $conditions[] = 's.level = ?';
+            $conditions[] = 's.skillLevel = ?';
             $bindings[]   = $filters['level'];
-        }
-        if (!empty($filters['type'])) {
-            $conditions[] = 's.type = ?';
-            $bindings[]   = $filters['type'];
         }
 
         $where  = implode(' AND ', $conditions);
         $offset = ($page - 1) * $perPage;
 
-        $sql = "SELECT s.*, c.name AS category_name, u.name AS user_name
+        $sql = "SELECT s.*, c.categoryName AS category_name, u.NAME AS user_name, s.skillName AS name, s.skillLevel AS level
                 FROM skills s
-                JOIN categories c ON c.id = s.category_id
-                JOIN users      u ON u.id = s.user_id
+                JOIN categories c ON c.id = s.categoryId
+                JOIN users      u ON u.id = s.userId
                 WHERE $where
-                ORDER BY s.created_at DESC
+                ORDER BY s.create_at DESC
                 LIMIT ? OFFSET ?";
 
         $bindings[] = $perPage;
@@ -93,15 +86,15 @@ class SkillRepository
 
     public function countAll(array $filters = []): int
     {
-        $conditions = ['s.is_active = 1'];
+        $conditions = ['1 = 1'];
         $bindings   = [];
 
         if (!empty($filters['search'])) {
-            $conditions[] = 's.name LIKE ?';
+            $conditions[] = 's.skillName LIKE ?';
             $bindings[]   = '%' . $filters['search'] . '%';
         }
         if (!empty($filters['category_id'])) {
-            $conditions[] = 's.category_id = ?';
+            $conditions[] = 's.categoryId = ?';
             $bindings[]   = (int)$filters['category_id'];
         }
 
@@ -171,11 +164,10 @@ class SkillRepository
     public function popularSkills(int $limit = 10): array
     {
         $stmt = $this->db->prepare("
-            SELECT s.name, c.name AS category, COUNT(*) AS count
+            SELECT s.skillName AS name, c.categoryName AS category, COUNT(*) AS count
             FROM skills s
-            JOIN categories c ON c.id = s.category_id
-            WHERE s.is_active = 1 AND s.type = 'offered'
-            GROUP BY s.name, c.name
+            JOIN categories c ON c.id = s.categoryId
+            GROUP BY s.skillName, c.categoryName
             ORDER BY count DESC
             LIMIT ?
         ");
@@ -185,17 +177,7 @@ class SkillRepository
 
     public function mostWanted(int $limit = 10): array
     {
-        $stmt = $this->db->prepare("
-            SELECT s.name, c.name AS category, COUNT(*) AS count
-            FROM skills s
-            JOIN categories c ON c.id = s.category_id
-            WHERE s.is_active = 1 AND s.type = 'wanted'
-            GROUP BY s.name, c.name
-            ORDER BY count DESC
-            LIMIT ?
-        ");
-        $stmt->execute([$limit]);
-        return $stmt->fetchAll();
+        return [];
     }
 
     // ----------------------------------------------------------------
@@ -205,8 +187,8 @@ class SkillRepository
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO skills (user_id, category_id, name, description, level, type)
-             VALUES (:user_id, :category_id, :name, :description, :level, :type)'
+            'INSERT INTO skills (userId, categoryId, skillName, description, skillLevel)
+             VALUES (:user_id, :category_id, :name, :description, :level)'
         );
         $stmt->execute([
             'user_id'     => $data['user_id'],
@@ -214,7 +196,6 @@ class SkillRepository
             'name'        => $data['name'],
             'description' => $data['description'] ?? null,
             'level'       => $data['level'],
-            'type'        => $data['type'],
         ]);
         return (int)$this->db->lastInsertId();
     }
@@ -223,8 +204,8 @@ class SkillRepository
     {
         $stmt = $this->db->prepare(
             'UPDATE skills
-             SET category_id = :category_id, name = :name, description = :description,
-                 level = :level, type = :type
+             SET categoryId = :category_id, skillName = :name, description = :description,
+                 skillLevel = :level
              WHERE id = :id'
         );
         return $stmt->execute([
@@ -232,15 +213,13 @@ class SkillRepository
             'name'        => $data['name'],
             'description' => $data['description'] ?? null,
             'level'       => $data['level'],
-            'type'        => $data['type'],
             'id'          => $id,
         ]);
     }
 
     public function softDelete(int $id): bool
     {
-        $stmt = $this->db->prepare('UPDATE skills SET is_active = 0 WHERE id = ?');
-        return $stmt->execute([$id]);
+        return $this->hardDelete($id);
     }
 
     public function hardDelete(int $id): bool

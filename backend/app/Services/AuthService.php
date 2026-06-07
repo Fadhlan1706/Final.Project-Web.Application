@@ -57,7 +57,7 @@ class AuthService
             return ['success' => false, 'message' => 'Invalid email or password.'];
         }
 
-        $status = $user['STATUS'] ?? 'active';
+        $status = $user['status'] ?? $user['STATUS'] ?? 'active';
         if ($status === 'suspended') {
             return ['success' => false, 'message' => 'Your account has been suspended.'];
         }
@@ -66,7 +66,8 @@ class AuthService
             return ['success' => false, 'message' => 'Please verify your email first before logging in.'];
         }
 
-        if (!password_verify($password, $user['PASSWORD'])) {
+        $hash = $user['password'] ?? $user['PASSWORD'] ?? '';
+        if (!password_verify($password, $hash)) {
             return ['success' => false, 'message' => 'Invalid email or password.'];
         }
 
@@ -113,7 +114,8 @@ class AuthService
     {
         $user = $this->users->findByEmail(strtolower(trim($email)));
 
-        if (!$user || !password_verify($current, $user['PASSWORD'])) {
+        $hash = $user['password'] ?? $user['PASSWORD'] ?? '';
+        if (!$user || !password_verify($current, $hash)) {
             return ['success' => false, 'message' => 'Current password is incorrect or user not found.'];
         }
 

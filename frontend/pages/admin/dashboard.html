@@ -119,28 +119,47 @@
 </div>
 <div id="toast-container"></div>
 <script src="../../assets/js/theme.js"></script>
-<script src="../../assets/js/mock-data.js"></script>
 <script src="../../assets/js/icons.js"></script>
 <script src="../../assets/js/main.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('recent-users-tbody').innerHTML = MOCK_USERS.slice(0,4).map(u => `
-    <tr>
-      <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="background:linear-gradient(135deg,${u.avatarColor},${u.avatarColor}99)">${u.initials}</div><span class="td-name">${u.name}</span></div></td>
-      <td>${u.major}</td>
-      <td style="font-size:0.78rem;color:var(--text-muted)">Baru-baru ini</td>
-      <td><span class="badge badge-green">Aktif</span></td>
-    </tr>`).join('');
-  const sorted = [...MOCK_USERS].sort((a,b)=>b.score-a.score);
-  document.getElementById('top-users-tbody').innerHTML = sorted.map((u,i) => `
-    <tr>
-      <td style="font-family:var(--font-display);font-weight:800;color:${i===0?'var(--amber)':i===1?'var(--text-secondary)':i===2?'#cd7f32':'var(--text-muted)'}">${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="background:linear-gradient(135deg,${u.avatarColor},${u.avatarColor}99)">${u.initials}</div><span class="td-name">${u.name}</span></div></td>
-      <td style="font-size:0.82rem;color:var(--text-secondary)">${u.major}</td>
-      <td style="font-weight:600">${u.collaborationsCount}</td>
-      <td><span style="color:var(--amber);font-weight:700"><i class="icon icon-xs c-amber" data-icon="star"></i> ${u.score}</span> <span style="font-size:0.75rem;color:var(--text-muted)">(${u.reviewCount})</span></td>
-      <td><span class="badge badge-green">Aktif</span></td>
-    </tr>`).join('');
+document.addEventListener('DOMContentLoaded', async () => {
+  requireAuth('admin');
+  try {
+      const res = await API.Admin.getUsers();
+      const users = res.data || [];
+      
+      const recent = [...users].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 4);
+      
+      document.getElementById('recent-users-tbody').innerHTML = recent.map(u => {
+        const initials = u.name.substring(0,2).toUpperCase();
+        return `
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="background:linear-gradient(135deg,var(--primary),var(--purple))">${initials}</div><span class="td-name">${u.name}</span></div></td>
+          <td>${u.major || '-'}</td>
+          <td style="font-size:0.78rem;color:var(--text-muted)">${new Date(u.created_at).toLocaleDateString()}</td>
+          <td><span class="badge badge-green">Aktif</span></td>
+        </tr>`;
+      }).join('');
+      
+      // We don't have the full score from just getUsers(), so we sort by whatever we have or just list them.
+      const top = [...users].slice(0, 5); // Fallback until backend gives score in listUsers
+      
+      document.getElementById('top-users-tbody').innerHTML = top.map((u,i) => {
+        const initials = u.name.substring(0,2).toUpperCase();
+        return `
+        <tr>
+          <td style="font-family:var(--font-display);font-weight:800;color:${i===0?'var(--amber)':i===1?'var(--text-secondary)':i===2?'#cd7f32':'var(--text-muted)'}">${i+1}</td>
+          <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="background:linear-gradient(135deg,var(--primary),var(--purple))">${initials}</div><span class="td-name">${u.name}</span></div></td>
+          <td style="font-size:0.82rem;color:var(--text-secondary)">${u.major || '-'}</td>
+          <td style="font-weight:600">-</td>
+          <td><span style="color:var(--amber);font-weight:700"><i class="icon icon-xs c-amber" data-icon="star"></i> -</span> <span style="font-size:0.75rem;color:var(--text-muted)">(0)</span></td>
+          <td><span class="badge badge-green">Aktif</span></td>
+        </tr>`;
+      }).join('');
+      hydrateIcons(document.getElementById('top-users-tbody'));
+  } catch(e) {
+      console.error(e);
+  }
 });
 </script>
 </body>

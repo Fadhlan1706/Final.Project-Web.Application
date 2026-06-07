@@ -18,13 +18,13 @@ class CategoryRepository
     public function findAll(): array
     {
         return $this->db->query(
-            'SELECT * FROM categories ORDER BY name ASC'
+            'SELECT id, categoryName AS name FROM categories ORDER BY categoryName ASC'
         )->fetchAll();
     }
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM categories WHERE id = ? LIMIT 1');
+        $stmt = $this->db->prepare('SELECT id, categoryName AS name FROM categories WHERE id = ? LIMIT 1');
         $stmt->execute([$id]);
         return $stmt->fetch() ?: null;
     }
@@ -32,11 +32,10 @@ class CategoryRepository
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO categories (name, description) VALUES (:name, :description)'
+            'INSERT INTO categories (categoryName) VALUES (:name)'
         );
         $stmt->execute([
-            'name'        => $data['name'],
-            'description' => $data['description'] ?? null,
+            'name' => $data['name'],
         ]);
         return (int)$this->db->lastInsertId();
     }
@@ -44,12 +43,11 @@ class CategoryRepository
     public function update(int $id, array $data): bool
     {
         $stmt = $this->db->prepare(
-            'UPDATE categories SET name = :name, description = :description WHERE id = :id'
+            'UPDATE categories SET categoryName = :name WHERE id = :id'
         );
         return $stmt->execute([
-            'name'        => $data['name'],
-            'description' => $data['description'] ?? null,
-            'id'          => $id,
+            'name' => $data['name'],
+            'id'   => $id,
         ]);
     }
 

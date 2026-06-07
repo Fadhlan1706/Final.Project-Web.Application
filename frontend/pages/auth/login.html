@@ -381,27 +381,46 @@
           });
       });
 
-      function handleLogin(e) {
+      async function handleLogin(e) {
         e.preventDefault();
         const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
         const btn = e.target.querySelector('[type="submit"]');
+        
         btn.disabled = true;
-        btn.innerHTML =
-          '<i class="icon icon-sm spin" data-icon="refresh-cw" data-color="primary"></i> Memverifikasi...';
+        btn.innerHTML = '<i class="icon icon-sm spin" data-icon="refresh-cw" data-color="primary"></i> Memverifikasi...';
         hydrateIcons(btn);
-        // Determine role from email prefix (demo logic — akan diganti PHP)
-        const role = email.startsWith("admin") ? "admin" : "user";
-        setTimeout(() => {
-          loginAs(role);
-        }, 1000);
+
+        try {
+          const res = await API.Auth.login({ email, password });
+          
+          // Save user data to localStorage so main.js getSession() works
+          const userData = res.data;
+          
+          // Since it's session based, we don't strictly need access_token but we save a dummy to pass requireAuth check
+          localStorage.setItem("access_token", "session_based"); 
+          localStorage.setItem("user_data", JSON.stringify(userData));
+
+          showToast("Berhasil", "Login berhasil", "success");
+          
+          setTimeout(() => {
+            const role = userData.role || (email.startsWith("admin") ? "admin" : "user");
+            const dest = role === "admin" ? "../admin/dashboard.html" : "../user/dashboard.html";
+            window.location.href = dest;
+          }, 1000);
+          
+        } catch (error) {
+          showToast("Gagal", error.message || "Email atau password salah", "danger");
+          btn.disabled = false;
+          btn.innerHTML = '<i class="icon icon-sm" data-icon="log-out" data-color="primary"></i> Masuk';
+          hydrateIcons(btn);
+        }
       }
 
       function loginAs(role) {
+        // Fallback for the demo buttons (mock)
         mockLogin(role);
-        const dest =
-          role === "admin"
-            ? "../admin/dashboard.html"
-            : "../user/dashboard.html";
+        const dest = role === "admin" ? "../admin/dashboard.html" : "../user/dashboard.html";
         window.location.href = dest;
       }
     </script>

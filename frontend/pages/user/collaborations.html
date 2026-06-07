@@ -241,7 +241,7 @@
             </div>
             <div class="kanban-cards" id="col-pending"></div>
           </div>
-          <div class="kanban-col" data-status="in-progress">
+          <div class="kanban-col" data-status="accepted">
             <div class="kanban-col-header">
               <div class="kanban-col-title">
                 <span class="kanban-col-dot"></span> Sedang Berjalan
@@ -427,7 +427,7 @@
             ).length;
           document.getElementById("count-inprogress").textContent =
             document.querySelectorAll(
-              '.kanban-col[data-status="in-progress"] .kanban-card',
+              '.kanban-col[data-status="accepted"] .kanban-card',
             ).length;
           document.getElementById("count-completed").textContent =
             document.querySelectorAll(

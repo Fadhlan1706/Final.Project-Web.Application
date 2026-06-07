@@ -112,7 +112,7 @@
                 ><i class="icon icon-sm" data-icon="home"></i> Dashboard</a
               >
               <div class="dropdown-divider"></div>
-              <div class="dropdown-item danger" onclick="mockLogout()">
+              <div class="dropdown-item danger" id="logout-btn">
                 <i class="icon icon-sm" data-icon="log-out"></i> Keluar
               </div>
             </div>
@@ -175,7 +175,7 @@
               )
             "
           >
-            <div class="avatar avatar-xl">RA</div>
+            <div class="avatar avatar-xl" id="top-avatar">RA</div>
             <div class="avatar-upload-overlay">
               <i
                 class="icon icon-lg"
@@ -186,22 +186,24 @@
           </div>
           <div style="flex: 1">
             <div
+              id="top-name"
               style="
                 font-family: var(--font-display);
                 font-size: 1.4rem;
                 font-weight: 800;
               "
             >
-              Reza Anugrah
+              <span id="top-name">Reza Anugrah</span>
             </div>
             <div
+              id="top-major"
               style="
                 color: var(--text-muted);
                 font-size: 0.85rem;
                 margin-top: 4px;
               "
             >
-              Desain Komunikasi Visual · Universitas Sam Ratulangi
+              Desain Komunikasi Visual
             </div>
             <div
               style="
@@ -212,10 +214,10 @@
               "
             >
               <i class="icon icon-sm" data-icon="star" data-color="amber"></i>
-              <span style="font-family: var(--font-display); font-weight: 700"
+              <span id="top-score" style="font-family: var(--font-display); font-weight: 700"
                 >4.6</span
               >
-              <span style="color: var(--text-muted); font-size: 0.8rem"
+              <span id="top-reviews" style="color: var(--text-muted); font-size: 0.8rem"
                 >(12 ulasan)</span
               >
             </div>
@@ -229,6 +231,7 @@
             >
               <div style="text-align: center">
                 <div
+                  id="top-collab-count"
                   style="
                     font-family: var(--font-display);
                     font-weight: 800;
@@ -243,6 +246,7 @@
               </div>
               <div style="text-align: center">
                 <div
+                  id="top-completed-count"
                   style="
                     font-family: var(--font-display);
                     font-weight: 800;
@@ -257,6 +261,7 @@
               </div>
               <div style="text-align: center">
                 <div
+                  id="top-skill-count"
                   style="
                     font-family: var(--font-display);
                     font-weight: 800;
@@ -298,68 +303,34 @@
                 </button>
               </div>
               <form onsubmit="saveProfile(event)" id="profile-form">
-                <div class="form-group">
-                  <label class="form-label">Nama Lengkap</label
-                  ><input
-                    class="form-control"
-                    type="text"
-                    value="Reza Anugrah"
-                    readonly
-                  />
-                </div>
-                <div class="two-col" style="gap: 12px">
-                  <div class="form-group">
-                    <label class="form-label">Jurusan</label
-                    ><input
-                      class="form-control"
-                      type="text"
-                      value="Desain Komunikasi Visual"
-                      readonly
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Angkatan</label
-                    ><input
-                      class="form-control"
-                      type="text"
-                      value="2022"
-                      readonly
-                    />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Universitas</label
-                  ><input
-                    class="form-control"
-                    type="text"
-                    value="Universitas Sam Ratulangi"
-                    readonly
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Bio Singkat</label
-                  ><textarea
-                    class="form-control"
-                    rows="3"
-                    id="bio-input"
-                    readonly
-                  >
-UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berdampak.</textarea
-                  >
-                </div>
-                <div class="form-group">
-                  <label class="form-label">LinkedIn (opsional)</label>
-                  <div class="input-group">
-                    <span class="input-icon"
-                      ><i class="icon icon-sm c-muted" data-icon="link"></i
-                    ></span>
+                <div class="row">
+                  <div class="col-md-6 form-group">
+                    <label class="form-label">Nama Lengkap</label>
                     <input
+                      type="text"
                       class="form-control"
-                      type="url"
-                      placeholder="https://linkedin.com/in/username"
+                      id="input-name"
                       readonly
                     />
                   </div>
+                  <div class="col-md-6 form-group">
+                    <label class="form-label">Jurusan</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="input-major"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Bio Singkat</label>
+                  <textarea
+                    class="form-control"
+                    rows="4"
+                    id="input-bio"
+                    readonly
+                  ></textarea>
                 </div>
                 <button
                   type="submit"
@@ -395,21 +366,6 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
                 "
                 id="want-learn-list"
               >
-                <span class="skill-tag"
-                  >React
-                  <button
-                    onclick="removeWantLearn(this)"
-                    style="
-                      background: none;
-                      color: var(--text-muted);
-                      margin-left: 4px;
-                      font-size: 12px;
-                      cursor: pointer;
-                      line-height: 1;
-                    "
-                  >
-                    <i class="icon icon-sm" data-icon="x"></i></button
-                ></span>
               </div>
               <div style="display: flex; gap: 8px">
                 <input
@@ -517,6 +473,7 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
         </div>
         <div class="modal-body">
           <form id="form-skill" onsubmit="saveSkill(event)">
+            <input type="hidden" id="skill-id" value="" />
             <div class="form-group">
               <label class="form-label">Nama Skill <span>*</span></label>
               <input
@@ -529,31 +486,23 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
             <div class="form-group">
               <label class="form-label">Kategori</label>
               <select class="form-control" id="skill-category">
-                <option>Frontend</option>
-                <option>Backend</option>
-                <option>Mobile</option>
-                <option>Design</option>
-                <option>Data Science</option>
-                <option>Database</option>
-                <option>Framework</option>
-                <option>DevOps</option>
-                <option>Motion</option>
+                <!-- Loaded dynamically -->
               </select>
             </div>
             <div class="form-group">
               <label class="form-label">Tingkat Keahlian <span>*</span></label>
               <div style="display: flex; gap: 8px">
-                <div style="flex: 1" onclick="setLevel('Pemula')">
-                  <div class="skill-level-btn" id="lvl-pemula">Pemula</div>
+                <div style="flex: 1" onclick="setLevel('Beginner')">
+                  <div class="skill-level-btn" id="lvl-beginner">Pemula</div>
                 </div>
-                <div style="flex: 1" onclick="setLevel('Menengah')">
-                  <div class="skill-level-btn" id="lvl-menengah">Menengah</div>
+                <div style="flex: 1" onclick="setLevel('Intermediate')">
+                  <div class="skill-level-btn" id="lvl-intermediate">Menengah</div>
                 </div>
-                <div style="flex: 1" onclick="setLevel('Mahir')">
-                  <div class="skill-level-btn" id="lvl-mahir">Mahir</div>
+                <div style="flex: 1" onclick="setLevel('Advanced')">
+                  <div class="skill-level-btn" id="lvl-advanced">Mahir</div>
                 </div>
               </div>
-              <input type="hidden" id="skill-level-val" value="Pemula" />
+              <input type="hidden" id="skill-level-val" value="Beginner" />
             </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end">
               <button
@@ -588,9 +537,10 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
     <script src="../../assets/js/icons.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script>
-      let mySkills = [...CURRENT_USER.skills];
-      let editingSkillIdx = null;
-      let selectedLevel = "Pemula";
+      let mySkills = [];
+      let categories = [];
+      let currentUser = null;
+      let selectedLevel = "Beginner";
 
       const catIcons = {
         Frontend: "palette",
@@ -607,7 +557,7 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
       function setLevel(level) {
         selectedLevel = level;
         document.getElementById("skill-level-val").value = level;
-        ["Pemula", "Menengah", "Mahir"].forEach((l) => {
+        ["Beginner", "Intermediate", "Advanced"].forEach((l) => {
           const el = document.getElementById("lvl-" + l.toLowerCase());
           if (!el) return;
           el.style.background = l === level ? "var(--accent-glow)" : "";
@@ -618,12 +568,69 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
         });
       }
 
+      async function fetchProfile() {
+          try {
+              const res = await API.Auth.getMe();
+              currentUser = res.data;
+              
+              document.getElementById("input-name").value = currentUser.name || '';
+              document.getElementById("input-major").value = currentUser.major || '';
+              document.getElementById("input-bio").value = currentUser.bio || '';
+
+              const initials = currentUser.name.substring(0,2).toUpperCase();
+              document.getElementById("top-avatar").innerText = currentUser.profilePicture ? '' : initials;
+              if (currentUser.profilePicture) {
+                  document.getElementById("top-avatar").style.background = `url(http://localhost:8000${currentUser.profilePicture})`;
+                  document.getElementById("top-avatar").style.backgroundSize = 'cover';
+              }
+              document.getElementById("top-name").innerText = currentUser.name;
+              document.getElementById("top-major").innerText = `${currentUser.major || 'Umum'}`;
+
+              // Stats
+              const statRes = await API.Explore.getUserStats(currentUser.id);
+              const stats = statRes.data;
+              document.getElementById("top-score").innerText = Number(stats.avg_rating || 0).toFixed(1);
+              document.getElementById("top-reviews").innerText = `(${stats.review_count || 0} ulasan)`;
+              document.getElementById("top-collab-count").innerText = stats.total_collabs || 0;
+              document.getElementById("top-completed-count").innerText = stats.completed_collabs || 0;
+              document.getElementById("top-skill-count").innerText = stats.total_skills || 0;
+          } catch(e) {
+              console.error(e);
+          }
+      }
+
+      async function fetchSkills() {
+          try {
+              const res = await API.Skills.getMySkills();
+              mySkills = res.data || [];
+              renderSkills();
+          } catch(e) {
+              console.error(e);
+          }
+      }
+
+      async function fetchCategories() {
+          try {
+              const res = await API.Categories.getAll();
+              categories = res.data || [];
+              const catSelect = document.getElementById("skill-category");
+              catSelect.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+          } catch(e) {
+              console.error(e);
+          }
+      }
+
       function renderSkills() {
         const list = document.getElementById("skills-list");
         const levelColor = {
-          Mahir: "green",
-          Menengah: "blue",
-          Pemula: "amber",
+          Advanced: "green",
+          Intermediate: "blue",
+          Beginner: "amber",
+        };
+        const levelText = {
+          Advanced: "Mahir",
+          Intermediate: "Menengah",
+          Beginner: "Pemula"
         };
         if (!mySkills.length) {
           list.innerHTML = `<div class="empty-state" style="padding:32px 0"><div class="empty-state-icon"><i class="icon icon-2xl c-muted" data-icon="layers"></i></div><h3>Belum ada skill</h3><p>Tambahkan skill pertamamu!</p></div>`;
@@ -633,98 +640,124 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
         list.innerHTML = mySkills
           .map(
             (s, i) => `
-    <div class="skill-row">
-      <i class="icon icon-lg c-accent" data-icon="${catIcons[s.category] || "briefcase"}"></i>
-      <div style="flex:1"><div style="font-weight:500;font-size:0.9rem">${s.name}</div><div style="font-size:0.75rem;color:var(--text-muted)">${s.category}</div></div>
-      <span class="badge badge-${levelColor[s.level] || "gray"}">${s.level}</span>
-      <button class="btn btn-ghost btn-icon btn-sm" onclick="editSkill(${i})" title="Edit"><i class="icon icon-sm c-secondary" data-icon="edit"></i></button>
-      <button class="btn btn-ghost btn-icon btn-sm" onclick="deleteSkill(${i})" title="Hapus"><i class="icon icon-sm c-red" data-icon="trash-2"></i></button>
-    </div>
-  `,
+            <div class="skill-row">
+              <i class="icon icon-lg c-accent" data-icon="${catIcons[s.category_name] || "briefcase"}"></i>
+              <div style="flex:1"><div style="font-weight:500;font-size:0.9rem">${s.skillName}</div><div style="font-size:0.75rem;color:var(--text-muted)">${s.category_name}</div></div>
+              <span class="badge badge-${levelColor[s.skillLevel] || "gray"}">${levelText[s.skillLevel] || s.skillLevel}</span>
+              <button class="btn btn-ghost btn-icon btn-sm" onclick="editSkill(${i})" title="Edit"><i class="icon icon-sm c-secondary" data-icon="edit"></i></button>
+              <button class="btn btn-ghost btn-icon btn-sm" onclick="deleteSkillAPI(${s.id})" title="Hapus"><i class="icon icon-sm c-red" data-icon="trash-2"></i></button>
+            </div>
+            `,
           )
           .join("");
         hydrateIcons(list);
       }
 
       function openAddSkillModal() {
-        editingSkillIdx = null;
         document.getElementById("skill-modal-title").innerHTML =
           '<i class="icon icon-sm c-accent" data-icon="layers"></i> Tambah Skill Baru';
         document.getElementById("skill-submit-btn").innerHTML =
           '<i class="icon icon-sm" data-icon="plus" data-color="primary"></i> Tambah Skill';
         document.getElementById("form-skill").reset();
-        setLevel("Pemula");
+        document.getElementById("skill-id").value = "";
+        setLevel("Beginner");
         openModal("add-skill-modal");
         hydrateIcons(document.getElementById("add-skill-modal"));
       }
 
-      function saveSkill(e) {
+      async function saveSkill(e) {
         e.preventDefault();
+        const id = document.getElementById("skill-id").value;
         const name = document.getElementById("skill-name").value.trim();
-        const cat = document.getElementById("skill-category").value;
+        const category_id = document.getElementById("skill-category").value;
+        
         if (!name) return;
-        if (editingSkillIdx !== null) {
-          mySkills[editingSkillIdx] = {
-            name,
-            category: cat,
-            level: selectedLevel,
-          };
-          showToast(
-            "Skill Diperbarui",
-            "" + name + " berhasil diperbarui.",
-            "success",
-          );
-        } else {
-          mySkills.push({ name, category: cat, level: selectedLevel });
-          showToast(
-            "Skill Ditambahkan",
-            "" + name + " berhasil ditambahkan!",
-            "success",
-          );
+        
+        try {
+            if (id) {
+                await API.Skills.update(id, { name, category_id, level: selectedLevel });
+                showToast("Skill Diperbarui", "Skill berhasil diperbarui.", "success");
+            } else {
+                await API.Skills.create({ name, category_id, level: selectedLevel });
+                showToast("Skill Ditambahkan", "Skill berhasil ditambahkan!", "success");
+            }
+            closeModal("add-skill-modal");
+            fetchSkills();
+            fetchProfile(); // Refresh stats
+        } catch(e) {
+            showToast("Gagal menyimpan skill", e.message, "error");
         }
-        closeModal("add-skill-modal");
-        editingSkillIdx = null;
-        renderSkills();
       }
 
       function editSkill(idx) {
-        editingSkillIdx = idx;
         const s = mySkills[idx];
         document.getElementById("skill-modal-title").innerHTML =
           '<i class="icon icon-sm c-accent" data-icon="edit"></i> Edit Skill';
         document.getElementById("skill-submit-btn").innerHTML =
           '<i class="icon icon-sm" data-icon="check" data-color="primary"></i> Simpan';
-        document.getElementById("skill-name").value = s.name;
-        document.getElementById("skill-category").value = s.category;
-        setLevel(s.level);
+        document.getElementById("skill-id").value = s.id;
+        document.getElementById("skill-name").value = s.skillName;
+        
+        // Find category id by name
+        const catObj = categories.find(c => c.name === s.categoryName);
+        if (catObj) document.getElementById("skill-category").value = catObj.id;
+        
+        setLevel(s.skillLevel);
         openModal("add-skill-modal");
         hydrateIcons(document.getElementById("add-skill-modal"));
       }
 
-      function deleteSkill(idx) {
-        const name = mySkills[idx].name;
-        mySkills.splice(idx, 1);
-        renderSkills();
-        showToast("Skill Dihapus", "" + name + " dihapus.", "warning");
+      async function deleteSkillAPI(id) {
+          if(!confirm("Hapus skill ini?")) return;
+          try {
+              await API.Skills.delete(id);
+              showToast("Skill Dihapus", "Berhasil dihapus.", "warning");
+              fetchSkills();
+              fetchProfile(); // refresh stats
+          } catch(e) {
+              showToast("Gagal menghapus", e.message, "error");
+          }
       }
 
-      function saveProfile(e) {
+      async function saveProfile(e) {
         e.preventDefault();
-        const form = document.getElementById("profile-form");
-        const inputs = form.querySelectorAll("input, textarea");
-        inputs.forEach((i) => i.setAttribute("readonly", "true"));
-        document.getElementById("save-profile-btn").style.display = "none";
-        document.getElementById("edit-profile-btn").style.display =
-          "inline-flex";
-        showToast("Profil Disimpan", "Perubahan berhasil disimpan!", "success");
+        
+        const payload = {
+            name: document.getElementById("input-name").value,
+            major: document.getElementById("input-major").value,
+            bio: document.getElementById("input-bio").value
+        };
+
+        try {
+            document.getElementById("save-profile-btn").innerHTML = '<i class="icon icon-sm spin" data-icon="refresh-cw"></i> Menyimpan...';
+            await API.Auth.updateProfile(payload);
+            
+            const form = document.getElementById("profile-form");
+            const inputs = form.querySelectorAll("input, textarea, select");
+            inputs.forEach((i) => i.setAttribute("disabled", "true"));
+            inputs.forEach((i) => i.setAttribute("readonly", "true"));
+            
+            document.getElementById("save-profile-btn").style.display = "none";
+            document.getElementById("edit-profile-btn").style.display = "inline-flex";
+            showToast("Profil Disimpan", "Perubahan berhasil disimpan!", "success");
+            
+            fetchProfile(); // Refresh UI
+            renderUserProfile(); // Refresh main nav
+        } catch(e) {
+            showToast("Gagal menyimpan profil", e.message, "error");
+        } finally {
+            document.getElementById("save-profile-btn").innerHTML = '<i class="icon icon-sm" data-icon="check" data-color="primary"></i> Simpan Perubahan';
+        }
       }
 
       function toggleEditProfile() {
         const form = document.getElementById("profile-form");
         const inputs = form.querySelectorAll("input, textarea");
         inputs.forEach((i) => i.removeAttribute("readonly"));
-        document.getElementById("save-profile-btn").style.display =
-          "inline-flex";
+        const select = document.getElementById("input-university");
+        select.removeAttribute("disabled");
+
+        document.getElementById("save-profile-btn").style.display = "inline-flex";
         document.getElementById("edit-profile-btn").style.display = "none";
       }
 
@@ -762,9 +795,7 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
         hydrateIcons(btn);
 
         try {
-          const user = CURRENT_USER; // Di aplikasi nyata, kita akan dapat email dari getMe
           await API.Auth.changePassword({
-            email: user.email || 'user@student.unsrat.ac.id', // Placeholder for mock
             current_password: currentPassword,
             new_password: newPassword,
             new_password_confirmation: newPasswordConfirm
@@ -783,7 +814,7 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
 
       async function loadReviews() {
         try {
-          const res = await API.Reviews.getForUser(CURRENT_USER.id || 1); // Mock ID 1
+          const res = await API.Reviews.getForUser(currentUser.id);
           const reviews = res.data || [];
           const list = document.getElementById("reviews-list");
           
@@ -802,7 +833,7 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
                   ${Array(5 - r.rating).fill('<i class="icon icon-sm c-muted" data-icon="star"></i>').join('')}
                 </div>
               </div>
-              <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">"${r.comment}"</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">"${r.review_text || ''}"</div>
             </div>
           `).join('');
           hydrateIcons(list);
@@ -819,10 +850,13 @@ UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berd
             addWantLearn();
           }
         });
-      document.addEventListener("DOMContentLoaded", () => {
-        renderSkills();
-        setLevel("Pemula");
-        loadReviews();
+      
+      document.addEventListener("DOMContentLoaded", async () => {
+        requireAuth('user');
+        await fetchProfile();
+        await fetchCategories();
+        await fetchSkills();
+        await loadReviews();
       });
     </script>
   </body>

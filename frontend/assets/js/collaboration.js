@@ -6,17 +6,30 @@ document.addEventListener('DOMContentLoaded', () => {
   let reviewTarget = null;
   let reviewScore  = 0;
   let draggedId    = null;
+  let allCollaborations = [];
+  const session = getSession();
 
   // ── RENDER KANBAN ──
+  async function loadAndRenderKanban() {
+    try {
+        const response = await API.Collaborations.getAll();
+        allCollaborations = response.data || [];
+        renderKanban();
+    } catch (e) {
+        showToast('Error', 'Gagal memuat data kolaborasi', 'error');
+    }
+  }
+
   function renderKanban() {
-    const statuses = ['pending', 'in-progress', 'completed'];
+    if (!session) return;
+    const statuses = ['pending', 'accepted', 'completed'];
     statuses.forEach(status => {
       const col   = document.querySelector(`.kanban-col[data-status="${status}"] .kanban-cards`);
       const count = document.querySelector(`.kanban-col[data-status="${status}"] .kanban-col-count`);
       if (!col) return;
 
-      const cards = MOCK_COLLABORATIONS.filter(c => c.status === status);
-      count.textContent = cards.length;
+      const cards = allCollaborations.filter(c => c.status === status);
+      if (count) count.textContent = cards.length;
 
       if (cards.length === 0) {
         col.innerHTML = `<div class="empty-state" style="padding:24px 0;font-size:0.8rem">
@@ -32,18 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function buildCard(c, status) {
-    const isInitiator = c.initiatorId === CURRENT_USER.id;
+    // Current user's role
+    const isInitiator = c.requester_id === session.id;
     const myRole      = isInitiator ? 'Pengirim' : 'Penerima';
+    
+    // Partner's details to show
+    const partnerName = isInitiator ? c.receiver_name : c.requester_name;
+    const initiatorInitials = (c.requester_name || '').substring(0,2).toUpperCase();
+    const partnerInitials = (c.receiver_name || '').substring(0,2).toUpperCase();
+
+    // Map hyphenated statuses back to underscore for backend if needed.
+    const toStatus = (s) => s;
 
     const actions = {
       pending: isInitiator
-        ? `<button class="btn btn-ghost btn-sm" onclick="cancelCollab(${c.id})">Batalkan</button>`
-        : `<button class="btn btn-success btn-sm" onclick="acceptCollab(${c.id})">Terima</button>
-           <button class="btn btn-danger btn-sm" onclick="rejectCollab(${c.id})">Tolak</button>`,
-      'in-progress':
-        `<button class="btn btn-primary btn-sm" onclick="completeCollab(${c.id})">Selesai</button>`,
+        ? `<button class="btn btn-ghost btn-sm" onclick="updateCollabStatus(${c.id}, 'rejected')">Batalkan</button>` 
+        : `<button class="btn btn-success btn-sm" onclick="updateCollabStatus(${c.id}, 'accepted')">Terima</button>
+           <button class="btn btn-danger btn-sm" onclick="updateCollabStatus(${c.id}, 'rejected')">Tolak</button>`,
+      'accepted':
+        `<button class="btn btn-primary btn-sm" onclick="updateCollabStatus(${c.id}, 'completed')">Selesai</button>`,
       completed:
-        c.review
+        c.is_reviewed
           ? `<span class="badge badge-green">✓ Diulas</span>`
           : `<button class="btn btn-outline-primary btn-sm" onclick="openReviewModal(${c.id})">Beri Ulasan</button>`,
     };
@@ -52,29 +74,23 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="kanban-card" data-id="${c.id}" draggable="true">
         <div class="kanban-card-top">
           <div class="kanban-card-users">
-            <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--accent),var(--purple))">${c.initiatorInitials}</div>
+            <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--accent),var(--purple))">${initiatorInitials}</div>
             <span class="kanban-card-arrow">→</span>
-            <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--green),#51cf66)">${c.partnerInitials}</div>
+            <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--green),#51cf66)">${partnerInitials}</div>
           </div>
           <span class="badge badge-${status === 'pending' ? 'amber' : status === 'in-progress' ? 'blue' : 'green'}" style="font-size:0.65rem">
             ${myRole}
           </span>
         </div>
         <div class="kanban-card-title">
-          ${isInitiator ? c.partnerName : c.initiatorName}
+          ${partnerName}
         </div>
-        <div class="kanban-card-desc">${c.message}</div>
+        <div class="kanban-card-desc">${c.message || 'Tidak ada pesan'}</div>
         <div class="kanban-card-skills">
-          <span class="skill-tag" style="font-size:0.72rem"><i class="icon icon-xs c-accent" data-icon="briefcase"></i> ${c.skillNeeded}</span>
-          <span class="skill-tag" style="font-size:0.72rem"><i class="icon icon-xs c-secondary" data-icon="refresh-cw"></i> ${c.skillOffered}</span>
+          <span class="skill-tag" style="font-size:0.72rem" title="Dibutuhkan"><i class="icon icon-xs c-accent" data-icon="briefcase"></i> ${c.skill_name || 'Skill'}</span>
         </div>
-        ${status === 'completed' && c.review ? `
-          <div style="background:var(--amber-glow);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:0.78rem;color:var(--text-secondary)">
-            ${renderStars(c.review.score)} <span style="color:var(--text-primary)">"${c.review.text}"</span>
-          </div>
-        ` : ''}
         <div class="kanban-card-footer">
-          <span class="kanban-card-date"><i class="icon icon-xs c-muted" data-icon="clock"></i> ${c.date}</span>
+          <span class="kanban-card-date"><i class="icon icon-xs c-muted" data-icon="clock"></i> ${new Date(c.created_at).toLocaleDateString()}</span>
           <div class="kanban-card-actions">${actions[status] || ''}</div>
         </div>
       </div>
@@ -99,17 +115,19 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.kanban-cards').forEach(zone => {
     zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', (e) => {
+    zone.addEventListener('drop', async (e) => {
       e.preventDefault();
       zone.classList.remove('drag-over');
       const newStatus = zone.closest('.kanban-col').dataset.status;
       if (draggedId && newStatus) {
-        const collab = MOCK_COLLABORATIONS.find(c => c.id === draggedId);
-        if (collab) {
-          collab.status = newStatus;
-          renderKanban();
-          showToast('Status diperbarui', `Kartu dipindah ke ${statusLabel(newStatus)}`, 'success');
-        }
+         try {
+             const apiStatus = newStatus === 'in-progress' ? 'in_progress' : newStatus;
+             await API.Collaborations.updateStatus(draggedId, { status: apiStatus });
+             await loadAndRenderKanban();
+             showToast('Status diperbarui', `Kartu dipindah ke ${statusLabel(newStatus)}`, 'success');
+         } catch(e) {
+             showToast('Gagal', e.message, 'error');
+         }
       }
     });
   });
@@ -119,50 +137,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ── ACTIONS ──
-  window.acceptCollab = function(id) {
-    const c = MOCK_COLLABORATIONS.find(x => x.id === id);
-    if (!c) return;
-    c.status = 'in-progress';
-    c.date   = 'Baru saja';
-    renderKanban();
-    showToast('Kolaborasi Diterima! 🎉', `Kamu telah menerima request dari ${c.initiatorName}`, 'success');
-  };
-
-  window.rejectCollab = function(id) {
-    const idx = MOCK_COLLABORATIONS.findIndex(x => x.id === id);
-    if (idx === -1) return;
-    const name = MOCK_COLLABORATIONS[idx].initiatorName;
-    MOCK_COLLABORATIONS.splice(idx, 1);
-    renderKanban();
-    showToast('Request Ditolak', `Request dari ${name} telah ditolak.`, 'error');
-  };
-
-  window.cancelCollab = function(id) {
-    const idx = MOCK_COLLABORATIONS.findIndex(x => x.id === id);
-    if (idx === -1) return;
-    MOCK_COLLABORATIONS.splice(idx, 1);
-    renderKanban();
-    showToast('Request Dibatalkan', 'Request kolaborasi telah dibatalkan.', 'warning');
-  };
-
-  window.completeCollab = function(id) {
-    const c = MOCK_COLLABORATIONS.find(x => x.id === id);
-    if (!c) return;
-    c.status = 'completed';
-    c.date   = 'Baru saja';
-    renderKanban();
-    showToast('Kolaborasi Selesai! 🏆', 'Kolaborasi berhasil diselesaikan. Jangan lupa beri ulasan!', 'success', 5000);
-    setTimeout(() => openReviewModal(id), 1500);
+  window.updateCollabStatus = async function(id, status) {
+      try {
+          const apiStatus = status === 'in-progress' ? 'in_progress' : status;
+          await API.Collaborations.updateStatus(id, { status: apiStatus });
+          await loadAndRenderKanban();
+          
+          if (status === 'in-progress') {
+              showToast('Kolaborasi Diterima! 🎉', `Status menjadi Sedang Berjalan`, 'success');
+          } else if (status === 'rejected') {
+              showToast('Ditolak/Dibatalkan', `Kolaborasi telah dihentikan`, 'warning');
+          } else if (status === 'completed') {
+              showToast('Kolaborasi Selesai! 🏆', 'Kolaborasi berhasil diselesaikan. Jangan lupa beri ulasan!', 'success', 5000);
+              setTimeout(() => openReviewModal(id), 1500);
+          }
+      } catch(e) {
+          showToast('Gagal', e.message, 'error');
+      }
   };
 
   // ── REVIEW MODAL ──
   window.openReviewModal = function(id) {
-    reviewTarget = MOCK_COLLABORATIONS.find(c => c.id === id);
+    reviewTarget = allCollaborations.find(c => c.id === id);
     if (!reviewTarget) return;
 
-    const partnerName = reviewTarget.initiatorId === CURRENT_USER.id
-      ? reviewTarget.partnerName
-      : reviewTarget.initiatorName;
+    const isInitiator = reviewTarget.requester_id === session.id;
+    const partnerName = isInitiator ? reviewTarget.receiver_name : reviewTarget.requester_name;
 
     document.getElementById('review-partner-name').textContent = partnerName;
     reviewScore = 0;
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initStarRating('star-rating', (val) => { reviewScore = val; });
   };
 
-  document.getElementById('form-review')?.addEventListener('submit', (e) => {
+  document.getElementById('form-review')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (reviewScore === 0) {
       showToast('Pilih Rating', 'Silakan beri rating bintang terlebih dahulu.', 'warning');
@@ -185,12 +185,25 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    reviewTarget.review = { score: reviewScore, text };
-    closeModal('review-modal');
-    renderKanban();
-    showToast('Ulasan Terkirim! ⭐', 'Terima kasih telah memberikan ulasan.', 'success');
+    try {
+      const isInitiator = reviewTarget.requester_id === session.id;
+      const targetUserId = isInitiator ? reviewTarget.receiver_id : reviewTarget.requester_id;
+
+      await API.Reviews.create({
+          target_user_id: targetUserId,
+          collaboration_id: reviewTarget.id,
+          rating: reviewScore,
+          review_text: text
+      });
+
+      closeModal('review-modal');
+      await loadAndRenderKanban();
+      showToast('Ulasan Terkirim! ⭐', 'Terima kasih telah memberikan ulasan.', 'success');
+    } catch(err) {
+      showToast('Gagal mengirim ulasan', err.message, 'error');
+    }
   });
 
   // Init
-  renderKanban();
+  loadAndRenderKanban();
 });

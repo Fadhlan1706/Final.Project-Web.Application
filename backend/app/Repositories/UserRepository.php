@@ -18,7 +18,7 @@ class UserRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT id, name, email, major, bio, profilePicture, reputationScore, status, is_verified, create_at
+            'SELECT id, NAME AS name, email, major, bio, profilePicture, reputationScore, STATUS AS status, is_verified, create_at AS created_at
              FROM users WHERE id = ? LIMIT 1'
         );
         $stmt->execute([$id]);
@@ -28,7 +28,7 @@ class UserRepository
     public function findByEmail(string $email): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT * FROM users WHERE email = ? LIMIT 1'
+            'SELECT id, NAME AS name, email, PASSWORD AS password, major, bio, profilePicture, reputationScore, STATUS AS status, is_verified, verification_code, create_at AS created_at FROM users WHERE email = ? LIMIT 1'
         );
         $stmt->execute([$email]);
         return $stmt->fetch() ?: null;
@@ -38,7 +38,7 @@ class UserRepository
     {
         $offset = ($page - 1) * $perPage;
         $stmt   = $this->db->prepare(
-            'SELECT id, name, email, major, bio, profilePicture, reputationScore, status, is_verified, create_at
+            'SELECT id, NAME AS name, email, major, bio, profilePicture, reputationScore, STATUS AS status, is_verified, create_at AS created_at
              FROM users ORDER BY create_at DESC LIMIT ? OFFSET ?'
         );
         $stmt->execute([$perPage, $offset]);
@@ -52,11 +52,11 @@ class UserRepository
 
     public function searchTalents(array $filters = [], int $page = 1, int $perPage = 12): array
     {
-        $conditions = ["u.status = 'active'"];
+        $conditions = ["u.STATUS = 'active'"];
         $bindings   = [];
 
         if (!empty($filters['search'])) {
-            $conditions[] = '(s.skillName LIKE ? OR u.name LIKE ?)';
+            $conditions[] = '(s.skillName LIKE ? OR u.NAME LIKE ?)';
             $bindings[]   = '%' . $filters['search'] . '%';
             $bindings[]   = '%' . $filters['search'] . '%';
         }
@@ -74,7 +74,7 @@ class UserRepository
 
         $sql = "
             SELECT DISTINCT
-                u.id, u.name, u.profilePicture, u.bio, u.major, u.reputationScore,
+                u.id, u.NAME AS name, u.profilePicture, u.bio, u.major, u.reputationScore,
                 COALESCE(AVG(r.rating), 0) AS avg_rating,
                 COUNT(DISTINCT r.id)       AS review_count
             FROM users u
@@ -89,7 +89,7 @@ class UserRepository
             $bindings[] = (float)$filters['min_rating'];
         }
 
-        $sql .= " ORDER BY avg_rating DESC, u.name ASC LIMIT ? OFFSET ?";
+        $sql .= " ORDER BY avg_rating DESC, u.NAME ASC LIMIT ? OFFSET ?";
         $bindings[] = $perPage;
         $bindings[] = $offset;
 
@@ -97,6 +97,7 @@ class UserRepository
         $stmt->execute($bindings);
         return $stmt->fetchAll();
     }
+
 
     public function create(array $data): int
     {
@@ -176,8 +177,8 @@ class UserRepository
             SELECT
                 (SELECT COUNT(*) FROM skills WHERE userId = :uid) AS total_skills,
                 (SELECT COUNT(*) FROM collaborationRequests WHERE senderId = :uid OR receiverId = :uid) AS total_collabs,
-                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = :uid OR receiverId = :uid) AND status = 'pending') AS pending_requests,
-                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = :uid OR receiverId = :uid) AND status = 'completed') AS completed_collabs,
+                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = :uid OR receiverId = :uid) AND STATUS = 'pending') AS pending_requests,
+                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = :uid OR receiverId = :uid) AND STATUS = 'completed') AS completed_collabs,
                 (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE reviewedUserId = :uid) AS avg_rating
         ");
         $stmt->execute(['uid' => $userId]);

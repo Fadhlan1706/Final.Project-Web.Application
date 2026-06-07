@@ -17,8 +17,7 @@ class CollaborationService
      */
     private const TRANSITIONS = [
         'pending'     => ['accepted', 'rejected'],  // receiver decides
-        'accepted'    => ['in_progress'],            // either party
-        'in_progress' => ['completed'],              // either party
+        'accepted'    => ['completed'],             // either party
         'completed'   => [],
         'rejected'    => [],
     ];
@@ -36,31 +35,20 @@ class CollaborationService
     public function sendRequest(int $requesterId, array $data): array
     {
         $receiverId = (int)$data['receiver_id'];
-        $skillId    = (int)$data['skill_id'];
 
         // Cannot request yourself
         if ($requesterId === $receiverId) {
             return ['success' => false, 'message' => 'You cannot send a request to yourself.'];
         }
 
-        // Validate skill exists and belongs to receiver
-        $skill = $this->skills->findById($skillId);
-        if (!$skill) {
-            return ['success' => false, 'message' => 'Skill not found.'];
-        }
-        if ((int)$skill['user_id'] !== $receiverId) {
-            return ['success' => false, 'message' => 'Skill does not belong to the requested user.'];
-        }
-
         // No duplicate pending requests
-        if ($this->collabs->pendingExists($requesterId, $receiverId, $skillId)) {
-            return ['success' => false, 'message' => 'You already have a pending request for this skill.'];
+        if ($this->collabs->pendingExists($requesterId, $receiverId)) {
+            return ['success' => false, 'message' => 'You already have a pending request for this user.'];
         }
 
         $id     = $this->collabs->create([
             'requester_id' => $requesterId,
             'receiver_id'  => $receiverId,
-            'skill_id'     => $skillId,
             'message'      => $data['message'] ?? null,
         ]);
         $collab = $this->collabs->findById($id);

@@ -116,12 +116,12 @@
             >
               Selamat datang kembali!
             </div>
-            <h1 style="font-size: 1.6rem; margin-bottom: 4px">
-              Halo, Reza Anugrah
+            <h1 id="welcome-name" style="font-size: 1.6rem; margin-bottom: 4px">
+              Halo, Pengguna
             </h1>
             <p style="color: var(--text-secondary); font-size: 0.9rem">
               Kamu punya
-              <strong style="color: var(--accent)">2 request</strong> menunggu
+              <strong id="pending-requests" style="color: var(--accent)">0 request</strong> menunggu
               respons.
             </p>
           </div>
@@ -142,7 +142,7 @@
               ></i>
             </div>
             <div>
-              <div class="stat-value">8</div>
+              <div id="stat-collab" class="stat-value">0</div>
               <div class="stat-label">Total Kolaborasi</div>
               <div
                 class="stat-change up"
@@ -162,7 +162,7 @@
               <i class="icon icon-lg" data-icon="star" data-color="amber"></i>
             </div>
             <div>
-              <div class="stat-value">4.6</div>
+              <div id="stat-rating" class="stat-value">0.0</div>
               <div class="stat-label">Skor Reputasi</div>
               <div
                 class="stat-change up"
@@ -186,7 +186,7 @@
               ></i>
             </div>
             <div>
-              <div class="stat-value">5</div>
+              <div id="stat-completed" class="stat-value">0</div>
               <div class="stat-label">Selesai</div>
               <div
                 class="stat-change up"
@@ -210,7 +210,7 @@
               ></i>
             </div>
             <div>
-              <div class="stat-value">12</div>
+              <div id="stat-reviews" class="stat-value">0</div>
               <div class="stat-label">Ulasan Diterima</div>
               <div
                 class="stat-change up"
@@ -241,117 +241,10 @@
                 >Lihat Semua</a
               >
             </div>
-            <div style="display: flex; flex-direction: column; gap: 2px">
-              <div
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 12px;
-                  padding: 12px 0;
-                  border-bottom: 1px solid var(--border);
-                "
-              >
-                <div
-                  class="avatar"
-                  style="
-                    background: linear-gradient(135deg, var(--green), #51cf66);
-                  "
-                >
-                  NP
-                </div>
-                <div style="flex: 1">
-                  <div style="font-size: 0.875rem; font-weight: 500">
-                    <strong>Nasya Putri</strong> menerima kolaborasimu
-                  </div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted)">
-                    Tadi, 14:22
-                  </div>
-                </div>
-                <span class="badge badge-green">Diterima</span>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 12px;
-                  padding: 12px 0;
-                  border-bottom: 1px solid var(--border);
-                "
-              >
-                <div
-                  class="avatar"
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      var(--accent),
-                      var(--purple)
-                    );
-                  "
-                >
-                  TH
-                </div>
-                <div style="flex: 1">
-                  <div style="font-size: 0.875rem; font-weight: 500">
-                    Kamu mengirim request ke <strong>Teo Hardianto</strong>
-                  </div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted)">
-                    Hari ini, 10:30
-                  </div>
-                </div>
-                <span class="badge badge-amber">Menunggu</span>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 12px;
-                  padding: 12px 0;
-                  border-bottom: 1px solid var(--border);
-                "
-              >
-                <div
-                  class="avatar"
-                  style="
-                    background: linear-gradient(135deg, var(--amber), #fcc419);
-                  "
-                >
-                  LS
-                </div>
-                <div style="flex: 1">
-                  <div style="font-size: 0.875rem; font-weight: 500">
-                    <strong>Laura Sitanggang</strong> memberi ulasan
-                    <span style="color: var(--amber)">★★★★★</span>
-                  </div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted)">
-                    5 hari lalu
-                  </div>
-                </div>
-                <span class="badge badge-blue">Ulasan</span>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: 12px;
-                  padding: 12px 0;
-                "
-              >
-                <div
-                  class="avatar"
-                  style="
-                    background: linear-gradient(135deg, var(--red), #ff8787);
-                  "
-                >
-                  BS
-                </div>
-                <div style="flex: 1">
-                  <div style="font-size: 0.875rem; font-weight: 500">
-                    <strong>Bram Susanto</strong> melihat profilmu
-                  </div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted)">
-                    1 minggu lalu
-                  </div>
-                </div>
+            <div id="recent-activity-list" style="display: flex; flex-direction: column; gap: 2px">
+              <div class="empty-state" style="padding: 16px 0;">
+                <div class="empty-state-icon"><i class="icon icon-lg c-muted" data-icon="loader"></i></div>
+                <h3>Memuat aktivitas...</h3>
               </div>
             </div>
           </div>
@@ -367,59 +260,8 @@
               >
               <a href="profile.html" class="btn btn-ghost btn-sm">Kelola</a>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 12px">
-              <div
-                style="
-                  padding-bottom: 10px;
-                  border-bottom: 1px solid var(--border);
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                  "
-                >
-                  <span style="font-size: 0.875rem; font-weight: 500"
-                    >UI/UX Design</span
-                  >
-                  <span class="badge badge-blue">Menengah</span>
-                </div>
-              </div>
-              <div
-                style="
-                  padding-bottom: 10px;
-                  border-bottom: 1px solid var(--border);
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                  "
-                >
-                  <span style="font-size: 0.875rem; font-weight: 500"
-                    >Figma</span
-                  >
-                  <span class="badge badge-blue">Menengah</span>
-                </div>
-              </div>
-              <div style="padding-bottom: 4px">
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                  "
-                >
-                  <span style="font-size: 0.875rem; font-weight: 500"
-                    >HTML/CSS</span
-                  >
-                  <span class="badge badge-amber">Pemula</span>
-                </div>
-              </div>
+            <div id="my-skills-list" style="display: flex; flex-direction: column; gap: 12px">
+              <!-- Skills loaded dynamically -->
             </div>
             <div
               style="
@@ -477,28 +319,103 @@
     <script src="../../assets/js/icons.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const grid = document.getElementById("suggestions-grid");
-        grid.innerHTML = MOCK_USERS.slice(0, 3)
-          .map(
-            (u) => `
-    <div class="user-card" onclick="window.location='explore.html'">
-      <div class="user-card-header">
-        <div class="user-card-avatar" style="background:linear-gradient(135deg,${u.avatarColor},${u.avatarColor}99)">${u.initials}</div>
-        <div style="flex:1"><div class="user-card-name">${u.name}</div><div class="user-card-major">${u.major}</div></div>
-        <div class="user-card-score"><div class="score-val">★ ${u.score}</div><div class="score-label">${u.reviewCount} ulasan</div></div>
-      </div>
-      <div class="user-card-skills">${u.skills
-        .slice(0, 2)
-        .map((s) => `<span class="skill-tag">${s.name}</span>`)
-        .join("")}</div>
-      <button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px;gap:6px">
-        <i class="icon icon-sm" data-icon="handshake" data-color="primary"></i> Minta Kolaborasi
-      </button>
-    </div>
-  `,
-          )
-          .join("");
+      document.addEventListener("DOMContentLoaded", async () => {
+        requireAuth('user');
+        
+        try {
+          // 1. Load User Profile & Stats
+          const userRes = await API.Auth.getMe();
+          const user = userRes.data;
+          document.getElementById('welcome-name').innerText = `Halo, ${user.name}`;
+          
+          const statsRes = await API.Explore.getUserStats(user.id);
+          const stats = statsRes.data;
+          
+          document.getElementById('pending-requests').innerText = `${stats.pending_requests} request`;
+          document.getElementById('stat-collab').innerText = stats.total_collabs;
+          document.getElementById('stat-rating').innerText = Number(stats.avg_rating).toFixed(1);
+          document.getElementById('stat-completed').innerText = stats.completed_collabs;
+          document.getElementById('stat-reviews').innerText = stats.total_skills; // Assuming stats format, otherwise adjust
+          
+          // 2. Load My Skills
+          const skillsRes = await API.Skills.getMySkills();
+          const skillsList = document.getElementById('my-skills-list');
+          if(skillsRes.data.length === 0) {
+             skillsList.innerHTML = '<div style="color:var(--text-muted);font-size:0.875rem">Belum ada skill ditambahkan.</div>';
+          } else {
+             skillsList.innerHTML = skillsRes.data.slice(0,4).map(s => `
+              <div style="padding-bottom: 10px; border-bottom: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.875rem; font-weight: 500">${s.skillName}</span>
+                  <span class="badge ${s.skillLevel === 'Beginner' ? 'badge-amber' : 'badge-blue'}">${s.skillLevel}</span>
+                </div>
+              </div>
+             `).join("");
+          }
+          
+          // 3. Load Recommendations
+          const expRes = await API.Explore.getTalents();
+          const grid = document.getElementById("suggestions-grid");
+          grid.innerHTML = expRes.data.slice(0, 3).map(u => {
+            const initials = u.name.substring(0,2).toUpperCase();
+            const bgImage = u.profilePicture ? `background-image:url(http://localhost:8000${u.profilePicture});background-size:cover;background-position:center;color:transparent;` : 'background:linear-gradient(135deg,var(--primary),var(--purple))';
+            return `
+              <div class="user-card" onclick="window.location='explore.html'">
+                <div class="user-card-header">
+                  <div class="user-card-avatar" style="${bgImage}">${initials}</div>
+                  <div style="flex:1"><div class="user-card-name">${u.name}</div><div class="user-card-major">${u.major || 'Umum'}</div></div>
+                  <div class="user-card-score"><div class="score-val">★ ${Number(u.avg_rating).toFixed(1)}</div><div class="score-label">${u.review_count} ulasan</div></div>
+                </div>
+                <div class="user-card-skills"><span class="skill-tag">Klik untuk detail</span></div>
+                <button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px;gap:6px">
+                  <i class="icon icon-sm" data-icon="handshake" data-color="primary"></i> Minta Kolaborasi
+                </button>
+              </div>
+            `;
+          }).join("");
+          
+          // 4. Load Recent Activity (Collaborations)
+          const actRes = await API.Collaborations.getAll();
+          const recentActs = actRes.data.slice(0, 3);
+          const actContainer = document.getElementById("recent-activity-list");
+          if (actContainer) {
+             if (recentActs.length === 0) {
+                 actContainer.innerHTML = '<div style="padding:12px 0; color:var(--text-muted); font-size:0.875rem;">Belum ada aktivitas.</div>';
+             } else {
+                 actContainer.innerHTML = recentActs.map(c => {
+                     const isInitiator = c.requester_id === user.id;
+                     const partnerName = isInitiator ? c.receiver_name : c.requester_name;
+                     const initials = (partnerName || 'U').substring(0,2).toUpperCase();
+                     
+                     let actionText = '';
+                     if (c.status === 'pending') actionText = isInitiator ? 'menunggu respon dari' : 'mengirimkan request kepadamu';
+                     else if (c.status === 'accepted') actionText = 'memulai kolaborasi denganmu';
+                     else if (c.status === 'completed') actionText = 'telah menyelesaikan kolaborasi';
+                     else if (c.status === 'rejected') actionText = 'menolak kolaborasi';
+                     
+                     return `
+                      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                        <div class="avatar" style="background: linear-gradient(135deg, var(--green), #51cf66);">${initials}</div>
+                        <div style="flex: 1">
+                          <div style="font-size: 0.875rem; font-weight: 500">
+                            <strong>${partnerName}</strong> ${actionText}
+                          </div>
+                          <div style="font-size: 0.75rem; color: var(--text-muted)">
+                            <i class="icon icon-xs c-muted" data-icon="clock"></i> ${new Date(c.updated_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                     `;
+                 }).join('');
+                 hydrateIcons(actContainer);
+             }
+          }
+          
+          hydrateIcons(document.getElementById('my-skills-list'));
+          hydrateIcons(document.getElementById('suggestions-grid'));
+        } catch(e) {
+          console.error("Dashboard load error", e);
+        }
       });
     </script>
   </body>

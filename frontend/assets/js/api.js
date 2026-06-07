@@ -11,16 +11,11 @@ async function fetchAPI(endpoint, method = "GET", data = null) {
     Accept: "application/json",
   };
 
-  // Ambil token dari localStorage (biasanya di-set setelah user login)
-  // agar endpoint yang butuh autentikasi bisa diakses
-  const token = localStorage.getItem("access_token");
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
+  // Backend menggunakan sistem session (cookies), maka dari itu `credentials: "include"` wajib
   const config = {
     method: method,
     headers: headers,
+    credentials: "include",
   };
 
   // Jika ada data payload (untuk POST/PUT), ubah ke string JSON
@@ -33,6 +28,11 @@ async function fetchAPI(endpoint, method = "GET", data = null) {
     const result = await response.json(); // Backend menggunakan \App\Helpers\Response::success
 
     if (!response.ok) {
+      if (response.status === 401 && !endpoint.includes("/api/auth/login")) {
+         localStorage.removeItem("access_token");
+         localStorage.removeItem("user_data");
+         window.location.replace("/frontend/pages/auth/login.html");
+      }
       throw new Error(result.message || "Terjadi kesalahan pada server");
     }
 

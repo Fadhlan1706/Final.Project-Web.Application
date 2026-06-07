@@ -3,20 +3,20 @@
 
 class DatabaseConfig
 {
-    public static $host = "localhost";
-    public static $port = "3306";
-    public static $dbname = "skillSwapPlatform";
-    public static $charset = "utf8mb4";
-    public static $username = "root";
-    public static $password = "andrew10";
+    public static function getHost() { return $_ENV['DB_HOST'] ?? "localhost"; }
+    public static function getPort() { return $_ENV['DB_PORT'] ?? "3306"; }
+    public static function getDbName() { return $_ENV['DB_NAME'] ?? "skillSwapPlatform"; }
+    public static function getCharset() { return "utf8mb4"; }
+    public static function getUsername() { return $_ENV['DB_USER'] ?? "root"; }
+    public static function getPassword() { return $_ENV['DB_PASS'] ?? ""; }
 }
 
 // Crucial: This is what our Database helper helper needs!
 return [
-    'host'    => DatabaseConfig::$host,
-    'port'    => DatabaseConfig::$port,
-    'dbname'  => DatabaseConfig::$dbname,
-    'charset' => DatabaseConfig::$charset,
-    'user'    => DatabaseConfig::$username,
-    'pass'    => DatabaseConfig::$password
+    'host'    => DatabaseConfig::getHost(),
+    'port'    => DatabaseConfig::getPort(),
+    'dbname'  => DatabaseConfig::getDbName(),
+    'charset' => DatabaseConfig::getCharset(),
+    'user'    => DatabaseConfig::getUsername(),
+    'pass'    => DatabaseConfig::getPassword()
 ];
