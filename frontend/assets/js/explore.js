@@ -1,11 +1,39 @@
-// explore.js — Pencarian, filter, Profile Modal, Request Modal
+// explore.js — Pencarian, filter, Profile Modal, Request Modal (API Integration)
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!document.getElementById('explore-grid')) return;
 
-  let filteredUsers = [...MOCK_USERS];
+  let filteredUsers = [];
   let selectedUser  = null;
-  let requestRating = 0;
+
+  // ── FETCH DATA ──
+  async function fetchUsers(filters = {}) {
+    const grid = document.getElementById('explore-grid');
+    const count = document.getElementById('result-count');
+    
+    // Loading State
+    grid.innerHTML = `
+      <div style="grid-column:1/-1; padding:40px; text-align:center; color:var(--text-muted)">
+        ${icon('loader', 32)}
+        <div style="margin-top:12px">Memuat data partner...</div>
+      </div>
+    `;
+    if (count) count.textContent = 'Memuat...';
+
+    try {
+      const data = await api.getUsers(filters);
+      filteredUsers = data;
+      renderGrid(filteredUsers);
+    } catch (err) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-state-icon" style="color:var(--red)">${icon('alert-circle', 32)}</div>
+          <h3>Gagal Memuat Data</h3>
+          <p>${err.message}</p>
+        </div>`;
+      if (count) count.textContent = 'Gagal memuat';
+    }
+  }
 
   // ── RENDER GRID ──
   function renderGrid(users) {
@@ -16,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (users.length === 0) {
       grid.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1">
-          <div class="empty-state-icon">🔍</div>
+          <div class="empty-state-icon">${icon('search', 32)}</div>
           <h3>Tidak ada hasil</h3>
           <p>Coba kata kunci atau filter yang berbeda</p>
         </div>`;
@@ -50,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="user-card-stat"><strong>${u.collaborationsCount}</strong> kolaborasi</span>
           </div>
           <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openRequestModal(${u.id})">
-            <i class="icon icon-sm" data-icon="handshake" data-color="primary"></i> Minta Kolaborasi
+            ${icon('handshake', 14)} Minta Kolaborasi
           </button>
         </div>
       </div>
@@ -59,45 +87,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── SEARCH & FILTER ──
   function applyFilters() {
-    const q       = (document.getElementById('search-input')?.value || '').toLowerCase();
+    const search  = document.getElementById('search-input')?.value || '';
     const cat     = document.getElementById('filter-category')?.value || '';
     const level   = document.getElementById('filter-level')?.value || '';
-    const sortBy  = document.getElementById('sort-by')?.value || 'score';
+    const major   = document.getElementById('filter-major')?.value || '';
 
-    let result = MOCK_USERS.filter(u => {
-      const matchQ = !q || 
-        u.name.toLowerCase().includes(q) ||
-        u.major.toLowerCase().includes(q) ||
-        u.bio.toLowerCase().includes(q) ||
-        u.skills.some(s => s.name.toLowerCase().includes(q));
-      const matchCat   = !cat   || u.skills.some(s => s.category === cat);
-      const matchLevel = !level || u.skills.some(s => s.level === level);
-      return matchQ && matchCat && matchLevel;
-    });
-
-    if (sortBy === 'score')   result.sort((a, b) => b.score - a.score);
-    if (sortBy === 'reviews') result.sort((a, b) => b.reviewCount - a.reviewCount);
-    if (sortBy === 'collabs') result.sort((a, b) => b.collaborationsCount - a.collaborationsCount);
-
-    filteredUsers = result;
-    renderGrid(filteredUsers);
+    // If API supports backend filtering, pass params. 
+    // Since mock mode might not fully support backend sorting perfectly yet, we rely on fetch wrapper handling it.
+    fetchUsers({ search, category: cat, level, major });
   }
 
-  document.getElementById('search-input')?.addEventListener('input', applyFilters);
+  // Debounce search input
+  let searchTimeout;
+  document.getElementById('search-input')?.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(applyFilters, 500);
+  });
+  
   document.getElementById('filter-category')?.addEventListener('change', applyFilters);
   document.getElementById('filter-level')?.addEventListener('change', applyFilters);
-  document.getElementById('sort-by')?.addEventListener('change', applyFilters);
+  document.getElementById('filter-major')?.addEventListener('change', applyFilters);
+  
   document.getElementById('btn-reset-filter')?.addEventListener('click', () => {
     document.getElementById('search-input').value = '';
     document.getElementById('filter-category').value = '';
     document.getElementById('filter-level').value = '';
-    document.getElementById('sort-by').value = 'score';
+    document.getElementById('filter-major').value = '';
     applyFilters();
   });
 
   // ── OPEN PROFILE MODAL ──
   window.openProfileModal = function(userId) {
-    selectedUser = MOCK_USERS.find(u => u.id === userId);
+    selectedUser = filteredUsers.find(u => u.id === userId);
     if (!selectedUser) return;
 
     // Populate header
@@ -106,108 +127,104 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('pm-name').textContent     = selectedUser.name;
     document.getElementById('pm-major').textContent    = `${selectedUser.major} • ${selectedUser.university}`;
     document.getElementById('pm-score').textContent    = selectedUser.score;
-    document.getElementById('pm-review-count').textContent = `(${selectedUser.reviewCount} ulasan)`;
-    document.getElementById('pm-stars').innerHTML      = renderStars(selectedUser.score);
+    document.getElementById('pm-reviews-count').textContent = selectedUser.reviewCount;
+    document.getElementById('pm-collab-count').textContent  = selectedUser.collaborationsCount;
 
     // Bio tab
     document.getElementById('pm-bio').textContent = selectedUser.bio;
-    document.getElementById('pm-skills-list').innerHTML = selectedUser.skills.map(s => `
-      <div class="skill-tag" style="margin-bottom:6px;">
-        ${s.name} ${skillLevelBadge(s.level)}
-        <span style="font-size:0.65rem;color:var(--text-muted);margin-left:2px;">${s.category}</span>
-      </div>
+    document.getElementById('pm-skills').innerHTML = selectedUser.skills.map(s => `
+      <span class="skill-tag">${s.name} ${skillLevelBadge(s.level)}</span>
     `).join('');
-    document.getElementById('pm-want-learn').innerHTML = selectedUser.wantToLearn.map(w => `
-      <span class="skill-tag">${w}</span>
+    document.getElementById('pm-learn').innerHTML = selectedUser.wantToLearn.map(w => `
+      <span class="skill-tag" style="background:var(--bg);border-color:var(--border)">${w}</span>
     `).join('');
 
     // Reviews tab
     const reviewsEl = document.getElementById('pm-reviews');
     if (selectedUser.reviews.length === 0) {
-      reviewsEl.innerHTML = '<div class="empty-state" style="padding:30px 0"><div class="empty-state-icon">💬</div><h3>Belum ada ulasan</h3></div>';
+      reviewsEl.innerHTML = '<div class="empty-state" style="padding:30px 0"><div class="empty-state-icon">' + icon('message-square', 32) + '</div><h3>Belum ada ulasan</h3></div>';
     } else {
       reviewsEl.innerHTML = selectedUser.reviews.map(r => `
-        <div class="review-item">
-          <div class="avatar" style="background:linear-gradient(135deg,var(--accent),var(--purple))">${r.fromInitials}</div>
-          <div style="flex:1">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <strong style="font-size:0.875rem">${r.from}</strong>
-              ${renderStars(r.score)}
-            </div>
-            <div class="review-text">${r.text}</div>
-            <div class="review-date">${r.date}</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <div style="font-weight:600">${r.from}</div>
+            <div style="color:var(--amber);font-size:0.8rem">★ ${r.score}</div>
           </div>
+          <div style="font-size:0.9rem;color:var(--text-secondary)">"${r.text}"</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">${r.date}</div>
         </div>
       `).join('');
     }
 
     openModal('profile-modal');
-    // Reset to first tab
-    document.querySelectorAll('#profile-modal .modal-tab').forEach((t,i) => t.classList.toggle('active', i===0));
-    document.querySelectorAll('#profile-modal .tab-panel').forEach((p,i) => p.classList.toggle('active', i===0));
   };
 
-  // ── OPEN REQUEST MODAL (dari profile modal atau card) ──
+  window.switchModalTab = function(tabName) {
+    document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(`tab-${tabName}`).style.display = 'block';
+    event.currentTarget.classList.add('active');
+  };
+
+  // ── OPEN REQUEST MODAL ──
   window.openRequestModal = function(userId) {
-    selectedUser = MOCK_USERS.find(u => u.id === userId);
+    selectedUser = filteredUsers.find(u => u.id === userId);
     if (!selectedUser) return;
+    
     closeModal('profile-modal');
 
-    document.getElementById('req-partner-name').textContent = selectedUser.name;
-    document.getElementById('req-partner-avatar').textContent = selectedUser.initials;
-    document.getElementById('req-partner-avatar').style.background = `linear-gradient(135deg, ${selectedUser.avatarColor}, ${selectedUser.avatarColor}99)`;
+    document.getElementById('req-name').textContent = selectedUser.name;
+    document.getElementById('req-avatar').textContent = selectedUser.initials;
+    document.getElementById('req-avatar').style.background = `linear-gradient(135deg, ${selectedUser.avatarColor}, ${selectedUser.avatarColor}99)`;
 
-    // Populate skill options from partner
+    // Populate skill options
     const skillNeeded = document.getElementById('req-skill-needed');
     skillNeeded.innerHTML = '<option value="">-- Pilih skill yang kamu butuhkan --</option>' +
       selectedUser.skills.map(s => `<option value="${s.name}">${s.name} (${s.level})</option>`).join('');
 
-    // Current user skills
-    const skillOffered = document.getElementById('req-skill-offered');
-    skillOffered.innerHTML = '<option value="">-- Pilih skill yang kamu tawarkan --</option>' +
-      CURRENT_USER.skills.map(s => `<option value="${s.name}">${s.name} (${s.level})</option>`).join('');
-
     openModal('request-modal');
   };
 
-  // Profile modal "Minta Kolaborasi" button
-  document.getElementById('btn-open-request')?.addEventListener('click', () => {
+  document.getElementById('pm-request-btn')?.addEventListener('click', () => {
     if (selectedUser) openRequestModal(selectedUser.id);
   });
 
   // ── SUBMIT REQUEST ──
-  document.getElementById('form-request')?.addEventListener('submit', (e) => {
+  document.getElementById('form-request')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const skillNeeded  = document.getElementById('req-skill-needed').value;
     const skillOffered = document.getElementById('req-skill-offered').value;
-    const msg          = document.getElementById('req-message').value.trim();
+    const msg          = e.target.querySelector('textarea').value.trim();
 
-    if (!skillNeeded || !skillOffered || !msg) {
-      showToast('Lengkapi form', 'Semua field harus diisi.', 'warning');
+    if (!skillNeeded || !skillOffered) {
+      showToast('Lengkapi form', 'Pilih skill yang dibutuhkan dan ditawarkan.', 'warning');
       return;
     }
 
-    // Add to collaborations mock
-    const newCollab = {
-      id: Date.now(),
-      initiatorId: CURRENT_USER.id,
-      partnerId: selectedUser.id,
-      initiatorName: CURRENT_USER.name,
-      initiatorInitials: CURRENT_USER.initials,
-      partnerName: selectedUser.name,
-      partnerInitials: selectedUser.initials,
-      skillNeeded, skillOffered, message: msg,
-      status: 'pending',
-      date: 'Baru saja',
-      dateRaw: new Date(),
-    };
-    MOCK_COLLABORATIONS.push(newCollab);
+    const btn = e.target.querySelector('[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = icon('loader', 16) + ' Mengirim...';
 
-    closeModal('request-modal');
-    document.getElementById('form-request').reset();
-    showToast('Permintaan Terkirim! 🎉', `Permintaan kolaborasi berhasil dikirim ke ${selectedUser.name}!`, 'success', 4000);
+    try {
+      await api.requestCollaboration({
+        partner_id: selectedUser.id,
+        skill_needed: skillNeeded,
+        skill_offered: skillOffered,
+        message: msg
+      });
+
+      closeModal('request-modal');
+      e.target.reset();
+      showToast('Permintaan Terkirim!', `Permintaan kolaborasi berhasil dikirim ke ${selectedUser.name}!`, 'success', 4000);
+    } catch (err) {
+      showToast('Gagal Mengirim Request', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
   });
 
-  // Init
-  renderGrid(MOCK_USERS);
+  // Init fetch
+  fetchUsers();
 });
