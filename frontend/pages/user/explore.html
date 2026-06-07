@@ -1,186 +1,407 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jelajahi Partner — SkillSwap</title>
-<link rel="stylesheet" href="../../assets/css/variables.css">
-<link rel="stylesheet" href="../../assets/css/global.css">
-<link rel="stylesheet" href="../../assets/css/layout.css">
-<link rel="stylesheet" href="../../assets/css/components.css">
-<link rel="stylesheet" href="../../assets/css/modal-kanban.css">
-<link rel="stylesheet" href="../../assets/css/icons.css">
-</head>
-<body>
-<div class="app-shell" id="app-shell">
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <div class="brand-icon"><i class="icon icon-lg" data-icon="refresh-cw" data-color="primary"></i></div>
-      <span class="brand-text">Skill<span>Swap</span></span>
-    </div>
-    <button class="navbar-toggle" id="sidebar-toggle"><i class="icon" data-icon="menu" data-color="secondary"></i></button>
-    <div class="navbar-search">
-      <span class="search-icon"><i class="icon icon-sm c-muted" data-icon="search"></i></span>
-      <input type="text" id="search-input" placeholder="Cari skill atau nama mahasiswa...">
-    </div>
-    <div class="navbar-actions">
-      <button class="nav-btn" id="theme-toggle"><i class="icon icon-sm c-muted" data-icon="moon"></i></button>
-      <button class="nav-btn"><i class="icon icon-sm c-muted" data-icon="bell"></i><span class="notif-badge">3</span></button>
-      <div class="profile-dropdown">
-        <div class="profile-btn" id="profile-btn">
-          <div class="profile-avatar">RA</div>
-          <div><div class="profile-name">Reza Anugrah</div><div class="profile-role">Mahasiswa</div></div>
-          <i class="icon icon-sm c-muted" data-icon="chevron-down"></i>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jelajahi Partner — SkillSwap</title>
+    <link rel="stylesheet" href="../../assets/css/variables.css" />
+    <link rel="stylesheet" href="../../assets/css/global.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/modal-kanban.css" />
+    <link rel="stylesheet" href="../../assets/css/icons.css" />
+  </head>
+  <body>
+    <div class="app-shell" id="app-shell">
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <div class="brand-icon">
+            <i
+              class="icon icon-lg"
+              data-icon="refresh-cw"
+              data-color="primary"
+            ></i>
+          </div>
+          <span class="brand-text">Skill<span>Swap</span></span>
         </div>
-        <div class="dropdown-menu" id="profile-menu">
-          <a class="dropdown-item" href="profile.html"><i class="icon icon-sm" data-icon="user"></i> Profil Saya</a>
-          <a class="dropdown-item" href="dashboard.html"><i class="icon icon-sm" data-icon="home"></i> Dashboard</a>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item danger" onclick="mockLogout()"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <aside class="sidebar">
-    <span class="sidebar-section-label">Menu Utama</span>
-    <a class="nav-link" href="dashboard.html"><span class="nav-icon"><i class="icon" data-icon="home"></i></span><span class="nav-label">Dashboard</span></a>
-    <a class="nav-link active" href="explore.html"><span class="nav-icon"><i class="icon" data-icon="search"></i></span><span class="nav-label">Jelajahi Partner</span></a>
-    <a class="nav-link" href="collaborations.html"><span class="nav-icon"><i class="icon" data-icon="handshake"></i></span><span class="nav-label">Kolaborasi Saya</span><span class="nav-badge">2</span></a>
-    <a class="nav-link" href="profile.html"><span class="nav-icon"><i class="icon" data-icon="user"></i></span><span class="nav-label">Profil &amp; Skill</span></a>
-    </aside>
-
-  <main class="main-content page-enter">
-    <div class="page-header-row">
-      <div class="page-header" style="margin-bottom:0">
-        <h1 style="display:flex;align-items:center;gap:10px"><i class="icon icon-xl c-accent" data-icon="search"></i> Jelajahi Partner</h1>
-        <p>Temukan mahasiswa berbakat untuk kolaborasi skill</p>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;margin:20px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <div style="display:flex;align-items:center;gap:6px;color:var(--text-muted)">
-        <i class="icon icon-sm c-muted" data-icon="list-filter"></i>
-      </div>
-      <select class="form-control" id="filter-category" style="width:auto;min-width:160px">
-        <option value="">Semua Kategori</option>
-        <option>Frontend</option><option>Backend</option><option>Mobile</option>
-        <option>Design</option><option>Data Science</option><option>Database</option>
-        <option>Framework</option><option>DevOps</option>
-      </select>
-      <select class="form-control" id="filter-level" style="width:auto;min-width:140px">
-        <option value="">Semua Level</option>
-        <option>Mahir</option><option>Menengah</option><option>Pemula</option>
-      </select>
-      <select class="form-control" id="sort-by" style="width:auto;min-width:160px">
-        <option value="score">Urutkan: Rating</option>
-        <option value="reviews">Urutkan: Ulasan</option>
-        <option value="collabs">Urutkan: Kolaborasi</option>
-      </select>
-      <button class="btn btn-ghost btn-sm" id="btn-reset-filter" style="gap:6px">
-        <i class="icon icon-sm" data-icon="refresh-cw"></i> Reset
-      </button>
-      <span style="margin-left:auto;font-size:0.82rem;color:var(--text-muted)" id="result-count">6 partner ditemukan</span>
-    </div>
-
-    <div class="cards-grid" id="explore-grid"></div>
-  </main>
-</div>
-
-<!-- PROFILE MODAL -->
-<div class="modal-overlay" id="profile-modal">
-  <div class="modal modal-lg">
-    <div class="modal-profile-header">
-      <div class="avatar avatar-xl" id="pm-avatar">TH</div>
-      <div class="modal-profile-info">
-        <div class="modal-profile-name" id="pm-name">Teo Hardianto</div>
-        <div class="modal-profile-major" id="pm-major">Teknik Informatika</div>
-        <div class="modal-profile-score">
-          <span class="score-number" id="pm-score">4.8</span>
-          <span id="pm-stars"></span>
-          <span class="score-count" id="pm-review-count">(23 ulasan)</span>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <button class="modal-close" data-close-modal="profile-modal"><i class="icon icon-sm" data-icon="x"></i></button>
-        <button class="btn btn-primary btn-sm" id="btn-open-request" style="gap:6px">
-          <i class="icon icon-sm" data-icon="handshake" data-color="primary"></i> Minta Kolaborasi
+        <button class="navbar-toggle" id="sidebar-toggle">
+          <i class="icon" data-icon="menu" data-color="secondary"></i>
         </button>
-      </div>
-    </div>
-    <div class="modal-tabs">
-      <div class="modal-tab active" data-tab="bio">Bio &amp; Skill</div>
-      <div class="modal-tab" data-tab="reviews">Ulasan</div>
-    </div>
-    <div class="modal-body" style="padding-top:16px">
-      <div class="tab-panel active" id="tab-bio">
-        <div style="margin-bottom:20px">
-          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px">Tentang</div>
-          <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7" id="pm-bio"></p>
+        <div class="navbar-search">
+          <span class="search-icon"
+            ><i class="icon icon-sm c-muted" data-icon="search"></i
+          ></span>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Cari skill atau nama mahasiswa..."
+          />
         </div>
-        <div style="margin-bottom:20px">
-          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px">Skill yang Dikuasai</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px" id="pm-skills-list"></div>
+        <div class="navbar-actions">
+          <button class="nav-btn" id="theme-toggle">
+            <i class="icon icon-sm c-muted" data-icon="moon"></i>
+          </button>
+          <button class="nav-btn">
+            <i class="icon icon-sm c-muted" data-icon="bell"></i
+            ><span class="notif-badge">3</span>
+          </button>
+          <div class="profile-dropdown">
+            <div class="profile-btn" id="profile-btn">
+              <div class="profile-avatar">RA</div>
+              <div>
+                <div class="profile-name">Reza Anugrah</div>
+                <div class="profile-role">Mahasiswa</div>
+              </div>
+              <i class="icon icon-sm c-muted" data-icon="chevron-down"></i>
+            </div>
+            <div class="dropdown-menu" id="profile-menu">
+              <a class="dropdown-item" href="profile.html"
+                ><i class="icon icon-sm" data-icon="user"></i> Profil Saya</a
+              >
+              <a class="dropdown-item" href="dashboard.html"
+                ><i class="icon icon-sm" data-icon="home"></i> Dashboard</a
+              >
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-item danger" onclick="mockLogout()">
+                <i class="icon icon-sm" data-icon="log-out"></i> Keluar
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px">Ingin Dipelajari</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px" id="pm-want-learn"></div>
-        </div>
-      </div>
-      <div class="tab-panel" id="tab-reviews">
-        <div id="pm-reviews"></div>
-      </div>
-    </div>
-  </div>
-</div>
+      </nav>
 
-<!-- REQUEST MODAL -->
-<div class="modal-overlay" id="request-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title" style="display:flex;align-items:center;gap:8px">
-        <i class="icon icon-sm c-accent" data-icon="handshake"></i> Ajukan Kolaborasi
-      </span>
-      <button class="modal-close" data-close-modal="request-modal"><i class="icon icon-sm" data-icon="x"></i></button>
+      <aside class="sidebar">
+        <span class="sidebar-section-label">Menu Utama</span>
+        <a class="nav-link" href="dashboard.html"
+          ><span class="nav-icon"><i class="icon" data-icon="home"></i></span
+          ><span class="nav-label">Dashboard</span></a
+        >
+        <a class="nav-link active" href="explore.html"
+          ><span class="nav-icon"><i class="icon" data-icon="search"></i></span
+          ><span class="nav-label">Jelajahi Partner</span></a
+        >
+        <a class="nav-link" href="collaborations.html"
+          ><span class="nav-icon"
+            ><i class="icon" data-icon="handshake"></i></span
+          ><span class="nav-label">Kolaborasi Saya</span
+          ><span class="nav-badge">2</span></a
+        >
+        <a class="nav-link" href="profile.html"
+          ><span class="nav-icon"><i class="icon" data-icon="user"></i></span
+          ><span class="nav-label">Profil &amp; Skill</span></a
+        >
+      </aside>
+
+      <main class="main-content page-enter">
+        <div class="page-header-row">
+          <div class="page-header" style="margin-bottom: 0">
+            <h1 style="display: flex; align-items: center; gap: 10px">
+              <i class="icon icon-xl c-accent" data-icon="search"></i> Jelajahi
+              Partner
+            </h1>
+            <p>Temukan mahasiswa berbakat untuk kolaborasi skill</p>
+          </div>
+        </div>
+
+        <!-- Skill Matches Section -->
+        <div style="margin-bottom: 32px;" id="matches-section">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <h2 style="font-size: 1.25rem; display: flex; align-items: center; gap: 8px;">
+              <i class="icon icon-sm c-accent" data-icon="zap"></i> Rekomendasi Partner (Match)
+            </h2>
+          </div>
+          <div class="cards-grid" id="matches-grid">
+            <div class="empty-state" style="grid-column: 1/-1; padding: 24px 0;">
+              <div class="empty-state-icon"><i class="icon icon-lg c-muted" data-icon="loader"></i></div>
+              <h3>Mencari rekomendasi...</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div
+          style="
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px 18px;
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              color: var(--text-muted);
+            "
+          >
+            <i class="icon icon-sm c-muted" data-icon="list-filter"></i>
+          </div>
+          <select
+            class="form-control"
+            id="filter-category"
+            style="width: auto; min-width: 160px"
+          >
+            <option value="">Semua Kategori</option>
+            <option>Frontend</option>
+            <option>Backend</option>
+            <option>Mobile</option>
+            <option>Design</option>
+            <option>Data Science</option>
+            <option>Database</option>
+            <option>Framework</option>
+            <option>DevOps</option>
+          </select>
+          <select
+            class="form-control"
+            id="filter-level"
+            style="width: auto; min-width: 140px"
+          >
+            <option value="">Semua Level</option>
+            <option>Mahir</option>
+            <option>Menengah</option>
+            <option>Pemula</option>
+          </select>
+          <select
+            class="form-control"
+            id="sort-by"
+            style="width: auto; min-width: 160px"
+          >
+            <option value="score">Urutkan: Rating</option>
+            <option value="reviews">Urutkan: Ulasan</option>
+            <option value="collabs">Urutkan: Kolaborasi</option>
+          </select>
+          <button
+            class="btn btn-ghost btn-sm"
+            id="btn-reset-filter"
+            style="gap: 6px"
+          >
+            <i class="icon icon-sm" data-icon="refresh-cw"></i> Reset
+          </button>
+          <span
+            style="
+              margin-left: auto;
+              font-size: 0.82rem;
+              color: var(--text-muted);
+            "
+            id="result-count"
+            >6 partner ditemukan</span
+          >
+        </div>
+
+        <div class="cards-grid" id="explore-grid"></div>
+      </main>
     </div>
-    <div class="modal-body">
-      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface-2);border-radius:var(--radius);margin-bottom:20px">
-        <div class="avatar" id="req-partner-avatar">TH</div>
-        <div>
-          <div style="font-weight:600;font-size:0.9rem" id="req-partner-name">Teo Hardianto</div>
-          <div style="font-size:0.75rem;color:var(--text-muted)">Partner yang kamu ajak kolaborasi</div>
+
+    <!-- PROFILE MODAL -->
+    <div class="modal-overlay" id="profile-modal">
+      <div class="modal modal-lg">
+        <div class="modal-profile-header">
+          <div class="avatar avatar-xl" id="pm-avatar">TH</div>
+          <div class="modal-profile-info">
+            <div class="modal-profile-name" id="pm-name">Teo Hardianto</div>
+            <div class="modal-profile-major" id="pm-major">
+              Teknik Informatika
+            </div>
+            <div class="modal-profile-score">
+              <span class="score-number" id="pm-score">4.8</span>
+              <span id="pm-stars"></span>
+              <span class="score-count" id="pm-review-count">(23 ulasan)</span>
+            </div>
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              align-items: flex-end;
+            "
+          >
+            <button class="modal-close" data-close-modal="profile-modal">
+              <i class="icon icon-sm" data-icon="x"></i>
+            </button>
+            <button
+              class="btn btn-primary btn-sm"
+              id="btn-open-request"
+              style="gap: 6px"
+            >
+              <i
+                class="icon icon-sm"
+                data-icon="handshake"
+                data-color="primary"
+              ></i>
+              Minta Kolaborasi
+            </button>
+          </div>
+        </div>
+        <div class="modal-tabs">
+          <div class="modal-tab active" data-tab="bio">Bio &amp; Skill</div>
+          <div class="modal-tab" data-tab="reviews">Ulasan</div>
+        </div>
+        <div class="modal-body" style="padding-top: 16px">
+          <div class="tab-panel active" id="tab-bio">
+            <div style="margin-bottom: 20px">
+              <div
+                style="
+                  font-size: 0.75rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                  color: var(--text-muted);
+                  margin-bottom: 8px;
+                "
+              >
+                Tentang
+              </div>
+              <p
+                style="
+                  font-size: 0.9rem;
+                  color: var(--text-secondary);
+                  line-height: 1.7;
+                "
+                id="pm-bio"
+              ></p>
+            </div>
+            <div style="margin-bottom: 20px">
+              <div
+                style="
+                  font-size: 0.75rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                  color: var(--text-muted);
+                  margin-bottom: 10px;
+                "
+              >
+                Skill yang Dikuasai
+              </div>
+              <div
+                style="display: flex; flex-wrap: wrap; gap: 8px"
+                id="pm-skills-list"
+              ></div>
+            </div>
+            <div>
+              <div
+                style="
+                  font-size: 0.75rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                  color: var(--text-muted);
+                  margin-bottom: 10px;
+                "
+              >
+                Ingin Dipelajari
+              </div>
+              <div
+                style="display: flex; flex-wrap: wrap; gap: 8px"
+                id="pm-want-learn"
+              ></div>
+            </div>
+          </div>
+          <div class="tab-panel" id="tab-reviews">
+            <div id="pm-reviews"></div>
+          </div>
         </div>
       </div>
-      <form id="form-request">
-        <div class="form-group">
-          <label class="form-label">Skill yang Kamu Butuhkan <span>*</span></label>
-          <select class="form-control" id="req-skill-needed" required><option value="">-- Pilih skill yang kamu butuhkan --</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Skill yang Kamu Tawarkan <span>*</span></label>
-          <select class="form-control" id="req-skill-offered" required><option value="">-- Pilih skill yang kamu tawarkan --</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Pesan ke Partner <span>*</span></label>
-          <textarea class="form-control" id="req-message" placeholder="Jelaskan proyekmu dan bagaimana kolaborasi ini bisa saling menguntungkan..." rows="4" required></textarea>
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button type="button" class="btn btn-secondary" data-close-modal="request-modal">Batal</button>
-          <button type="submit" class="btn btn-primary" style="gap:6px">
-            <i class="icon icon-sm" data-icon="send" data-color="primary"></i> Kirim Request
+    </div>
+
+    <!-- REQUEST MODAL -->
+    <div class="modal-overlay" id="request-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <span
+            class="modal-title"
+            style="display: flex; align-items: center; gap: 8px"
+          >
+            <i class="icon icon-sm c-accent" data-icon="handshake"></i> Ajukan
+            Kolaborasi
+          </span>
+          <button class="modal-close" data-close-modal="request-modal">
+            <i class="icon icon-sm" data-icon="x"></i>
           </button>
         </div>
-      </form>
+        <div class="modal-body">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              padding: 14px;
+              background: var(--surface-2);
+              border-radius: var(--radius);
+              margin-bottom: 20px;
+            "
+          >
+            <div class="avatar" id="req-partner-avatar">TH</div>
+            <div>
+              <div
+                style="font-weight: 600; font-size: 0.9rem"
+                id="req-partner-name"
+              >
+                Teo Hardianto
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted)">
+                Partner yang kamu ajak kolaborasi
+              </div>
+            </div>
+          </div>
+          <form id="form-request">
+            <div class="form-group">
+              <label class="form-label"
+                >Skill yang Kamu Butuhkan <span>*</span></label
+              >
+              <select class="form-control" id="req-skill-needed" required>
+                <option value="">-- Pilih skill yang kamu butuhkan --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Skill yang Kamu Tawarkan <span>*</span></label
+              >
+              <select class="form-control" id="req-skill-offered" required>
+                <option value="">-- Pilih skill yang kamu tawarkan --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pesan ke Partner <span>*</span></label>
+              <textarea
+                class="form-control"
+                id="req-message"
+                placeholder="Jelaskan proyekmu dan bagaimana kolaborasi ini bisa saling menguntungkan..."
+                rows="4"
+                required
+              ></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-close-modal="request-modal"
+              >
+                Batal
+              </button>
+              <button type="submit" class="btn btn-primary" style="gap: 6px">
+                <i
+                  class="icon icon-sm"
+                  data-icon="send"
+                  data-color="primary"
+                ></i>
+                Kirim Request
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<div id="toast-container"></div>
-<script src="../../assets/js/theme.js"></script>
-<script src="../../assets/js/mock-data.js"></script>
-<script src="../../assets/js/icons.js"></script>
-<script src="../../assets/js/main.js"></script>
-<script src="../../assets/js/explore.js"></script>
-</body>
+    <div id="toast-container"></div>
+    <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/icons.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/explore.js"></script>
+  </body>
 </html>

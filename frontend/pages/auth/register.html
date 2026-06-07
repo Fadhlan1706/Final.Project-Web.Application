@@ -1,144 +1,359 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daftar — SkillSwap</title>
-<link rel="stylesheet" href="../../assets/css/variables.css">
-<link rel="stylesheet" href="../../assets/css/global.css">
-<link rel="stylesheet" href="../../assets/css/components.css">
-<link rel="stylesheet" href="../../assets/css/icons.css">
-<style>
-  body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px}
-  .auth-bg{position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 70% 30%,rgba(92,124,250,0.12),transparent 60%),radial-gradient(ellipse 40% 50% at 20% 70%,rgba(190,75,219,0.1),transparent 60%);pointer-events:none}
-  .register-box{position:relative;z-index:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:44px 40px;width:100%;max-width:540px;animation:pageEnter 0.5s ease both}
-  .register-box .logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
-  .register-box .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff}
-  .register-box h1{font-size:1.6rem;font-weight:800;margin-bottom:6px}
-  .register-box .subtitle{color:var(--text-secondary);font-size:0.875rem;margin-bottom:28px}
-  .register-box .subtitle a{color:var(--accent)}
-  .two-col-form{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
-  .steps-indicator{display:flex;gap:8px;margin-bottom:28px}
-  .step-dot{height:4px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s}
-  .step-dot.done{background:var(--accent)}
-  @media(max-width:480px){.two-col-form{grid-template-columns:1fr}.register-box{padding:32px 20px}}
-</style>
-</head>
-<body>
-<div class="auth-bg"></div>
-<div class="register-box">
-  <div class="logo">
-    <div class="logo-icon"><i class="icon" data-icon="refresh-cw" data-color="primary"></i></div>
-    <span style="font-family:var(--font-display);font-size:1.3rem;font-weight:800">Skill<span style="color:var(--accent)">Swap</span></span>
-  </div>
-  <h1>Buat Akun Baru</h1>
-  <p class="subtitle">Sudah punya akun? <a href="login.html">Masuk di sini</a></p>
-  <div class="steps-indicator">
-    <div class="step-dot done" id="dot-1"></div>
-    <div class="step-dot" id="dot-2"></div>
-    <div class="step-dot" id="dot-3"></div>
-  </div>
-  <form id="register-form" onsubmit="handleRegister(event)">
-    <div class="two-col-form">
-      <div class="form-group">
-        <label class="form-label">Nama Depan <span>*</span></label>
-        <input type="text" class="form-control" placeholder="Reza" required oninput="updateDots(1)">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar — SkillSwap</title>
+    <link rel="stylesheet" href="../../assets/css/variables.css" />
+    <link rel="stylesheet" href="../../assets/css/global.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/icons.css" />
+    <style>
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+      .auth-bg {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 60% 50% at 70% 30%,
+            rgba(92, 124, 250, 0.12),
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 40% 50% at 20% 70%,
+            rgba(190, 75, 219, 0.1),
+            transparent 60%
+          );
+        pointer-events: none;
+      }
+      .register-box {
+        position: relative;
+        z-index: 1;
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 44px 40px;
+        width: 100%;
+        max-width: 540px;
+        animation: pageEnter 0.5s ease both;
+      }
+      .register-box .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+      .register-box .logo-icon {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, var(--accent), var(--purple));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+      }
+      .register-box h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+      .register-box .subtitle {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 28px;
+      }
+      .register-box .subtitle a {
+        color: var(--accent);
+      }
+      .two-col-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 16px;
+      }
+      .steps-indicator {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 28px;
+      }
+      .step-dot {
+        height: 4px;
+        flex: 1;
+        border-radius: 2px;
+        background: var(--border);
+        transition: background 0.3s;
+      }
+      .step-dot.done {
+        background: var(--accent);
+      }
+      @media (max-width: 480px) {
+        .two-col-form {
+          grid-template-columns: 1fr;
+        }
+        .register-box {
+          padding: 32px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-bg"></div>
+    <div class="register-box">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="icon" data-icon="refresh-cw" data-color="primary"></i>
+        </div>
+        <span
+          style="
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 800;
+          "
+          >Skill<span style="color: var(--accent)">Swap</span></span
+        >
       </div>
-      <div class="form-group">
-        <label class="form-label">Nama Belakang <span>*</span></label>
-        <input type="text" class="form-control" placeholder="Anugrah" required>
+      <h1>Buat Akun Baru</h1>
+      <p class="subtitle">
+        Sudah punya akun? <a href="login.html">Masuk di sini</a>
+      </p>
+      <div class="steps-indicator">
+        <div class="step-dot done" id="dot-1"></div>
+        <div class="step-dot" id="dot-2"></div>
+        <div class="step-dot" id="dot-3"></div>
       </div>
+      <form id="register-form" onsubmit="handleRegister(event)">
+        <div class="two-col-form">
+          <div class="form-group">
+            <label class="form-label">Nama Depan <span>*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Reza"
+              required
+              oninput="updateDots(1)"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nama Belakang <span>*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Anugrah"
+              required
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span>*</span></label>
+          <div class="input-group">
+            <span class="input-icon"
+              ><i class="icon icon-sm c-muted" data-icon="mail"></i
+            ></span>
+            <input
+              type="email"
+              class="form-control"
+              placeholder="email@mahasiswa.ac.id"
+              required
+              oninput="updateDots(2)"
+            />
+          </div>
+        </div>
+        <div class="two-col-form">
+          <div class="form-group">
+            <label class="form-label">Jurusan <span>*</span></label>
+            <select class="form-control" required>
+              <option value="">Pilih Jurusan</option>
+              <option>Teknik Informatika</option>
+              <option>Sistem Informasi</option>
+              <option>Desain Komunikasi Visual</option>
+              <option>Manajemen Informatika</option>
+              <option>Teknik Elektro</option>
+              <option>Lainnya</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Angkatan <span>*</span></label>
+            <select class="form-control" required>
+              <option value="">Tahun</option>
+              <option>2024</option>
+              <option>2023</option>
+              <option>2022</option>
+              <option>2021</option>
+              <option>2020</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span>*</span></label>
+          <div class="input-group">
+            <span class="input-icon"
+              ><i class="icon icon-sm c-muted" data-icon="lock"></i
+            ></span>
+            <input
+              type="password"
+              class="form-control"
+              id="reg-pw"
+              placeholder="Minimal 8 karakter"
+              required
+              oninput="
+                updateDots(3);
+                checkStrength(this.value);
+              "
+            />
+            <button
+              type="button"
+              class="input-action"
+              onclick="togglePw('reg-pw', this)"
+            >
+              <i class="icon icon-sm c-muted" data-icon="eye"></i>
+            </button>
+          </div>
+          <div
+            id="pw-strength"
+            style="margin-top: 6px; display: flex; gap: 4px"
+          >
+            <div
+              style="
+                height: 3px;
+                flex: 1;
+                border-radius: 2px;
+                background: var(--border);
+              "
+              id="ps1"
+            ></div>
+            <div
+              style="
+                height: 3px;
+                flex: 1;
+                border-radius: 2px;
+                background: var(--border);
+              "
+              id="ps2"
+            ></div>
+            <div
+              style="
+                height: 3px;
+                flex: 1;
+                border-radius: 2px;
+                background: var(--border);
+              "
+              id="ps3"
+            ></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Konfirmasi Password <span>*</span></label>
+          <div class="input-group">
+            <span class="input-icon"
+              ><i class="icon icon-sm c-muted" data-icon="lock"></i
+            ></span>
+            <input
+              type="password"
+              class="form-control"
+              id="reg-pw2"
+              placeholder="Ulangi password"
+              required
+            />
+            <button
+              type="button"
+              class="input-action"
+              onclick="togglePw('reg-pw2', this)"
+            >
+              <i class="icon icon-sm c-muted" data-icon="eye"></i>
+            </button>
+          </div>
+        </div>
+        <label
+          style="
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            margin-bottom: 24px;
+          "
+        >
+          <input
+            type="checkbox"
+            style="accent-color: var(--accent); margin-top: 3px"
+            required
+          />
+          Saya setuju dengan
+          <a href="#" style="color: var(--accent)">Syarat &amp; Ketentuan</a>
+          serta
+          <a href="#" style="color: var(--accent)">Kebijakan Privasi</a>
+          SkillSwap.
+        </label>
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg"
+          style="width: 100%; gap: 8px"
+        >
+          <i class="icon" data-icon="refresh-cw" data-color="primary"></i> Buat
+          Akun — Gratis!
+        </button>
+      </form>
     </div>
-    <div class="form-group">
-      <label class="form-label">Email <span>*</span></label>
-      <div class="input-group">
-        <span class="input-icon"><i class="icon icon-sm c-muted" data-icon="mail"></i></span>
-        <input type="email" class="form-control" placeholder="email@mahasiswa.ac.id" required oninput="updateDots(2)">
-      </div>
-    </div>
-    <div class="two-col-form">
-      <div class="form-group">
-        <label class="form-label">Jurusan <span>*</span></label>
-        <select class="form-control" required>
-          <option value="">Pilih Jurusan</option>
-          <option>Teknik Informatika</option>
-          <option>Sistem Informasi</option>
-          <option>Desain Komunikasi Visual</option>
-          <option>Manajemen Informatika</option>
-          <option>Teknik Elektro</option>
-          <option>Lainnya</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Angkatan <span>*</span></label>
-        <select class="form-control" required>
-          <option value="">Tahun</option>
-          <option>2024</option><option>2023</option><option>2022</option>
-          <option>2021</option><option>2020</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Password <span>*</span></label>
-      <div class="input-group">
-        <span class="input-icon"><i class="icon icon-sm c-muted" data-icon="lock"></i></span>
-        <input type="password" class="form-control" id="reg-pw" placeholder="Minimal 8 karakter" required oninput="updateDots(3);checkStrength(this.value)">
-        <button type="button" class="input-action" onclick="togglePw('reg-pw',this)"><i class="icon icon-sm c-muted" data-icon="eye"></i></button>
-      </div>
-      <div id="pw-strength" style="margin-top:6px;display:flex;gap:4px">
-        <div style="height:3px;flex:1;border-radius:2px;background:var(--border)" id="ps1"></div>
-        <div style="height:3px;flex:1;border-radius:2px;background:var(--border)" id="ps2"></div>
-        <div style="height:3px;flex:1;border-radius:2px;background:var(--border)" id="ps3"></div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Konfirmasi Password <span>*</span></label>
-      <div class="input-group">
-        <span class="input-icon"><i class="icon icon-sm c-muted" data-icon="lock"></i></span>
-        <input type="password" class="form-control" id="reg-pw2" placeholder="Ulangi password" required>
-        <button type="button" class="input-action" onclick="togglePw('reg-pw2',this)"><i class="icon icon-sm c-muted" data-icon="eye"></i></button>
-      </div>
-    </div>
-    <label style="display:flex;align-items:flex-start;gap:10px;font-size:0.83rem;color:var(--text-secondary);cursor:pointer;margin-bottom:24px">
-      <input type="checkbox" style="accent-color:var(--accent);margin-top:3px" required>
-      Saya setuju dengan <a href="#" style="color:var(--accent)">Syarat &amp; Ketentuan</a> serta <a href="#" style="color:var(--accent)">Kebijakan Privasi</a> SkillSwap.
-    </label>
-    <button type="submit" class="btn btn-primary btn-lg" style="width:100%;gap:8px">
-      <i class="icon" data-icon="refresh-cw" data-color="primary"></i> Buat Akun — Gratis!
-    </button>
-  </form>
-</div>
-<div id="toast-container"></div>
-<script src="../../assets/js/theme.js"></script>
-<script src="../../assets/js/icons.js"></script>
-<script src="../../assets/js/main.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', initTheme);
-  function togglePw(id, btn) {
-    const el = document.getElementById(id);
-    el.type = el.type === 'password' ? 'text' : 'password';
-    const ic = btn.querySelector('i.icon');
-    ic.dataset.icon = el.type === 'password' ? 'eye' : 'eye-off';
-    hydrateIcons(btn);
-  }
-  function updateDots(step) {
-    for (let i = 1; i <= 3; i++) document.getElementById('dot-'+i).classList.toggle('done', i <= step);
-  }
-  function checkStrength(val) {
-    const strength = Math.min(3,[val.length>=8,/[A-Z]/.test(val),/[0-9!@#$]/.test(val)].filter(Boolean).length);
-    const colors = ['','var(--red)','var(--amber)','var(--green)'];
-    for (let i=1;i<=3;i++) document.getElementById('ps'+i).style.background = i<=strength ? colors[strength] : 'var(--border)';
-  }
-  function handleRegister(e) {
-    e.preventDefault();
-    const pw1 = document.getElementById('reg-pw').value;
-    const pw2 = document.getElementById('reg-pw2').value;
-    if (pw1 !== pw2) { showToast('Password tidak cocok','Pastikan kedua password sama.','error'); return; }
-    const btn = e.target.querySelector('[type="submit"]');
-    btn.disabled = true; btn.innerHTML = '<i class="icon spin" data-icon="refresh-cw" data-color="primary"></i> Membuat akun...';
-    hydrateIcons(btn);
-    setTimeout(() => { window.location.href = 'login.html'; }, 1500);
-  }
-</script>
-</body>
+    <div id="toast-container"></div>
+    <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/icons.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", initTheme);
+      function togglePw(id, btn) {
+        const el = document.getElementById(id);
+        el.type = el.type === "password" ? "text" : "password";
+        const ic = btn.querySelector("i.icon");
+        ic.dataset.icon = el.type === "password" ? "eye" : "eye-off";
+        hydrateIcons(btn);
+      }
+      function updateDots(step) {
+        for (let i = 1; i <= 3; i++)
+          document
+            .getElementById("dot-" + i)
+            .classList.toggle("done", i <= step);
+      }
+      function checkStrength(val) {
+        const strength = Math.min(
+          3,
+          [val.length >= 8, /[A-Z]/.test(val), /[0-9!@#$]/.test(val)].filter(
+            Boolean,
+          ).length,
+        );
+        const colors = ["", "var(--red)", "var(--amber)", "var(--green)"];
+        for (let i = 1; i <= 3; i++)
+          document.getElementById("ps" + i).style.background =
+            i <= strength ? colors[strength] : "var(--border)";
+      }
+      function handleRegister(e) {
+        e.preventDefault();
+        const pw1 = document.getElementById("reg-pw").value;
+        const pw2 = document.getElementById("reg-pw2").value;
+        if (pw1 !== pw2) {
+          showToast(
+            "Password tidak cocok",
+            "Pastikan kedua password sama.",
+            "error",
+          );
+          return;
+        }
+        const btn = e.target.querySelector('[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="icon spin" data-icon="refresh-cw" data-color="primary"></i> Membuat akun...';
+        hydrateIcons(btn);
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 1500);
+      }
+    </script>
+  </body>
 </html>

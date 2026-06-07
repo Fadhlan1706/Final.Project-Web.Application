@@ -1,312 +1,829 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profil &amp; Skill — SkillSwap</title>
-<link rel="stylesheet" href="../../assets/css/variables.css">
-<link rel="stylesheet" href="../../assets/css/global.css">
-<link rel="stylesheet" href="../../assets/css/layout.css">
-<link rel="stylesheet" href="../../assets/css/components.css">
-<link rel="stylesheet" href="../../assets/css/modal-kanban.css">
-<link rel="stylesheet" href="../../assets/css/icons.css">
-<style>
-  .avatar-upload{position:relative;width:96px;height:96px;cursor:pointer}
-  .avatar-upload .avatar-xl{width:96px;height:96px}
-  .avatar-upload-overlay{position:absolute;inset:0;border-radius:20px;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s}
-  .avatar-upload:hover .avatar-upload-overlay{opacity:1}
-  .skill-row{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;transition:all 0.2s;animation:cardIn 0.25s ease both}
-  .skill-row:hover{border-color:var(--border-2)}
-  @keyframes cardIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-  .skill-level-btn{padding:10px;border:1px solid var(--border);border-radius:10px;text-align:center;font-size:0.82rem;transition:all 0.2s;cursor:pointer}
-</style>
-</head>
-<body>
-<div class="app-shell" id="app-shell">
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <div class="brand-icon"><i class="icon icon-lg" data-icon="refresh-cw" data-color="primary"></i></div>
-      <span class="brand-text">Skill<span>Swap</span></span>
-    </div>
-    <button class="navbar-toggle" id="sidebar-toggle"><i class="icon" data-icon="menu" data-color="secondary"></i></button>
-    <div class="navbar-actions">
-      <button class="nav-btn" id="theme-toggle"><i class="icon icon-sm c-muted" data-icon="moon"></i></button>
-      <button class="nav-btn"><i class="icon icon-sm c-muted" data-icon="bell"></i><span class="notif-badge">3</span></button>
-      <div class="profile-dropdown">
-        <div class="profile-btn" id="profile-btn">
-          <div class="profile-avatar">RA</div>
-          <div><div class="profile-name">Reza Anugrah</div><div class="profile-role">Mahasiswa</div></div>
-          <i class="icon icon-sm c-muted" data-icon="chevron-down"></i>
-        </div>
-        <div class="dropdown-menu" id="profile-menu">
-          <a class="dropdown-item" href="profile.html"><i class="icon icon-sm" data-icon="user"></i> Profil Saya</a>
-          <a class="dropdown-item" href="dashboard.html"><i class="icon icon-sm" data-icon="home"></i> Dashboard</a>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item danger" onclick="mockLogout()"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <aside class="sidebar">
-    <span class="sidebar-section-label">Menu Utama</span>
-    <a class="nav-link" href="dashboard.html"><span class="nav-icon"><i class="icon" data-icon="home"></i></span><span class="nav-label">Dashboard</span></a>
-    <a class="nav-link" href="explore.html"><span class="nav-icon"><i class="icon" data-icon="search"></i></span><span class="nav-label">Jelajahi Partner</span></a>
-    <a class="nav-link" href="collaborations.html"><span class="nav-icon"><i class="icon" data-icon="handshake"></i></span><span class="nav-label">Kolaborasi Saya</span><span class="nav-badge">2</span></a>
-    <a class="nav-link active" href="profile.html"><span class="nav-icon"><i class="icon" data-icon="user"></i></span><span class="nav-label">Profil &amp; Skill</span></a>
-    </aside>
-
-  <main class="main-content page-enter">
-    <div class="page-header">
-      <h1 style="display:flex;align-items:center;gap:10px"><i class="icon icon-xl c-accent" data-icon="user"></i> Profil &amp; Skill</h1>
-      <p>Kelola informasi profil dan daftar keahlian yang kamu miliki</p>
-    </div>
-
-    <!-- Profile top card -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px">
-      <div class="avatar-upload" onclick="showToast('Upload Foto','Fitur upload foto akan segera hadir!','warning')">
-        <div class="avatar avatar-xl">RA</div>
-        <div class="avatar-upload-overlay"><i class="icon icon-lg" data-icon="camera" data-color="primary"></i></div>
-      </div>
-      <div style="flex:1">
-        <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800">Reza Anugrah</div>
-        <div style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">Desain Komunikasi Visual · Universitas Sam Ratulangi</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-          <i class="icon icon-sm" data-icon="star" data-color="amber"></i>
-          <span style="font-family:var(--font-display);font-weight:700">4.6</span>
-          <span style="color:var(--text-muted);font-size:0.8rem">(12 ulasan)</span>
-        </div>
-        <div style="display:flex;gap:24px;margin-top:16px;flex-wrap:wrap">
-          <div style="text-align:center"><div style="font-family:var(--font-display);font-weight:800;font-size:1.4rem">8</div><div style="font-size:0.72rem;color:var(--text-muted)">Kolaborasi</div></div>
-          <div style="text-align:center"><div style="font-family:var(--font-display);font-weight:800;font-size:1.4rem">5</div><div style="font-size:0.72rem;color:var(--text-muted)">Selesai</div></div>
-          <div style="text-align:center"><div style="font-family:var(--font-display);font-weight:800;font-size:1.4rem">3</div><div style="font-size:0.72rem;color:var(--text-muted)">Skill</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="two-col" style="gap:20px">
-      <div>
-        <div class="card" style="margin-bottom:20px">
-          <div class="card-header">
-            <span class="card-title" style="display:flex;align-items:center;gap:8px"><i class="icon icon-sm c-accent" data-icon="user"></i> Informasi Profil</span>
-            <button class="btn btn-outline-primary btn-sm" id="edit-profile-btn" onclick="toggleEditProfile()" style="gap:4px">
-              <i class="icon icon-sm" data-icon="edit" data-color="accent"></i> Edit
-            </button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil &amp; Skill — SkillSwap</title>
+    <link rel="stylesheet" href="../../assets/css/variables.css" />
+    <link rel="stylesheet" href="../../assets/css/global.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/modal-kanban.css" />
+    <link rel="stylesheet" href="../../assets/css/icons.css" />
+    <style>
+      .avatar-upload {
+        position: relative;
+        width: 96px;
+        height: 96px;
+        cursor: pointer;
+      }
+      .avatar-upload .avatar-xl {
+        width: 96px;
+        height: 96px;
+      }
+      .avatar-upload-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .avatar-upload:hover .avatar-upload-overlay {
+        opacity: 1;
+      }
+      .skill-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 8px;
+        transition: all 0.2s;
+        animation: cardIn 0.25s ease both;
+      }
+      .skill-row:hover {
+        border-color: var(--border-2);
+      }
+      @keyframes cardIn {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .skill-level-btn {
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        text-align: center;
+        font-size: 0.82rem;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell" id="app-shell">
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <div class="brand-icon">
+            <i
+              class="icon icon-lg"
+              data-icon="refresh-cw"
+              data-color="primary"
+            ></i>
           </div>
-          <form onsubmit="saveProfile(event)" id="profile-form">
-            <div class="form-group"><label class="form-label">Nama Lengkap</label><input class="form-control" type="text" value="Reza Anugrah" readonly></div>
-            <div class="two-col" style="gap:12px">
-              <div class="form-group"><label class="form-label">Jurusan</label><input class="form-control" type="text" value="Desain Komunikasi Visual" readonly></div>
-              <div class="form-group"><label class="form-label">Angkatan</label><input class="form-control" type="text" value="2022" readonly></div>
+          <span class="brand-text">Skill<span>Swap</span></span>
+        </div>
+        <button class="navbar-toggle" id="sidebar-toggle">
+          <i class="icon" data-icon="menu" data-color="secondary"></i>
+        </button>
+        <div class="navbar-actions">
+          <button class="nav-btn" id="theme-toggle">
+            <i class="icon icon-sm c-muted" data-icon="moon"></i>
+          </button>
+          <button class="nav-btn">
+            <i class="icon icon-sm c-muted" data-icon="bell"></i
+            ><span class="notif-badge">3</span>
+          </button>
+          <div class="profile-dropdown">
+            <div class="profile-btn" id="profile-btn">
+              <div class="profile-avatar">RA</div>
+              <div>
+                <div class="profile-name">Reza Anugrah</div>
+                <div class="profile-role">Mahasiswa</div>
+              </div>
+              <i class="icon icon-sm c-muted" data-icon="chevron-down"></i>
             </div>
-            <div class="form-group"><label class="form-label">Universitas</label><input class="form-control" type="text" value="Universitas Sam Ratulangi" readonly></div>
-            <div class="form-group"><label class="form-label">Bio Singkat</label><textarea class="form-control" rows="3" id="bio-input" readonly>UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berdampak.</textarea></div>
-            <div class="form-group">
-              <label class="form-label">LinkedIn (opsional)</label>
-              <div class="input-group">
-                <span class="input-icon"><i class="icon icon-sm c-muted" data-icon="link"></i></span>
-                <input class="form-control" type="url" placeholder="https://linkedin.com/in/username" readonly>
+            <div class="dropdown-menu" id="profile-menu">
+              <a class="dropdown-item" href="profile.html"
+                ><i class="icon icon-sm" data-icon="user"></i> Profil Saya</a
+              >
+              <a class="dropdown-item" href="dashboard.html"
+                ><i class="icon icon-sm" data-icon="home"></i> Dashboard</a
+              >
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-item danger" onclick="mockLogout()">
+                <i class="icon icon-sm" data-icon="log-out"></i> Keluar
               </div>
             </div>
-            <button type="submit" class="btn btn-primary" id="save-profile-btn" style="gap:6px;display:none"><i class="icon icon-sm" data-icon="check" data-color="primary"></i> Simpan Perubahan</button>
+          </div>
+        </div>
+      </nav>
+
+      <aside class="sidebar">
+        <span class="sidebar-section-label">Menu Utama</span>
+        <a class="nav-link" href="dashboard.html"
+          ><span class="nav-icon"><i class="icon" data-icon="home"></i></span
+          ><span class="nav-label">Dashboard</span></a
+        >
+        <a class="nav-link" href="explore.html"
+          ><span class="nav-icon"><i class="icon" data-icon="search"></i></span
+          ><span class="nav-label">Jelajahi Partner</span></a
+        >
+        <a class="nav-link" href="collaborations.html"
+          ><span class="nav-icon"
+            ><i class="icon" data-icon="handshake"></i></span
+          ><span class="nav-label">Kolaborasi Saya</span
+          ><span class="nav-badge">2</span></a
+        >
+        <a class="nav-link active" href="profile.html"
+          ><span class="nav-icon"><i class="icon" data-icon="user"></i></span
+          ><span class="nav-label">Profil &amp; Skill</span></a
+        >
+      </aside>
+
+      <main class="main-content page-enter">
+        <div class="page-header">
+          <h1 style="display: flex; align-items: center; gap: 10px">
+            <i class="icon icon-xl c-accent" data-icon="user"></i> Profil &amp;
+            Skill
+          </h1>
+          <p>Kelola informasi profil dan daftar keahlian yang kamu miliki</p>
+        </div>
+
+        <!-- Profile top card -->
+        <div
+          style="
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+          "
+        >
+          <div
+            class="avatar-upload"
+            onclick="
+              showToast(
+                'Upload Foto',
+                'Fitur upload foto akan segera hadir!',
+                'warning',
+              )
+            "
+          >
+            <div class="avatar avatar-xl">RA</div>
+            <div class="avatar-upload-overlay">
+              <i
+                class="icon icon-lg"
+                data-icon="camera"
+                data-color="primary"
+              ></i>
+            </div>
+          </div>
+          <div style="flex: 1">
+            <div
+              style="
+                font-family: var(--font-display);
+                font-size: 1.4rem;
+                font-weight: 800;
+              "
+            >
+              Reza Anugrah
+            </div>
+            <div
+              style="
+                color: var(--text-muted);
+                font-size: 0.85rem;
+                margin-top: 4px;
+              "
+            >
+              Desain Komunikasi Visual · Universitas Sam Ratulangi
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 8px;
+              "
+            >
+              <i class="icon icon-sm" data-icon="star" data-color="amber"></i>
+              <span style="font-family: var(--font-display); font-weight: 700"
+                >4.6</span
+              >
+              <span style="color: var(--text-muted); font-size: 0.8rem"
+                >(12 ulasan)</span
+              >
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 24px;
+                margin-top: 16px;
+                flex-wrap: wrap;
+              "
+            >
+              <div style="text-align: center">
+                <div
+                  style="
+                    font-family: var(--font-display);
+                    font-weight: 800;
+                    font-size: 1.4rem;
+                  "
+                >
+                  8
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted)">
+                  Kolaborasi
+                </div>
+              </div>
+              <div style="text-align: center">
+                <div
+                  style="
+                    font-family: var(--font-display);
+                    font-weight: 800;
+                    font-size: 1.4rem;
+                  "
+                >
+                  5
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted)">
+                  Selesai
+                </div>
+              </div>
+              <div style="text-align: center">
+                <div
+                  style="
+                    font-family: var(--font-display);
+                    font-weight: 800;
+                    font-size: 1.4rem;
+                  "
+                >
+                  3
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted)">
+                  Skill
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col" style="gap: 20px">
+          <div>
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-header">
+                <span
+                  class="card-title"
+                  style="display: flex; align-items: center; gap: 8px"
+                  ><i class="icon icon-sm c-accent" data-icon="user"></i>
+                  Informasi Profil</span
+                >
+                <button
+                  class="btn btn-outline-primary btn-sm"
+                  id="edit-profile-btn"
+                  onclick="toggleEditProfile()"
+                  style="gap: 4px"
+                >
+                  <i
+                    class="icon icon-sm"
+                    data-icon="edit"
+                    data-color="accent"
+                  ></i>
+                  Edit
+                </button>
+              </div>
+              <form onsubmit="saveProfile(event)" id="profile-form">
+                <div class="form-group">
+                  <label class="form-label">Nama Lengkap</label
+                  ><input
+                    class="form-control"
+                    type="text"
+                    value="Reza Anugrah"
+                    readonly
+                  />
+                </div>
+                <div class="two-col" style="gap: 12px">
+                  <div class="form-group">
+                    <label class="form-label">Jurusan</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      value="Desain Komunikasi Visual"
+                      readonly
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Angkatan</label
+                    ><input
+                      class="form-control"
+                      type="text"
+                      value="2022"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Universitas</label
+                  ><input
+                    class="form-control"
+                    type="text"
+                    value="Universitas Sam Ratulangi"
+                    readonly
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Bio Singkat</label
+                  ><textarea
+                    class="form-control"
+                    rows="3"
+                    id="bio-input"
+                    readonly
+                  >
+UI/UX Designer yang sedang belajar frontend. Passionate tentang desain yang berdampak.</textarea
+                  >
+                </div>
+                <div class="form-group">
+                  <label class="form-label">LinkedIn (opsional)</label>
+                  <div class="input-group">
+                    <span class="input-icon"
+                      ><i class="icon icon-sm c-muted" data-icon="link"></i
+                    ></span>
+                    <input
+                      class="form-control"
+                      type="url"
+                      placeholder="https://linkedin.com/in/username"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  id="save-profile-btn"
+                  style="gap: 6px; display: none"
+                >
+                  <i
+                    class="icon icon-sm"
+                    data-icon="check"
+                    data-color="primary"
+                  ></i>
+                  Simpan Perubahan
+                </button>
+              </form>
+            </div>
+
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-header">
+                <span
+                  class="card-title"
+                  style="display: flex; align-items: center; gap: 8px"
+                  ><i class="icon icon-sm c-accent" data-icon="briefcase"></i>
+                  Ingin Dipelajari</span
+                >
+              </div>
+              <div
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 8px;
+                  margin-bottom: 14px;
+                "
+                id="want-learn-list"
+              >
+                <span class="skill-tag"
+                  >React
+                  <button
+                    onclick="removeWantLearn(this)"
+                    style="
+                      background: none;
+                      color: var(--text-muted);
+                      margin-left: 4px;
+                      font-size: 12px;
+                      cursor: pointer;
+                      line-height: 1;
+                    "
+                  >
+                    <i class="icon icon-sm" data-icon="x"></i></button
+                ></span>
+              </div>
+              <div style="display: flex; gap: 8px">
+                <input
+                  class="form-control"
+                  id="want-learn-input"
+                  placeholder="Tambah skill yang ingin dipelajari..."
+                  style="flex: 1"
+                />
+                <button
+                  class="btn btn-secondary"
+                  onclick="addWantLearn()"
+                  style="gap: 4px"
+                >
+                  <i class="icon icon-sm" data-icon="plus"></i> Tambah
+                </button>
+              </div>
+            </div>
+
+            <!-- Ganti Password Card -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title" style="display: flex; align-items: center; gap: 8px">
+                  <i class="icon icon-sm c-red" data-icon="lock"></i> Keamanan Akun
+                </span>
+              </div>
+              <form onsubmit="changePassword(event)" id="password-form">
+                <div class="form-group">
+                  <label class="form-label">Password Saat Ini</label>
+                  <input class="form-control" type="password" id="current-password" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Password Baru</label>
+                  <input class="form-control" type="password" id="new-password" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Konfirmasi Password Baru</label>
+                  <input class="form-control" type="password" id="new-password-confirm" required />
+                </div>
+                <button type="submit" class="btn btn-outline-danger" style="width: 100%; gap: 6px" id="btn-change-password">
+                  <i class="icon icon-sm" data-icon="key"></i> Ganti Password
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-header">
+                <span
+                  class="card-title"
+                  style="display: flex; align-items: center; gap: 8px"
+                  ><i class="icon icon-sm c-accent" data-icon="layers"></i> Skill
+                  Saya</span
+                >
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="openAddSkillModal()"
+                  style="gap: 4px"
+                >
+                  <i
+                    class="icon icon-sm"
+                    data-icon="plus"
+                    data-color="primary"
+                  ></i>
+                  Tambah
+                </button>
+              </div>
+              <div id="skills-list"></div>
+            </div>
+
+            <!-- Ulasan Card -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title" style="display: flex; align-items: center; gap: 8px">
+                  <i class="icon icon-sm c-amber" data-icon="star"></i> Ulasan
+                </span>
+              </div>
+              <div id="reviews-list">
+                <div class="empty-state" style="padding: 16px 0;">
+                  <div class="empty-state-icon"><i class="icon icon-lg c-muted" data-icon="message-square"></i></div>
+                  <h3>Memuat Ulasan...</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ADD SKILL MODAL -->
+    <div class="modal-overlay" id="add-skill-modal">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <span
+            class="modal-title"
+            id="skill-modal-title"
+            style="display: flex; align-items: center; gap: 8px"
+          >
+            <i class="icon icon-sm c-accent" data-icon="layers"></i> Tambah
+            Skill Baru
+          </span>
+          <button class="modal-close" data-close-modal="add-skill-modal">
+            <i class="icon icon-sm" data-icon="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="form-skill" onsubmit="saveSkill(event)">
+            <div class="form-group">
+              <label class="form-label">Nama Skill <span>*</span></label>
+              <input
+                class="form-control"
+                id="skill-name"
+                placeholder="Contoh: React.js, Figma, Python..."
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kategori</label>
+              <select class="form-control" id="skill-category">
+                <option>Frontend</option>
+                <option>Backend</option>
+                <option>Mobile</option>
+                <option>Design</option>
+                <option>Data Science</option>
+                <option>Database</option>
+                <option>Framework</option>
+                <option>DevOps</option>
+                <option>Motion</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tingkat Keahlian <span>*</span></label>
+              <div style="display: flex; gap: 8px">
+                <div style="flex: 1" onclick="setLevel('Pemula')">
+                  <div class="skill-level-btn" id="lvl-pemula">Pemula</div>
+                </div>
+                <div style="flex: 1" onclick="setLevel('Menengah')">
+                  <div class="skill-level-btn" id="lvl-menengah">Menengah</div>
+                </div>
+                <div style="flex: 1" onclick="setLevel('Mahir')">
+                  <div class="skill-level-btn" id="lvl-mahir">Mahir</div>
+                </div>
+              </div>
+              <input type="hidden" id="skill-level-val" value="Pemula" />
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-close-modal="add-skill-modal"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                id="skill-submit-btn"
+                style="gap: 6px"
+              >
+                <i
+                  class="icon icon-sm"
+                  data-icon="plus"
+                  data-color="primary"
+                ></i>
+                Tambah Skill
+              </button>
+            </div>
           </form>
         </div>
-
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title" style="display:flex;align-items:center;gap:8px"><i class="icon icon-sm c-accent" data-icon="briefcase"></i> Ingin Dipelajari</span>
-          </div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px" id="want-learn-list">
-            <span class="skill-tag">React <button onclick="removeWantLearn(this)" style="background:none;color:var(--text-muted);margin-left:4px;font-size:12px;cursor:pointer;line-height:1"><i class="icon icon-sm" data-icon="x"></i></button></span>
-            <span class="skill-tag">JavaScript <button onclick="removeWantLearn(this)" style="background:none;color:var(--text-muted);margin-left:4px;font-size:12px;cursor:pointer;line-height:1"><i class="icon icon-sm" data-icon="x"></i></button></span>
-            <span class="skill-tag">Backend PHP <button onclick="removeWantLearn(this)" style="background:none;color:var(--text-muted);margin-left:4px;font-size:12px;cursor:pointer;line-height:1"><i class="icon icon-sm" data-icon="x"></i></button></span>
-          </div>
-          <div style="display:flex;gap:8px">
-            <input class="form-control" id="want-learn-input" placeholder="Tambah skill yang ingin dipelajari..." style="flex:1">
-            <button class="btn btn-secondary" onclick="addWantLearn()" style="gap:4px"><i class="icon icon-sm" data-icon="plus"></i> Tambah</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title" style="display:flex;align-items:center;gap:8px"><i class="icon icon-sm c-accent" data-icon="layers"></i> Skill Saya</span>
-          <button class="btn btn-primary btn-sm" onclick="openAddSkillModal()" style="gap:4px">
-            <i class="icon icon-sm" data-icon="plus" data-color="primary"></i> Tambah
-          </button>
-        </div>
-        <div id="skills-list"></div>
       </div>
     </div>
-  </main>
-</div>
 
-<!-- ADD SKILL MODAL -->
-<div class="modal-overlay" id="add-skill-modal">
-  <div class="modal modal-sm">
-    <div class="modal-header">
-      <span class="modal-title" id="skill-modal-title" style="display:flex;align-items:center;gap:8px">
-        <i class="icon icon-sm c-accent" data-icon="layers"></i> Tambah Skill Baru
-      </span>
-      <button class="modal-close" data-close-modal="add-skill-modal"><i class="icon icon-sm" data-icon="x"></i></button>
-    </div>
-    <div class="modal-body">
-      <form id="form-skill" onsubmit="saveSkill(event)">
-        <div class="form-group">
-          <label class="form-label">Nama Skill <span>*</span></label>
-          <input class="form-control" id="skill-name" placeholder="Contoh: React.js, Figma, Python..." required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Kategori</label>
-          <select class="form-control" id="skill-category">
-            <option>Frontend</option><option>Backend</option><option>Mobile</option>
-            <option>Design</option><option>Data Science</option><option>Database</option>
-            <option>Framework</option><option>DevOps</option><option>Motion</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tingkat Keahlian <span>*</span></label>
-          <div style="display:flex;gap:8px">
-            <div style="flex:1" onclick="setLevel('Pemula')"><div class="skill-level-btn" id="lvl-pemula">Pemula</div></div>
-            <div style="flex:1" onclick="setLevel('Menengah')"><div class="skill-level-btn" id="lvl-menengah">Menengah</div></div>
-            <div style="flex:1" onclick="setLevel('Mahir')"><div class="skill-level-btn" id="lvl-mahir">Mahir</div></div>
-          </div>
-          <input type="hidden" id="skill-level-val" value="Pemula">
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button type="button" class="btn btn-secondary" data-close-modal="add-skill-modal">Batal</button>
-          <button type="submit" class="btn btn-primary" id="skill-submit-btn" style="gap:6px">
-            <i class="icon icon-sm" data-icon="plus" data-color="primary"></i> Tambah Skill
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+    <div id="toast-container"></div>
+    <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/icons.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+      let mySkills = [...CURRENT_USER.skills];
+      let editingSkillIdx = null;
+      let selectedLevel = "Pemula";
 
-<div id="toast-container"></div>
-<script src="../../assets/js/theme.js"></script>
-<script src="../../assets/js/mock-data.js"></script>
-<script src="../../assets/js/icons.js"></script>
-<script src="../../assets/js/main.js"></script>
-<script>
-let mySkills = [...CURRENT_USER.skills];
-let editingSkillIdx = null;
-let selectedLevel = 'Pemula';
+      const catIcons = {
+        Frontend: "palette",
+        Backend: "cpu",
+        Mobile: "smartphone",
+        Design: "palette",
+        "Data Science": "bar-chart-2",
+        Database: "database",
+        Framework: "layers",
+        DevOps: "terminal",
+        Motion: "briefcase",
+      };
 
-const catIcons = {Frontend:'palette',Backend:'cpu',Mobile:'smartphone',Design:'palette','Data Science':'bar-chart-2',Database:'database',Framework:'layers',DevOps:'terminal',Motion:'briefcase'};
+      function setLevel(level) {
+        selectedLevel = level;
+        document.getElementById("skill-level-val").value = level;
+        ["Pemula", "Menengah", "Mahir"].forEach((l) => {
+          const el = document.getElementById("lvl-" + l.toLowerCase());
+          if (!el) return;
+          el.style.background = l === level ? "var(--accent-glow)" : "";
+          el.style.borderColor =
+            l === level ? "var(--accent)" : "var(--border)";
+          el.style.color = l === level ? "var(--accent-2)" : "";
+          el.style.fontWeight = l === level ? "600" : "";
+        });
+      }
 
-function setLevel(level) {
-  selectedLevel = level;
-  document.getElementById('skill-level-val').value = level;
-  ['Pemula','Menengah','Mahir'].forEach(l => {
-    const el = document.getElementById('lvl-'+l.toLowerCase());
-    if (!el) return;
-    el.style.background  = l===level ? 'var(--accent-glow)' : '';
-    el.style.borderColor = l===level ? 'var(--accent)' : 'var(--border)';
-    el.style.color       = l===level ? 'var(--accent-2)' : '';
-    el.style.fontWeight  = l===level ? '600' : '';
-  });
-}
-
-function renderSkills() {
-  const list = document.getElementById('skills-list');
-  const levelColor = {Mahir:'green',Menengah:'blue',Pemula:'amber'};
-  if (!mySkills.length) {
-    list.innerHTML = `<div class="empty-state" style="padding:32px 0"><div class="empty-state-icon"><i class="icon icon-2xl c-muted" data-icon="layers"></i></div><h3>Belum ada skill</h3><p>Tambahkan skill pertamamu!</p></div>`;
-    hydrateIcons(list); return;
-  }
-  list.innerHTML = mySkills.map((s,i) => `
+      function renderSkills() {
+        const list = document.getElementById("skills-list");
+        const levelColor = {
+          Mahir: "green",
+          Menengah: "blue",
+          Pemula: "amber",
+        };
+        if (!mySkills.length) {
+          list.innerHTML = `<div class="empty-state" style="padding:32px 0"><div class="empty-state-icon"><i class="icon icon-2xl c-muted" data-icon="layers"></i></div><h3>Belum ada skill</h3><p>Tambahkan skill pertamamu!</p></div>`;
+          hydrateIcons(list);
+          return;
+        }
+        list.innerHTML = mySkills
+          .map(
+            (s, i) => `
     <div class="skill-row">
-      <i class="icon icon-lg c-accent" data-icon="${catIcons[s.category]||'briefcase'}"></i>
+      <i class="icon icon-lg c-accent" data-icon="${catIcons[s.category] || "briefcase"}"></i>
       <div style="flex:1"><div style="font-weight:500;font-size:0.9rem">${s.name}</div><div style="font-size:0.75rem;color:var(--text-muted)">${s.category}</div></div>
-      <span class="badge badge-${levelColor[s.level]||'gray'}">${s.level}</span>
+      <span class="badge badge-${levelColor[s.level] || "gray"}">${s.level}</span>
       <button class="btn btn-ghost btn-icon btn-sm" onclick="editSkill(${i})" title="Edit"><i class="icon icon-sm c-secondary" data-icon="edit"></i></button>
       <button class="btn btn-ghost btn-icon btn-sm" onclick="deleteSkill(${i})" title="Hapus"><i class="icon icon-sm c-red" data-icon="trash-2"></i></button>
     </div>
-  `).join('');
-  hydrateIcons(list);
-}
+  `,
+          )
+          .join("");
+        hydrateIcons(list);
+      }
 
-function openAddSkillModal() {
-  editingSkillIdx = null;
-  document.getElementById('skill-modal-title').innerHTML = '<i class="icon icon-sm c-accent" data-icon="layers"></i> Tambah Skill Baru';
-  document.getElementById('skill-submit-btn').innerHTML  = '<i class="icon icon-sm" data-icon="plus" data-color="primary"></i> Tambah Skill';
-  document.getElementById('form-skill').reset();
-  setLevel('Pemula');
-  openModal('add-skill-modal');
-  hydrateIcons(document.getElementById('add-skill-modal'));
-}
+      function openAddSkillModal() {
+        editingSkillIdx = null;
+        document.getElementById("skill-modal-title").innerHTML =
+          '<i class="icon icon-sm c-accent" data-icon="layers"></i> Tambah Skill Baru';
+        document.getElementById("skill-submit-btn").innerHTML =
+          '<i class="icon icon-sm" data-icon="plus" data-color="primary"></i> Tambah Skill';
+        document.getElementById("form-skill").reset();
+        setLevel("Pemula");
+        openModal("add-skill-modal");
+        hydrateIcons(document.getElementById("add-skill-modal"));
+      }
 
-function saveSkill(e) {
-  e.preventDefault();
-  const name = document.getElementById('skill-name').value.trim();
-  const cat  = document.getElementById('skill-category').value;
-  if (!name) return;
-  if (editingSkillIdx !== null) {
-    mySkills[editingSkillIdx] = {name, category:cat, level:selectedLevel};
-    showToast('Skill Diperbarui',''+name+' berhasil diperbarui.','success');
-  } else {
-    mySkills.push({name, category:cat, level:selectedLevel});
-    showToast('Skill Ditambahkan',''+name+' berhasil ditambahkan!','success');
-  }
-  closeModal('add-skill-modal');
-  editingSkillIdx = null;
-  renderSkills();
-}
+      function saveSkill(e) {
+        e.preventDefault();
+        const name = document.getElementById("skill-name").value.trim();
+        const cat = document.getElementById("skill-category").value;
+        if (!name) return;
+        if (editingSkillIdx !== null) {
+          mySkills[editingSkillIdx] = {
+            name,
+            category: cat,
+            level: selectedLevel,
+          };
+          showToast(
+            "Skill Diperbarui",
+            "" + name + " berhasil diperbarui.",
+            "success",
+          );
+        } else {
+          mySkills.push({ name, category: cat, level: selectedLevel });
+          showToast(
+            "Skill Ditambahkan",
+            "" + name + " berhasil ditambahkan!",
+            "success",
+          );
+        }
+        closeModal("add-skill-modal");
+        editingSkillIdx = null;
+        renderSkills();
+      }
 
-function editSkill(idx) {
-  editingSkillIdx = idx;
-  const s = mySkills[idx];
-  document.getElementById('skill-modal-title').innerHTML = '<i class="icon icon-sm c-accent" data-icon="edit"></i> Edit Skill';
-  document.getElementById('skill-submit-btn').innerHTML  = '<i class="icon icon-sm" data-icon="check" data-color="primary"></i> Simpan';
-  document.getElementById('skill-name').value = s.name;
-  document.getElementById('skill-category').value = s.category;
-  setLevel(s.level);
-  openModal('add-skill-modal');
-  hydrateIcons(document.getElementById('add-skill-modal'));
-}
+      function editSkill(idx) {
+        editingSkillIdx = idx;
+        const s = mySkills[idx];
+        document.getElementById("skill-modal-title").innerHTML =
+          '<i class="icon icon-sm c-accent" data-icon="edit"></i> Edit Skill';
+        document.getElementById("skill-submit-btn").innerHTML =
+          '<i class="icon icon-sm" data-icon="check" data-color="primary"></i> Simpan';
+        document.getElementById("skill-name").value = s.name;
+        document.getElementById("skill-category").value = s.category;
+        setLevel(s.level);
+        openModal("add-skill-modal");
+        hydrateIcons(document.getElementById("add-skill-modal"));
+      }
 
-function deleteSkill(idx) {
-  const name = mySkills[idx].name;
-  mySkills.splice(idx,1);
-  renderSkills();
-  showToast('Skill Dihapus',''+name+' dihapus.','warning');
-}
+      function deleteSkill(idx) {
+        const name = mySkills[idx].name;
+        mySkills.splice(idx, 1);
+        renderSkills();
+        showToast("Skill Dihapus", "" + name + " dihapus.", "warning");
+      }
 
-function saveProfile(e) {
-  e.preventDefault();
-  const form = document.getElementById('profile-form');
-  const inputs = form.querySelectorAll('input, textarea');
-  inputs.forEach(i => i.setAttribute('readonly', 'true'));
-  document.getElementById('save-profile-btn').style.display = 'none';
-  document.getElementById('edit-profile-btn').style.display = 'inline-flex';
-  showToast('Profil Disimpan','Perubahan berhasil disimpan!','success');
-}
+      function saveProfile(e) {
+        e.preventDefault();
+        const form = document.getElementById("profile-form");
+        const inputs = form.querySelectorAll("input, textarea");
+        inputs.forEach((i) => i.setAttribute("readonly", "true"));
+        document.getElementById("save-profile-btn").style.display = "none";
+        document.getElementById("edit-profile-btn").style.display =
+          "inline-flex";
+        showToast("Profil Disimpan", "Perubahan berhasil disimpan!", "success");
+      }
 
-function toggleEditProfile() {
-  const form = document.getElementById('profile-form');
-  const inputs = form.querySelectorAll('input, textarea');
-  inputs.forEach(i => i.removeAttribute('readonly'));
-  document.getElementById('save-profile-btn').style.display = 'inline-flex';
-  document.getElementById('edit-profile-btn').style.display = 'none';
-}
+      function toggleEditProfile() {
+        const form = document.getElementById("profile-form");
+        const inputs = form.querySelectorAll("input, textarea");
+        inputs.forEach((i) => i.removeAttribute("readonly"));
+        document.getElementById("save-profile-btn").style.display =
+          "inline-flex";
+        document.getElementById("edit-profile-btn").style.display = "none";
+      }
 
-function addWantLearn() {
-  const input = document.getElementById('want-learn-input');
-  const val = input.value.trim();
-  if (!val) return;
-  const list = document.getElementById('want-learn-list');
-  const span = document.createElement('span');
-  span.className = 'skill-tag';
-  span.innerHTML = val+' <button onclick="removeWantLearn(this)" style="background:none;color:var(--text-muted);margin-left:4px;font-size:12px;cursor:pointer;line-height:1"><i class="icon icon-sm" data-icon="x"></i></button>';
-  list.appendChild(span);
-  input.value = '';
-}
-function removeWantLearn(btn) { btn.closest('.skill-tag').remove(); }
+      function addWantLearn() {
+        const input = document.getElementById("want-learn-input");
+        const val = input.value.trim();
+        if (!val) return;
+        const list = document.getElementById("want-learn-list");
+        const span = document.createElement("span");
+        span.className = "skill-tag";
+        span.innerHTML =
+          val +
+          ' <button onclick="removeWantLearn(this)" style="background:none;color:var(--text-muted);margin-left:4px;font-size:12px;cursor:pointer;line-height:1"><i class="icon icon-sm" data-icon="x"></i></button>';
+        list.appendChild(span);
+        input.value = "";
+      }
+      function removeWantLearn(btn) {
+        btn.closest(".skill-tag").remove();
+      }
 
-document.getElementById('want-learn-input')?.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();addWantLearn();} });
-document.addEventListener('DOMContentLoaded', () => { renderSkills(); setLevel('Pemula'); });
-</script>
-</body>
+      async function changePassword(e) {
+        e.preventDefault();
+        const currentPassword = document.getElementById("current-password").value;
+        const newPassword = document.getElementById("new-password").value;
+        const newPasswordConfirm = document.getElementById("new-password-confirm").value;
+
+        if (newPassword !== newPasswordConfirm) {
+          showToast("Error", "Password baru dan konfirmasi tidak cocok.", "danger");
+          return;
+        }
+
+        const btn = document.getElementById("btn-change-password");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="icon icon-sm spin" data-icon="refresh-cw"></i> Memproses...';
+        hydrateIcons(btn);
+
+        try {
+          const user = CURRENT_USER; // Di aplikasi nyata, kita akan dapat email dari getMe
+          await API.Auth.changePassword({
+            email: user.email || 'user@student.unsrat.ac.id', // Placeholder for mock
+            current_password: currentPassword,
+            new_password: newPassword,
+            new_password_confirmation: newPasswordConfirm
+          });
+          
+          showToast("Berhasil", "Password berhasil diubah.", "success");
+          document.getElementById("password-form").reset();
+        } catch (err) {
+          showToast("Gagal", err.message || "Gagal mengubah password.", "danger");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="icon icon-sm" data-icon="key"></i> Ganti Password';
+          hydrateIcons(btn);
+        }
+      }
+
+      async function loadReviews() {
+        try {
+          const res = await API.Reviews.getForUser(CURRENT_USER.id || 1); // Mock ID 1
+          const reviews = res.data || [];
+          const list = document.getElementById("reviews-list");
+          
+          if (!reviews.length) {
+            list.innerHTML = `<div class="empty-state" style="padding: 24px 0;"><div class="empty-state-icon"><i class="icon icon-lg c-muted" data-icon="star"></i></div><h3>Belum ada ulasan</h3><p>Selesaikan kolaborasi untuk mendapatkan ulasan.</p></div>`;
+            hydrateIcons(list);
+            return;
+          }
+
+          list.innerHTML = reviews.map(r => `
+            <div style="border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <div style="font-weight: 600;">${r.reviewer_name || 'Pengguna'}</div>
+                <div style="color: var(--amber); display: flex; gap: 2px;">
+                  ${Array(r.rating).fill('<i class="icon icon-sm" data-icon="star" data-color="amber" style="fill: var(--amber)"></i>').join('')}
+                  ${Array(5 - r.rating).fill('<i class="icon icon-sm c-muted" data-icon="star"></i>').join('')}
+                </div>
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">"${r.comment}"</div>
+            </div>
+          `).join('');
+          hydrateIcons(list);
+        } catch(err) {
+          document.getElementById("reviews-list").innerHTML = `<div class="empty-state" style="padding: 24px 0;"><h3 style="color:var(--red)">Gagal memuat ulasan</h3></div>`;
+        }
+      }
+
+      document
+        .getElementById("want-learn-input")
+        ?.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addWantLearn();
+          }
+        });
+      document.addEventListener("DOMContentLoaded", () => {
+        renderSkills();
+        setLevel("Pemula");
+        loadReviews();
+      });
+    </script>
+  </body>
 </html>

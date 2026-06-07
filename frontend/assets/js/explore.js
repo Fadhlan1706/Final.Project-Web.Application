@@ -208,6 +208,47 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Permintaan Terkirim! 🎉', `Permintaan kolaborasi berhasil dikirim ke ${selectedUser.name}!`, 'success', 4000);
   });
 
+  // ── LOAD MATCHES ──
+  async function loadMatches() {
+    if (!document.getElementById('matches-grid')) return;
+    try {
+      if (typeof API !== 'undefined' && API.Skills && API.Skills.getMatches) {
+        const res = await API.Skills.getMatches();
+        const matches = res.data || [];
+        const grid = document.getElementById('matches-grid');
+        
+        if (!matches.length) {
+          grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1; padding: 24px 0;"><h3>Belum ada rekomendasi</h3><p>Tambahkan skill di profil untuk mendapatkan rekomendasi partner.</p></div>';
+          return;
+        }
+
+        // For this demo, let's just map the returned matches to the same HTML structure as renderGrid.
+        // In a real app, the API format would match. Here we adapt it if necessary.
+        grid.innerHTML = matches.map((u, i) => `
+          <div class="user-card fade-in" style="animation-delay:${i * 60}ms" data-id="${u.id}" onclick="openProfileModal(${u.id})">
+            <div class="user-card-header">
+              <div class="user-card-avatar" style="background: linear-gradient(135deg, var(--accent), var(--purple))">
+                ${u.name.substring(0,2).toUpperCase()}
+              </div>
+              <div style="flex:1">
+                <div class="user-card-name">${u.name}</div>
+                <div class="user-card-major">${u.major || 'Mahasiswa'}</div>
+              </div>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--green); margin-top: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+              <i class="icon icon-sm" data-icon="check-circle"></i> Match Score: ${u.match_score}%
+            </div>
+          </div>
+        `).join('');
+        hydrateIcons(grid);
+      }
+    } catch (err) {
+      console.error("Failed to load matches:", err);
+      document.getElementById('matches-grid').innerHTML = '<div class="empty-state" style="grid-column: 1/-1; padding: 24px 0;"><h3 style="color:var(--red)">Gagal memuat rekomendasi</h3></div>';
+    }
+  }
+
   // Init
   renderGrid(MOCK_USERS);
+  loadMatches();
 });

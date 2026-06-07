@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verifikasi Email — SkillSwap</title>
+    <link rel="stylesheet" href="../../assets/css/variables.css" />
+    <link rel="stylesheet" href="../../assets/css/global.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/icons.css" />
+    <style>
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .auth-bg {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 70% 50% at 30% 40%,
+            rgba(92, 124, 250, 0.12),
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 50% 40% at 75% 70%,
+            rgba(190, 75, 219, 0.1),
+            transparent 60%
+          );
+        pointer-events: none;
+      }
+      .auth-container {
+        position: relative;
+        z-index: 1;
+        width: 480px;
+        max-width: calc(100vw - 32px);
+        margin: 16px;
+        animation: pageEnter 0.5s ease both;
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4);
+        border-radius: var(--radius-xl);
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        padding: 48px 36px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+      }
+      .auth-container h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+      .auth-container .subtitle {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 28px;
+      }
+      .icon-circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--accent-glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-bg"></div>
+    <div class="auth-container">
+      <div class="icon-circle">
+        <i class="icon icon-lg" data-icon="mail" data-color="accent"></i>
+      </div>
+      <h1>Verifikasi Email</h1>
+      <p class="subtitle" id="verify-subtitle">
+        Masukkan kode verifikasi yang telah dikirimkan ke email Anda.
+      </p>
+
+      <form id="verify-form" onsubmit="handleVerify(event)">
+        <div class="form-group" style="text-align: left">
+          <label class="form-label">Email <span>*</span></label>
+          <div class="input-group">
+            <span class="input-icon"
+              ><i class="icon icon-sm c-muted" data-icon="mail"></i
+            ></span>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              placeholder="email@mahasiswa.ac.id"
+              required
+            />
+          </div>
+        </div>
+        <div class="form-group" style="text-align: left">
+          <label class="form-label">Kode Verifikasi <span>*</span></label>
+          <div class="input-group">
+            <span class="input-icon"
+              ><i class="icon icon-sm c-muted" data-icon="key"></i
+            ></span>
+            <input
+              type="text"
+              class="form-control"
+              id="code"
+              placeholder="Masukkan 6 digit kode"
+              required
+            />
+          </div>
+        </div>
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg"
+          style="width: 100%; gap: 8px"
+          id="verify-btn"
+        >
+          <i
+            class="icon icon-sm"
+            data-icon="check-circle"
+            data-color="primary"
+          ></i>
+          Verifikasi Sekarang
+        </button>
+      </form>
+
+      <div
+        id="success-state"
+        style="
+          display: none;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        "
+      >
+        <p style="color: var(--text-secondary); font-size: 0.95rem">
+          Email Anda berhasil diverifikasi. Silakan masuk untuk mulai
+          mengeksplorasi SkillSwap.
+        </p>
+        <a href="login.html" class="btn btn-primary btn-lg" style="width: 100%"
+          >Masuk ke Akun</a
+        >
+      </div>
+
+      <div style="margin-top: 32px">
+        <a
+          href="login.html"
+          style="
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+          "
+        >
+          <i class="icon icon-sm c-muted" data-icon="arrow-left"></i> Kembali ke
+          Login
+        </a>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/icons.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const emailParam = urlParams.get("email");
+        const codeParam = urlParams.get("code");
+
+        if (emailParam) document.getElementById("email").value = emailParam;
+        if (codeParam) {
+          document.getElementById("code").value = codeParam;
+          // Auto submit if both are present
+          if (emailParam) {
+            handleVerify(new Event("submit", { cancelable: true }));
+          }
+        }
+      });
+
+      async function handleVerify(e) {
+        if (e) e.preventDefault();
+        const email = document.getElementById("email").value;
+        const code = document.getElementById("code").value;
+        const btn = document.getElementById("verify-btn");
+
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="icon icon-sm spin" data-icon="refresh-cw" data-color="primary"></i> Memverifikasi...';
+        hydrateIcons(btn);
+
+        try {
+          await API.Auth.verifyEmail({ email, code });
+
+          showToast("Berhasil", "Email telah diverifikasi.", "success");
+          document.getElementById("verify-form").style.display = "none";
+          document.getElementById("success-state").style.display = "flex";
+
+          const iconCircle = document.querySelector(".icon-circle");
+          iconCircle.style.background = "var(--green-glow)";
+          iconCircle.innerHTML =
+            '<i class="icon icon-lg" data-icon="check" data-color="green"></i>';
+          hydrateIcons(iconCircle);
+        } catch (error) {
+          showToast("Gagal", error.message, "danger");
+          btn.disabled = false;
+          btn.innerHTML =
+            '<i class="icon icon-sm" data-icon="check-circle" data-color="primary"></i> Verifikasi Sekarang';
+          hydrateIcons(btn);
+        }
+      }
+    </script>
+  </body>
+</html>

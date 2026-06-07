@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kolaborasi — SkillSwap Admin</title>
+<link rel="stylesheet" href="../../assets/css/variables.css">
+<link rel="stylesheet" href="../../assets/css/global.css">
+<link rel="stylesheet" href="../../assets/css/layout.css">
+<link rel="stylesheet" href="../../assets/css/components.css">
+<link rel="stylesheet" href="../../assets/css/icons.css">
+<style>
+  .collab-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .collab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .collab-status {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+  .status-accepted { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+  .status-completed { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+  .status-cancelled { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+</style>
+</head>
+<body>
+<div class="app-shell" id="app-shell">
+
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-icon"><i class="icon icon-sm" data-icon="refresh-cw" data-color="primary"></i></div>
+      <span class="brand-text"><span>Skill<span>Swap</span></span> <span style="font-size:0.6rem;background:var(--red);color:#fff;padding:2px 6px;border-radius:5px;margin-left:4px">ADMIN</span></span>
+    </div>
+    <button class="navbar-toggle" id="sidebar-toggle"><i class="icon" data-icon="menu" data-color="secondary"></i></button>
+    <div class="navbar-search"><span class="search-icon"><i class="icon icon-sm c-muted" data-icon="search"></i></span><input type="text" id="collab-search" placeholder="Cari kolaborasi..."></div>
+    <div class="navbar-actions">
+      <button class="nav-btn" id="theme-toggle"><i class="icon icon-sm c-muted" data-icon="sun"></i></button>
+      <div class="profile-dropdown">
+        <div class="profile-btn" id="profile-btn">
+          <div class="profile-avatar" style="background:linear-gradient(135deg,var(--red),#ff8787)">AD</div>
+          <div><div class="profile-name">Admin</div><div class="profile-role">Administrator</div></div>▾
+        </div>
+        <div class="dropdown-menu" id="profile-menu">
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" onclick="API.Auth.logout().then(()=>window.location.href='../auth/login.html')"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <aside class="sidebar">
+    <span class="sidebar-section-label">Panel Admin</span>
+    <a class="nav-link" href="dashboard.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="bar-chart-2"></i></span><span class="nav-label">Overview</span></a>
+    <a class="nav-link" href="manage-users.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="users"></i></span><span class="nav-label">Kelola User</span></a>
+    <a class="nav-link" href="categories.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="tag"></i></span><span class="nav-label">Kategori Skill</span></a>
+    <a class="nav-link active" href="collaborations.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="briefcase"></i></span><span class="nav-label">Kolaborasi</span></a>
+    <a class="nav-link" href="reports.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="flag"></i></span><span class="nav-label">Laporan</span></a>
+  </aside>
+
+  <main class="main-content page-enter">
+    <div class="page-header-row" style="margin-bottom:24px">
+      <div class="page-header" style="margin-bottom:0">
+        <h1><i class="icon icon-sm" data-icon="briefcase"></i> Semua Kolaborasi</h1>
+        <p>Pantau seluruh aktivitas kolaborasi antar pengguna</p>
+      </div>
+    </div>
+
+    <div class="cards-grid" id="collaborations-grid">
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-state-icon"><i class="icon icon-sm" data-icon="loader"></i></div>
+        <h3>Memuat data kolaborasi...</h3>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/icons.js"></script>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script>
+let collaborations = [];
+
+function renderCollaborations(list) {
+  const grid = document.getElementById('collaborations-grid');
+  const q = document.getElementById('collab-search')?.value.toLowerCase() || '';
+  const filtered = list.filter(c => 
+    (c.notes && c.notes.toLowerCase().includes(q)) || 
+    (c.requester_name && c.requester_name.toLowerCase().includes(q)) ||
+    (c.receiver_name && c.receiver_name.toLowerCase().includes(q))
+  );
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon"><i class="icon icon-sm" data-icon="briefcase"></i></div><h3>Tidak ada kolaborasi ditemukan</h3></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => {
+    let statusClass = 'status-pending';
+    if(c.status === 'accepted') statusClass = 'status-accepted';
+    if(c.status === 'completed') statusClass = 'status-completed';
+    if(c.status === 'cancelled') statusClass = 'status-cancelled';
+
+    return `
+    <div class="card collab-card">
+      <div class="collab-header">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;">ID #${c.id}</div>
+        <span class="collab-status ${statusClass}">${c.status}</span>
+      </div>
+      <div style="font-size:0.85rem;color:var(--text-secondary);display:flex;justify-content:space-between;">
+        <div><strong>Dari:</strong> ${c.requester_name || 'User ' + c.requester_id}</div>
+        <div><strong>Ke:</strong> ${c.receiver_name || 'User ' + c.receiver_id}</div>
+      </div>
+      <div style="font-size:0.85rem;color:var(--text-secondary);">
+        <strong>Skill Ditawarkan:</strong> ID ${c.offered_skill_id} <br>
+        <strong>Skill Diminta:</strong> ID ${c.requested_skill_id}
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px;padding-top:8px;border-top:1px solid var(--border-color);">
+        <em>"${c.notes || 'Tanpa catatan'}"</em>
+      </div>
+    </div>
+  `}).join('');
+}
+
+async function loadCollaborations() {
+  try {
+    const res = await API.Admin.listCollaborations();
+    collaborations = res.data || [];
+    renderCollaborations(collaborations);
+  } catch (err) {
+    console.error(err);
+    document.getElementById('collaborations-grid').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;color:var(--red);">
+        <div class="empty-state-icon"><i class="icon icon-sm" data-icon="alert-circle"></i></div>
+        <h3>Gagal memuat data</h3>
+        <p>${err.message}</p>
+      </div>`;
+  }
+}
+
+document.getElementById('collab-search').addEventListener('input', () => renderCollaborations(collaborations));
+document.addEventListener('DOMContentLoaded', loadCollaborations);
+</script>
+</body>
+</html>
