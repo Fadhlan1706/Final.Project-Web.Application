@@ -14,15 +14,11 @@ class UserRepository
     {
         $this->db = Database::getInstance();
     }
-
-    // ----------------------------------------------------------------
-    // Finders
-    // ----------------------------------------------------------------
-
+    
     public function findById(int $id): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT id, name, email, role, avatar, bio, jurusan, angkatan, is_active, created_at
+            'SELECT id, name, email, major, bio, profilePicture, reputationScore, status, is_verified, create_at
              FROM users WHERE id = ? LIMIT 1'
         );
         $stmt->execute([$id]);
@@ -42,8 +38,8 @@ class UserRepository
     {
         $offset = ($page - 1) * $perPage;
         $stmt   = $this->db->prepare(
-            'SELECT id, name, email, role, avatar, bio, jurusan, angkatan, is_active, created_at
-             FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?'
+            'SELECT id, name, email, major, bio, profilePicture, reputationScore, status, is_verified, create_at
+             FROM users ORDER BY create_at DESC LIMIT ? OFFSET ?'
         );
         $stmt->execute([$perPage, $offset]);
         return $stmt->fetchAll();
@@ -54,30 +50,22 @@ class UserRepository
         return (int)$this->db->query('SELECT COUNT(*) FROM users')->fetchColumn();
     }
 
-    // ----------------------------------------------------------------
-    // Explore / Talent Search
-    // ----------------------------------------------------------------
-
-    /**
-     * Search users who have skills matching a query.
-     * Optionally filter by category, level, and minimum rating.
-     */
     public function searchTalents(array $filters = [], int $page = 1, int $perPage = 12): array
     {
-        $conditions = ['u.is_active = 1', "u.role = 'user'"];
+        $conditions = ["u.status = 'active'"];
         $bindings   = [];
 
         if (!empty($filters['search'])) {
-            $conditions[] = '(s.name LIKE ? OR u.name LIKE ?)';
+            $conditions[] = '(s.skillName LIKE ? OR u.name LIKE ?)';
             $bindings[]   = '%' . $filters['search'] . '%';
             $bindings[]   = '%' . $filters['search'] . '%';
         }
         if (!empty($filters['category_id'])) {
-            $conditions[] = 's.category_id = ?';
+            $conditions[] = 's.categoryId = ?';
             $bindings[]   = (int)$filters['category_id'];
         }
         if (!empty($filters['level'])) {
-            $conditions[] = 's.level = ?';
+            $conditions[] = 's.skillLevel = ?';
             $bindings[]   = $filters['level'];
         }
 
@@ -86,13 +74,14 @@ class UserRepository
 
         $sql = "
             SELECT DISTINCT
-                u.id, u.name, u.avatar, u.bio, u.jurusan,
+                u.id, u.name, u.profilePicture, u.bio, u.major, u.reputationScore,
                 COALESCE(AVG(r.rating), 0) AS avg_rating,
                 COUNT(DISTINCT r.id)       AS review_count
             FROM users u
-            LEFT JOIN skills  s ON s.user_id = u.id AND s.type = 'offered' AND s.is_active = 1
-            LEFT JOIN reviews r ON r.reviewee_id = u.id
+            LEFT JOIN skills  s ON s.userId = u.id
+            LEFT JOIN reviews r ON r.reviewedUserId = u.id
             WHERE $where
+            GROUP BY u.id
         ";
 
         if (!empty($filters['min_rating'])) {
@@ -109,23 +98,26 @@ class UserRepository
         return $stmt->fetchAll();
     }
 
-    // ----------------------------------------------------------------
-    // Write operations
-    // ----------------------------------------------------------------
-
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO users (name, email, password, role)
-             VALUES (:name, :email, :password, :role)'
+            'INSERT INTO users (name, email, password, is_verified, verification_code)
+             VALUES (:name, :email, :password, :is_verified, :verification_code)'
         );
         $stmt->execute([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => $data['password'],
-            'role'     => $data['role'] ?? 'user',
+            'name'              => $data['name'],
+            'email'             => $data['email'],
+            'password'          => $data['password'],
+            'is_verified'       => $data['is_verified'] ?? 0,
+            'verification_code' => $data['verification_code'] ?? null,
         ]);
         return (int)$this->db->lastInsertId();
+    }
+
+    public function verifyEmail(int $id): bool
+    {
+        $stmt = $this->db->prepare('UPDATE users SET is_verified = 1, verification_code = NULL WHERE id = ?');
+        return $stmt->execute([$id]);
     }
 
     public function updateProfile(int $id, array $data): bool
@@ -133,10 +125,17 @@ class UserRepository
         $fields   = [];
         $bindings = [];
 
-        foreach (['name', 'bio', 'jurusan', 'angkatan', 'avatar'] as $field) {
-            if (array_key_exists($field, $data)) {
-                $fields[]         = "$field = :$field";
-                $bindings[$field] = $data[$field];
+        $schemaMapping = [
+            'name'           => 'name',
+            'bio'            => 'bio',
+            'major'          => 'major',
+            'profilePicture' => 'profilePicture'
+        ];
+
+        foreach ($schemaMapping as $arrayKey => $dbColumn) {
+            if (array_key_exists($arrayKey, $data)) {
+                $fields[]         = "$dbColumn = :$arrayKey";
+                $bindings[$arrayKey] = $data[$arrayKey];
             }
         }
 
@@ -155,10 +154,14 @@ class UserRepository
         return $stmt->execute([$hashedPassword, $id]);
     }
 
-    public function setActiveStatus(int $id, bool $active): bool
+    public function setStatus(int $id, string $status): bool
     {
-        $stmt = $this->db->prepare('UPDATE users SET is_active = ? WHERE id = ?');
-        return $stmt->execute([(int)$active, $id]);
+        // Allowed values matching schema enum constraints
+        if (!in_array($status, ['active', 'suspended'])) {
+            return false;
+        }
+        $stmt = $this->db->prepare('UPDATE users SET status = ? WHERE id = ?');
+        return $stmt->execute([$status, $id]);
     }
 
     public function delete(int $id): bool
@@ -167,21 +170,15 @@ class UserRepository
         return $stmt->execute([$id]);
     }
 
-    // ----------------------------------------------------------------
-    // Stats
-    // ----------------------------------------------------------------
-
     public function getStats(int $userId): array
     {
         $stmt = $this->db->prepare("
             SELECT
-                (SELECT COUNT(*) FROM skills WHERE user_id = :uid AND is_active = 1)                     AS total_skills,
-                (SELECT COUNT(*) FROM collaborations WHERE (requester_id = :uid OR receiver_id = :uid))  AS total_collabs,
-                (SELECT COUNT(*) FROM collaborations
-                    WHERE (requester_id = :uid OR receiver_id = :uid) AND status = 'pending')             AS pending_requests,
-                (SELECT COUNT(*) FROM collaborations
-                    WHERE (requester_id = :uid OR receiver_id = :uid) AND status = 'completed')           AS completed_collabs,
-                (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE reviewee_id = :uid)                  AS avg_rating
+                (SELECT COUNT(*) FROM skills WHERE userId = :uid) AS total_skills,
+                (SELECT COUNT(*) FROM collaborationRequests WHERE senderId = :uid OR receiverId = :uid) AS total_collabs,
+                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = :uid OR receiverId = :uid) AND status = 'pending') AS pending_requests,
+                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = :uid OR receiverId = :uid) AND status = 'completed') AS completed_collabs,
+                (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE reviewedUserId = :uid) AS avg_rating
         ");
         $stmt->execute(['uid' => $userId]);
         return $stmt->fetch();

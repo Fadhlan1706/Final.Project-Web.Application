@@ -11,10 +11,11 @@ use App\Helpers\Router;
 // ====================================================================
 // AUTH
 // ====================================================================
-Router::post('/api/auth/register',  [AuthController::class, 'register']);
-Router::post('/api/auth/login',     [AuthController::class, 'login']);
-Router::post('/api/auth/logout',    [AuthController::class, 'logout']);
-Router::get( '/api/auth/me',        [AuthController::class, 'me']);
+Router::post('/api/auth/register',     [AuthController::class, 'register']);
+Router::post('/api/auth/verify-email', [AuthController::class, 'verifyEmail']);
+Router::post('/api/auth/login',        [AuthController::class, 'login']);
+Router::post('/api/auth/logout',       [AuthController::class, 'logout']);
+Router::get( '/api/auth/me',           [AuthController::class, 'me']);
 Router::put( '/api/auth/password',  [AuthController::class, 'changePassword']);
 
 // Profile

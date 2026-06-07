@@ -20,9 +20,6 @@ class AuthController
         $this->users = new UserRepository();
     }
 
-    // ----------------------------------------------------------------
-    // POST /api/auth/register
-    // ----------------------------------------------------------------
     public function register(): void
     {
         AuthMiddleware::guest();
@@ -36,7 +33,6 @@ class AuthController
             'password_confirmation' => 'required|confirmed',
         ]);
 
-        // Reuse "confirmed" from password field
         $body['password_confirmation'] = $body['password_confirmation'] ?? '';
 
         $v2 = Validator::make($body, [
@@ -45,7 +41,6 @@ class AuthController
             'password' => 'required|min:8|max:72',
         ]);
 
-        // Manual confirmation check
         if (($body['password'] ?? '') !== ($body['password_confirmation'] ?? '')) {
             Response::validationError(['password_confirmation' => ['Passwords do not match.']]);
         }
@@ -54,7 +49,6 @@ class AuthController
             Response::validationError($v2->errors());
         }
 
-        // Restrict registration to the specific student domain
         if (isset($body['email']) && !str_ends_with($body['email'], '@student.unsrat.ac.id')) {
             Response::validationError(['email' => ['Please use your unsrat email to register.']]);
         }
@@ -68,9 +62,30 @@ class AuthController
         Response::success($result['data'], $result['message'], 201);
     }
 
-    // ----------------------------------------------------------------
-    // POST /api/auth/login
-    // ----------------------------------------------------------------
+    public function verifyEmail(): void
+    {
+        AuthMiddleware::guest();
+
+        $body = $this->jsonBody();
+
+        $v = Validator::make($body, [
+            'email' => 'required|email',
+            'code'  => 'required',
+        ]);
+
+        if ($v->fails()) {
+            Response::validationError($v->errors());
+        }
+
+        $result = $this->auth->verifyEmail($body['email'], $body['code']);
+
+        if (!$result['success']) {
+            Response::error($result['message'], 400);
+        }
+
+        Response::success([], $result['message']);
+    }
+
     public function login(): void
     {
         AuthMiddleware::guest();
@@ -100,9 +115,6 @@ class AuthController
         Response::success($result['data'], $result['message']);
     }
 
-    // ----------------------------------------------------------------
-    // POST /api/auth/logout
-    // ----------------------------------------------------------------
     public function logout(): void
     {
         AuthMiddleware::handle();
@@ -110,9 +122,6 @@ class AuthController
         Response::success(null, 'Logged out successfully.');
     }
 
-    // ----------------------------------------------------------------
-    // GET /api/auth/me
-    // ----------------------------------------------------------------
     public function me(): void
     {
         AuthMiddleware::handle();
@@ -127,9 +136,6 @@ class AuthController
         Response::success($user);
     }
 
-    // ----------------------------------------------------------------
-    // PUT /api/auth/password
-    // ----------------------------------------------------------------
     public function changePassword(): void
     {
         AuthMiddleware::handle();
@@ -137,6 +143,7 @@ class AuthController
         $body = $this->jsonBody();
 
         $v = Validator::make($body, [
+            'email'            => 'required|email',
             'current_password' => 'required',
             'new_password'     => 'required|min:8|max:72',
         ]);
@@ -149,8 +156,14 @@ class AuthController
             Response::validationError(['new_password_confirmation' => ['Passwords do not match.']]);
         }
 
-        $userId = (int)\App\Helpers\Session::get('user_id');
-        $result = $this->auth->changePassword($userId, $body['current_password'], $body['new_password']);
+        $currentUser = $this->auth->currentUser();
+        $sessionEmail = $currentUser['email'] ?? $currentUser['EMAIL'] ?? '';
+
+        if (strtolower(trim($body['email'])) !== strtolower(trim($sessionEmail))) {
+            Response::error('You can only change the password for your own logged-in account.', 403);
+        }
+
+        $result = $this->auth->changePassword($body['email'], $body['current_password'], $body['new_password']);
 
         if (!$result['success']) {
             Response::error($result['message'], 422);
@@ -159,24 +172,19 @@ class AuthController
         Response::success(null, $result['message']);
     }
 
-    // ----------------------------------------------------------------
-    // PUT /api/profile
-    // ----------------------------------------------------------------
     public function updateProfile(): void
     {
         AuthMiddleware::handle();
 
         $userId = (int)\App\Helpers\Session::get('user_id');
 
-        // Handle multipart form (file upload) OR JSON
         $isMultipart = str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data');
         $body        = $isMultipart ? $_POST : $this->jsonBody();
 
         $v = Validator::make($body, [
-            'name'    => 'required|min:2|max:100',
-            'bio'     => 'max:500',
-            'jurusan' => 'max:100',
-            'angkatan'=> 'integer',
+            'name'  => 'required|min:2|max:100',
+            'bio'   => 'max:500',
+            'major' => 'max:100'
         ]);
 
         if ($v->fails()) {
@@ -184,19 +192,17 @@ class AuthController
         }
 
         $updateData = [
-            'name'    => $body['name'],
-            'bio'     => $body['bio']     ?? null,
-            'jurusan' => $body['jurusan'] ?? null,
-            'angkatan'=> $body['angkatan'] ? (int)$body['angkatan'] : null,
+            'name'  => $body['name'],
+            'bio'   => $body['bio']   ?? null,
+            'major' => $body['major'] ?? null,
         ];
 
-        // Handle avatar upload
-        if ($isMultipart && !empty($_FILES['avatar']['tmp_name'])) {
-            $avatarPath = $this->handleAvatarUpload($_FILES['avatar'], $userId);
+        if ($isMultipart && !empty($_FILES['profilePicture']['tmp_name'])) {
+            $avatarPath = $this->handleAvatarUpload($_FILES['profilePicture'], $userId);
             if ($avatarPath === false) {
-                Response::error('Invalid or oversized avatar file.', 422);
+                Response::error('Invalid or oversized image file.', 422);
             }
-            $updateData['avatar'] = $avatarPath;
+            $updateData['profilePicture'] = $avatarPath;
         }
 
         $this->users->updateProfile($userId, $updateData);
@@ -205,10 +211,6 @@ class AuthController
         unset($user['password']);
         Response::success($user, 'Profile updated.');
     }
-
-    // ----------------------------------------------------------------
-    // Internal helpers
-    // ----------------------------------------------------------------
 
     private function jsonBody(): array
     {
