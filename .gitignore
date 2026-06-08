@@ -1,1 +1,17 @@
 .env
+insert_admin.php
+temp_check_2.php
+temp_check_3.php
+temp_check_stats.php
+temp_check.php
+test_api.php
+test_collab_api.php
+test_collab.php
+test_cors.php
+test_db.php
+test_desc_users.php
+test_find_id.php
+test_mail.php
+test_me_api.php
+test_queries.php
+test.php
