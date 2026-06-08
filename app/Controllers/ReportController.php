@@ -40,11 +40,16 @@ class ReportController
             Response::error('You cannot report yourself.', 400);
         }
 
+        // Dynamically find an admin to assign
+        $db = \App\Helpers\Database::getInstance();
+        $admin = $db->query("SELECT id FROM admins LIMIT 1")->fetch();
+        $adminId = $admin ? $admin['id'] : 1;
+
         $id = $this->reports->create([
             'reporter_id'      => $reporterId,
             'reported_user_id' => (int)$body['reported_user_id'],
             'reason'           => trim($body['reason']),
-            'handled_by_admin_id' => 1 // Default assignment since NOT NULL in schema
+            'handled_by_admin_id' => $adminId
         ]);
 
         Response::success(['id' => $id], 'Report submitted successfully.', 201);

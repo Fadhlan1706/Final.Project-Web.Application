@@ -54,5 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 \App\Helpers\Session::start();
 
 require ROOT . '/routes/api.php';
-
-\App\Helpers\Router::dispatch();
+try {
+    \App\Helpers\Router::dispatch();
+} catch (\Throwable $e) {
+    // Ensure that API errors always return JSON, even if display_errors is on
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Internal Server Error',
+        'debug' => $debug ? $e->getMessage() : null
+    ]);
+}
