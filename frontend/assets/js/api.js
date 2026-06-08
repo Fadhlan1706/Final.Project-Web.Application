@@ -50,8 +50,9 @@ const API = {
   // ================== AUTH ==================
   Auth: {
     register: (data) => fetchAPI("/api/auth/register", "POST", data),
-    verifyEmail: (data) => fetchAPI("/api/auth/verify-email", "POST", data),
     login: (data) => fetchAPI("/api/auth/login", "POST", data),
+    adminLogin: (data) => fetchAPI("/api/auth/admin-login", "POST", data),
+    verifyEmail: (data) => fetchAPI("/api/auth/verify-email", "POST", data),
     logout: () => fetchAPI("/api/auth/logout", "POST"),
     getMe: () => fetchAPI("/api/auth/me", "GET"),
     changePassword: (data) => fetchAPI("/api/auth/password", "PUT", data),
@@ -102,8 +103,8 @@ const API = {
 
   // ================== ADMIN ==================
   Admin: {
-    getReports: () => fetchAPI("/api/admin/reports", "GET"),
-    getUsers: () => fetchAPI("/api/admin/users", "GET"),
+    getReportsOverview: () => fetchAPI("/api/admin/reports", "GET"),
+    getUsers: (page = 1, search = "") => fetchAPI(`/api/admin/users?page=${page}&search=${encodeURIComponent(search)}`, "GET"),
     getUser: (id) => fetchAPI(`/api/admin/users/${id}`, "GET"),
     suspendUser: (id) => fetchAPI(`/api/admin/users/${id}/suspend`, "PUT"),
     restoreUser: (id) => fetchAPI(`/api/admin/users/${id}/restore`, "PUT"),
@@ -114,5 +115,7 @@ const API = {
     deleteCategory: (id) => fetchAPI(`/api/admin/categories/${id}`, "DELETE"),
     deleteSkill: (id) => fetchAPI(`/api/admin/skills/${id}`, "DELETE"),
     listCollaborations: () => fetchAPI("/api/admin/collaborations", "GET"),
+    getReportsList: (page = 1) => fetchAPI(`/api/admin/reports-list?page=${page}`, "GET"),
+    updateReportStatus: (id, status) => fetchAPI(`/api/admin/reports/${id}`, "PUT", { status })
   },
 };

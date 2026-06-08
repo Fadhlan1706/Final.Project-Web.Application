@@ -257,9 +257,9 @@
       </div>
 
       <div class="auth-form-wrap">
-        <h1>Masuk</h1>
+        <h1>Admin Login</h1>
         <p class="subtitle">
-          Belum punya akun? <a href="register.html">Daftar gratis</a>
+          Portal khusus Administrator. <a href="login.html">Masuk sebagai Mahasiswa</a>
         </p>
 
         <form id="login-form" onsubmit="handleLogin(event)">
@@ -273,7 +273,7 @@
                 type="email"
                 class="form-control"
                 id="email"
-                placeholder="email@mahasiswa.ac.id"
+                placeholder="admin@domain.com"
                 required
               />
             </div>
@@ -367,7 +367,7 @@
         hydrateIcons(btn);
 
         try {
-          const res = await API.Auth.login({ email, password });
+          const res = await API.Auth.adminLogin({ email, password });
           
           // Save user data to localStorage so main.js getSession() works
           const userData = res.data;
@@ -379,7 +379,7 @@
           showToast("Berhasil", "Login berhasil", "success");
           
           setTimeout(() => {
-            window.location.href = "../user/dashboard.html";
+            window.location.href = "../admin/dashboard.html";
           }, 1000);
           
         } catch (error) {

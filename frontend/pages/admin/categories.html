@@ -30,7 +30,7 @@
         </div>
         <div class="dropdown-menu" id="profile-menu">
           <div class="dropdown-divider"></div>
-          <div class="dropdown-item danger" onclick="mockLogout()"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
+          <div class="dropdown-item danger" onclick="API.Auth.logout().then(() => { localStorage.removeItem('access_token'); localStorage.removeItem('user_data'); window.location.href = '../auth/admin-login.html'; })"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@
     <a class="nav-link" href="dashboard.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="bar-chart-2"></i></span><span class="nav-label">Overview</span></a>
     <a class="nav-link" href="manage-users.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="users"></i></span><span class="nav-label">Kelola User</span></a>
     <a class="nav-link active" href="categories.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="tag"></i></span><span class="nav-label">Kategori Skill</span></a>
-    <a class="nav-link" href="reports.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="flag"></i></span><span class="nav-label">Laporan</span><span class="nav-badge" style="background:var(--red)">3</span></a>
+    <a class="nav-link" href="reports.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="flag"></i></span><span class="nav-label">Laporan</span></a>
     </aside>
 
   <main class="main-content page-enter">
@@ -91,20 +91,11 @@
 <div id="toast-container"></div>
 
 <script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/icons.js"></script>
 <script src="../../assets/js/main.js"></script>
 <script>
-let categories = [
-  { id:1, name:'Frontend',     icon:'<i class="icon icon-sm" data-icon="palette"></i>', desc:'HTML, CSS, JavaScript, React, Vue, Angular', count:142 },
-  { id:2, name:'Backend',      icon:'<i class="icon icon-sm" data-icon="settings"></i>', desc:'PHP, Node.js, Python, Java, Laravel, Express', count:118 },
-  { id:3, name:'Mobile',       icon:'<i class="icon icon-sm" data-icon="smartphone"></i>', desc:'Android, iOS, Flutter, React Native, Kotlin', count:87 },
-  { id:4, name:'Design',       icon:'<i class="icon icon-sm" data-icon="edit"></i>', desc:'Figma, Adobe XD, UI/UX, Illustrator, Photoshop', count:203 },
-  { id:5, name:'Data Science', icon:'<i class="icon icon-sm" data-icon="bar-chart-2"></i>', desc:'Python, R, Pandas, Machine Learning, Tableau', count:64 },
-  { id:6, name:'Database',     icon:'<i class="icon icon-sm" data-icon="database"></i>', desc:'MySQL, PostgreSQL, MongoDB, Redis, SQL Server', count:96 },
-  { id:7, name:'Framework',    icon:'<i class="icon icon-sm" data-icon="grid-2x2"></i>', desc:'Laravel, Django, Spring Boot, Next.js, Nuxt.js', count:77 },
-  { id:8, name:'DevOps',       icon:'<i class="icon icon-sm" data-icon="terminal"></i>', desc:'Docker, Kubernetes, CI/CD, AWS, Git', count:43 },
-  { id:9, name:'Motion',       icon:'<i class="icon icon-sm" data-icon="briefcase"></i>', desc:'After Effects, Premiere, Motion Graphics, 3D', count:31 },
-];
+let categories = [];
 let editingCatId = null;
 
 function renderCategories(list) {
@@ -118,17 +109,16 @@ function renderCategories(list) {
   grid.innerHTML = filtered.map(c => `
     <div class="card" style="cursor:default">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="font-size:2rem">${c.icon}</div>
+        <div style="font-size:2rem"><i class="icon icon-sm" data-icon="tag"></i></div>
         <div style="display:flex;gap:6px">
           <button class="btn btn-secondary btn-sm" onclick="editCategory(${c.id})"><i class="icon icon-sm" data-icon="edit"></i></button>
           <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})"><i class="icon icon-sm" data-icon="trash-2"></i></button>
         </div>
       </div>
       <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:6px">${c.name}</div>
-      <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:14px;line-height:1.5">${c.desc}</div>
+      <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:14px;line-height:1.5">${c.description || '-'}</div>
       <div style="display:flex;align-items:center;justify-content:space-between">
-        <span class="badge badge-blue">${c.count} skill</span>
-        <span style="font-size:0.72rem;color:var(--text-muted)">Aktif</span>
+        <span class="badge badge-blue">Kategori Aktif</span>
       </div>
     </div>
   `).join('');
@@ -152,39 +142,56 @@ function editCategory(id) {
   document.getElementById('cat-submit-btn').textContent  = 'Simpan Simpan';
   document.getElementById('cat-edit-id').value = id;
   document.getElementById('cat-name').value    = c.name;
-  document.getElementById('cat-icon').value    = c.icon;
-  document.getElementById('cat-desc').value    = c.desc;
+  document.getElementById('cat-desc').value    = c.description || '';
   openModal('cat-modal');
 }
 
-function deleteCategory(id) {
-  const c = categories.find(x => x.id === id);
-  if (!c) return;
-  categories = categories.filter(x => x.id !== id);
-  renderCategories(categories);
-  showToast('Kategori Dihapus', `${c.name} telah dihapus.`, 'warning');
+async function deleteCategory(id) {
+  if (!confirm("Yakin ingin menghapus kategori ini?")) return;
+  try {
+    await API.Admin.deleteCategory(id);
+    showToast('Kategori Dihapus', `Kategori telah dihapus.`, 'warning');
+    fetchCategories();
+  } catch(e) {
+    showToast('Gagal', e.message, 'danger');
+  }
 }
 
-function saveCategory(e) {
+async function saveCategory(e) {
   e.preventDefault();
   const name = document.getElementById('cat-name').value.trim();
-  const icon = document.getElementById('cat-icon').value.trim() || 'Lainnya';
-  const desc = document.getElementById('cat-desc').value.trim();
+  const description = document.getElementById('cat-desc').value.trim();
 
-  if (editingCatId) {
-    const c = categories.find(x => x.id === editingCatId);
-    if (c) { c.name = name; c.icon = icon; c.desc = desc; }
-    showToast('Kategori Diperbarui <i class="icon icon-sm c-green" data-icon="check-circle"></i>', `${name} berhasil diperbarui.`, 'success');
-  } else {
-    categories.push({ id: Date.now(), name, icon, desc, count: 0 });
-    showToast('Kategori Ditambahkan Tambah', `${name} berhasil ditambahkan.`, 'success');
+  try {
+    if (editingCatId) {
+      await API.Admin.updateCategory(editingCatId, { name, description });
+      showToast('Kategori Diperbarui', `${name} berhasil diperbarui.`, 'success');
+    } else {
+      await API.Admin.createCategory({ name, description });
+      showToast('Kategori Ditambahkan', `${name} berhasil ditambahkan.`, 'success');
+    }
+    closeModal('cat-modal');
+    fetchCategories();
+  } catch (e) {
+    showToast('Gagal', e.message, 'danger');
   }
-  closeModal('cat-modal');
-  renderCategories(categories);
+}
+
+async function fetchCategories() {
+    try {
+        const res = await API.Admin.listCategories();
+        categories = res.data || [];
+        renderCategories(categories);
+    } catch(e) {
+        console.error(e);
+    }
 }
 
 document.getElementById('cat-search').addEventListener('input', () => renderCategories(categories));
-document.addEventListener('DOMContentLoaded', () => renderCategories(categories));
+document.addEventListener('DOMContentLoaded', () => {
+    requireAuth('admin');
+    fetchCategories();
+});
 </script>
 </body>
 </html>

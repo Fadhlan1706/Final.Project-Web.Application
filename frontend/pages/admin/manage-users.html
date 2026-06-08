@@ -69,7 +69,7 @@
             </div>
             <div class="dropdown-menu" id="profile-menu">
               <div class="dropdown-divider"></div>
-              <div class="dropdown-item danger" onclick="mockLogout()">
+              <div class="dropdown-item danger" onclick="API.Auth.logout().then(() => { localStorage.removeItem('access_token'); localStorage.removeItem('user_data'); window.location.href = '../auth/admin-login.html'; })">
                 <i class="icon icon-sm" data-icon="log-out"></i> Keluar
               </div>
             </div>
@@ -97,8 +97,7 @@
         <a class="nav-link" href="reports.html"
           ><span class="nav-icon"
             ><i class="icon icon-sm" data-icon="flag"></i></span
-          ><span class="nav-label">Laporan</span
-          ><span class="nav-badge" style="background: var(--red)">3</span></a
+          ><span class="nav-label">Laporan</span></a
         >
       </aside>
 
@@ -260,16 +259,17 @@
     <div id="toast-container"></div>
 
     <script src="../../assets/js/theme.js"></script>
-    <!-- Removed mock-data.js -->
+    <script src="../../assets/js/api.js"></script>
     <script src="../../assets/js/icons.js"></script>
     <script src="../../assets/js/main.js"></script>
+    <script>
       let adminUsers = [];
       let selectedUserId = null;
 
       async function fetchUsers() {
           try {
               const res = await API.Admin.getUsers();
-              adminUsers = res.data || [];
+              adminUsers = res.data.items || [];
               applyFilters();
           } catch(e) {
               console.error(e);
@@ -310,7 +310,7 @@
       <td><span style="color:var(--amber);font-weight:700"><i class="icon icon-xs c-amber" data-icon="star"></i> -</span></td>
       <td>
         ${
-          u.is_verified === 1 // Fallback status representation since we don't have suspended column yet
+          u.status === 'active'
             ? '<span class="badge badge-green">Aktif</span>'
             : '<span class="badge badge-red">Disuspend</span>'
         }
@@ -319,9 +319,9 @@
         <div style="display:flex;gap:5px">
           <button class="btn btn-secondary btn-sm" onclick="viewUser('${u.id}')" title="Detail"><i class="icon icon-sm" data-icon="eye"></i></button>
           ${
-            u.is_verified === 1
-              ? `<button class="btn btn-danger btn-sm" onclick="toggleSuspend('${u.id}')" title="Suspend"><i class="icon icon-sm" data-icon="x"></i></button>`
-              : `<button class="btn btn-success btn-sm" onclick="toggleSuspend('${u.id}')" title="Aktifkan"><i class="icon icon-sm c-green" data-icon="check-circle"></i></button>`
+            u.status === 'active'
+              ? `<button class="btn btn-danger btn-sm" onclick="toggleSuspend('${u.id}', true)" title="Suspend"><i class="icon icon-sm" data-icon="x"></i></button>`
+              : `<button class="btn btn-success btn-sm" onclick="toggleSuspend('${u.id}', false)" title="Aktifkan"><i class="icon icon-sm c-green" data-icon="check-circle"></i></button>`
           }
         </div>
       </td>
@@ -342,7 +342,7 @@
             u.name.toLowerCase().includes(q) ||
             (u.major && u.major.toLowerCase().includes(q)) ||
             u.email.toLowerCase().includes(q);
-          const matchS = !s || (s === 'active' && u.is_verified === 1) || (s === 'suspended' && u.is_verified === 0);
+          const matchS = !s || (s === 'active' && u.status === 'active') || (s === 'suspended' && u.status === 'suspended');
           return matchQ && matchS;
         });
         renderTable(result);
@@ -373,7 +373,7 @@
         <div style="color:var(--text-muted);font-size:0.82rem">${u.major || '-'} · ${u.university || '-'}</div>
         <div style="color:var(--text-muted);font-size:0.78rem;margin-top:4px">${u.email}</div>
         <div style="margin-top:8px;display:flex;gap:8px">
-          ${u.is_verified === 1 ? '<span class="badge badge-green">Aktif</span>' : '<span class="badge badge-red">Disuspend</span>'}
+          ${u.status === 'active' ? '<span class="badge badge-green">Aktif</span>' : '<span class="badge badge-red">Disuspend</span>'}
         </div>
       </div>
     </div>
@@ -401,8 +401,19 @@
         hydrateIcons(document.getElementById("user-detail-modal"));
       }
 
-      function toggleSuspend(id) {
-        showToast('Fitur Belum Tersedia', 'Toggle suspend backend feature is not fully implemented yet.', 'warning');
+      async function toggleSuspend(id, suspend) {
+        try {
+            if (suspend) {
+                await API.Admin.suspendUser(id);
+                showToast("Berhasil", "Pengguna telah disuspend", "success");
+            } else {
+                await API.Admin.restoreUser(id);
+                showToast("Berhasil", "Pengguna telah diaktifkan kembali", "success");
+            }
+            fetchUsers();
+        } catch(e) {
+            showToast("Gagal", e.message, "danger");
+        }
       }
 
       function addUser(e) {

@@ -27,6 +27,7 @@ class AuthService
             'name'              => trim($data['name']),
             'email'             => strtolower(trim($data['email'])),
             'password'          => password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]),
+            'major'             => $data['major'] ?? null,
             'is_verified'       => 0,
             'verification_code' => $verificationCode,
         ]);

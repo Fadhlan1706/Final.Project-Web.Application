@@ -7,17 +7,20 @@ use App\Helpers\Response;
 use App\Helpers\Validator;
 use App\Middleware\AuthMiddleware;
 use App\Repositories\UserRepository;
+use App\Repositories\AdminRepository;
 use App\Services\AuthService;
 
 class AuthController
 {
     private AuthService    $auth;
     private UserRepository $users;
+    private AdminRepository $admins;
 
     public function __construct()
     {
-        $this->auth  = new AuthService();
-        $this->users = new UserRepository();
+        $this->auth   = new AuthService();
+        $this->users  = new UserRepository();
+        $this->admins = new AdminRepository();
     }
 
     public function register(): void
@@ -113,6 +116,46 @@ class AuthController
         }
 
         Response::success($result['data'], $result['message']);
+    }
+
+    public function adminLogin(): void
+    {
+        AuthMiddleware::guest();
+
+        $body = $this->jsonBody();
+
+        $v = Validator::make($body, [
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if ($v->fails()) {
+            Response::validationError($v->errors());
+        }
+
+        $admin = $this->admins->findByEmail(strtolower(trim($body['email'])));
+
+        if (!$admin) {
+            Response::error('Invalid admin credentials.', 401);
+        }
+
+        $hash = $admin['password'] ?? $admin['PASSWORD'] ?? '';
+        if (!password_verify($body['password'], $hash)) {
+            Response::error('Invalid admin credentials.', 401);
+        }
+
+        \App\Helpers\Session::start();
+        session_regenerate_id(true);
+
+        \App\Helpers\Session::set('user_id',   $admin['id']);
+        \App\Helpers\Session::set('user_name', $admin['name'] ?? $admin['NAME'] ?? '');
+        \App\Helpers\Session::set('user_role', 'admin');
+
+        unset($admin['password']);
+        unset($admin['PASSWORD']);
+        $admin['role'] = 'admin';
+
+        Response::success($admin, 'Admin login successful.');
     }
 
     public function logout(): void

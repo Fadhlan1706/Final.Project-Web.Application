@@ -29,7 +29,7 @@
         </div>
         <div class="dropdown-menu" id="profile-menu">
           <div class="dropdown-divider"></div>
-          <div class="dropdown-item danger" onclick="mockLogout()"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
+          <div class="dropdown-item danger" onclick="API.Auth.logout().then(() => { localStorage.removeItem('access_token'); localStorage.removeItem('user_data'); window.location.href = '../auth/admin-login.html'; })"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
         </div>
       </div>
     </div>
@@ -40,7 +40,7 @@
     <a class="nav-link active" href="dashboard.html"><span class="nav-icon"><i class="icon" data-icon="bar-chart-2"></i></span><span class="nav-label">Overview</span></a>
     <a class="nav-link" href="manage-users.html"><span class="nav-icon"><i class="icon" data-icon="users"></i></span><span class="nav-label">Kelola User</span></a>
     <a class="nav-link" href="categories.html"><span class="nav-icon"><i class="icon" data-icon="tag"></i></span><span class="nav-label">Kategori Skill</span></a>
-    <a class="nav-link" href="reports.html"><span class="nav-icon"><i class="icon" data-icon="flag"></i></span><span class="nav-label">Laporan</span><span class="nav-badge" style="background:var(--red)">3</span></a>
+    <a class="nav-link" href="reports.html"><span class="nav-icon"><i class="icon" data-icon="flag"></i></span><span class="nav-label">Laporan</span></a>
     </aside>
 
   <main class="main-content page-enter">
@@ -52,19 +52,19 @@
     <div class="stats-grid" style="margin-bottom:28px">
       <div class="stat-card">
         <div class="stat-icon blue"><i class="icon icon-lg" data-icon="users" data-color="accent"></i></div>
-        <div><div class="stat-value">1,240</div><div class="stat-label">Total Pengguna</div><div class="stat-change up" style="display:flex;align-items:center;gap:4px"><i class="icon icon-xs" data-icon="trending-up" data-color="green"></i> +38 minggu ini</div></div>
+        <div><div class="stat-value" id="stat-users">0</div><div class="stat-label">Total Pengguna</div><div class="stat-change up" style="display:flex;align-items:center;gap:4px" id="stat-recent-users"><i class="icon icon-xs" data-icon="trending-up" data-color="green"></i> +0 minggu ini</div></div>
       </div>
       <div class="stat-card">
         <div class="stat-icon green"><i class="icon icon-lg" data-icon="handshake" data-color="green"></i></div>
-        <div><div class="stat-value">3,821</div><div class="stat-label">Total Kolaborasi</div><div class="stat-change up" style="display:flex;align-items:center;gap:4px"><i class="icon icon-xs" data-icon="trending-up" data-color="green"></i> +120 bulan ini</div></div>
+        <div><div class="stat-value" id="stat-collabs">0</div><div class="stat-label">Total Kolaborasi</div><div class="stat-change up" style="display:flex;align-items:center;gap:4px"><i class="icon icon-xs" data-icon="trending-up" data-color="green"></i> <span id="stat-active-collabs">0</span> aktif</div></div>
       </div>
       <div class="stat-card">
         <div class="stat-icon amber"><i class="icon icon-lg" data-icon="star" data-color="amber"></i></div>
-        <div><div class="stat-value">4.7</div><div class="stat-label">Rata-rata Rating</div><div class="stat-change up" style="display:flex;align-items:center;gap:4px"><i class="icon icon-xs" data-icon="trending-up" data-color="green"></i> 0.1 naik</div></div>
+        <div><div class="stat-value" id="stat-rating">0.0</div><div class="stat-label">Rata-rata Rating</div></div>
       </div>
       <div class="stat-card">
         <div class="stat-icon purple"><i class="icon icon-lg" data-icon="flag" data-color="red"></i></div>
-        <div><div class="stat-value">3</div><div class="stat-label">Laporan Aktif</div><div class="stat-change down" style="display:flex;align-items:center;gap:4px"><i class="icon icon-xs" data-icon="alert-triangle" data-color="red"></i> Perlu ditinjau</div></div>
+        <div><div class="stat-value" id="stat-reports">0</div><div class="stat-label">Laporan Aktif</div><div class="stat-change down" style="display:flex;align-items:center;gap:4px"><i class="icon icon-xs" data-icon="alert-triangle" data-color="red"></i> Perlu ditinjau</div></div>
       </div>
     </div>
 
@@ -93,11 +93,10 @@
         </div>
         <div class="card">
           <div class="card-header"><span class="card-title" style="display:flex;align-items:center;gap:8px"><i class="icon icon-sm c-accent" data-icon="trending-up"></i> Aktivitas (7 hari)</span></div>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px"><span style="color:var(--text-secondary)">Pengguna Baru</span><span style="font-weight:600">38</span></div><div class="progress-bar"><div class="progress-fill" style="width:76%"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px"><span style="color:var(--text-secondary)">Kolaborasi Baru</span><span style="font-weight:600">84</span></div><div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px"><span style="color:var(--text-secondary)">Ulasan Ditulis</span><span style="font-weight:600">61</span></div><div class="progress-bar"><div class="progress-fill" style="width:48%"></div></div></div>
-            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px"><span style="color:var(--text-secondary)">Laporan Masuk</span><span style="font-weight:600">3</span></div><div class="progress-bar"><div class="progress-fill" style="width:10%;background:var(--red)"></div></div></div>
+          <div style="display:flex;flex-direction:column;gap:12px" id="activity-container">
+            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px"><span style="color:var(--text-secondary)">Pengguna Baru</span><span style="font-weight:600" id="act-users">0</span></div><div class="progress-bar"><div class="progress-fill" id="act-users-bar" style="width:0%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px"><span style="color:var(--text-secondary)">Kolaborasi Aktif</span><span style="font-weight:600" id="act-collabs">0</span></div><div class="progress-bar"><div class="progress-fill" id="act-collabs-bar" style="width:0%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px"><span style="color:var(--text-secondary)">Laporan Masuk</span><span style="font-weight:600" id="act-reports">0</span></div><div class="progress-bar"><div class="progress-fill" id="act-reports-bar" style="width:0%;background:var(--red)"></div></div></div>
           </div>
         </div>
       </div>
@@ -119,14 +118,61 @@
 </div>
 <div id="toast-container"></div>
 <script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/icons.js"></script>
 <script src="../../assets/js/main.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
   requireAuth('admin');
   try {
-      const res = await API.Admin.getUsers();
-      const users = res.data || [];
+      const reportsRes = await API.Admin.getReportsOverview();
+      const overview = reportsRes.data;
+      
+      // Update header stats
+      document.getElementById('stat-users').innerText = overview.totals.users;
+      document.getElementById('stat-recent-users').innerHTML = `<i class="icon icon-xs" data-icon="trending-up" data-color="green"></i> +${overview.totals.recent_users} minggu ini`;
+      document.getElementById('stat-collabs').innerText = overview.totals.collaborations;
+      document.getElementById('stat-active-collabs').innerText = overview.collaboration_stats['in_progress'] || 0;
+      
+      const topRated = overview.top_rated_users || [];
+      const avg = topRated.length > 0 ? (topRated.reduce((sum, u) => sum + parseFloat(u.avg_rating), 0) / topRated.length).toFixed(1) : "0.0";
+      document.getElementById('stat-rating').innerText = avg;
+      document.getElementById('stat-reports').innerText = overview.totals.active_reports;
+
+      // Update Activity (relative percentages)
+      const maxUsers = 100;
+      const uPct = Math.min((overview.totals.recent_users / maxUsers) * 100, 100);
+      document.getElementById('act-users').innerText = overview.totals.recent_users;
+      document.getElementById('act-users-bar').style.width = uPct + '%';
+
+      const maxCollabs = 100;
+      const cActive = overview.collaboration_stats['in_progress'] || 0;
+      const cPct = Math.min((cActive / maxCollabs) * 100, 100);
+      document.getElementById('act-collabs').innerText = cActive;
+      document.getElementById('act-collabs-bar').style.width = cPct + '%';
+
+      const maxReports = 50;
+      const rPct = Math.min((overview.totals.active_reports / maxReports) * 100, 100);
+      document.getElementById('act-reports').innerText = overview.totals.active_reports;
+      document.getElementById('act-reports-bar').style.width = rPct + '%';
+
+      // Update Top Users
+      document.getElementById('top-users-tbody').innerHTML = (overview.top_rated_users || []).map((u,i) => {
+        const initials = u.name.substring(0,2).toUpperCase();
+        return `
+        <tr>
+          <td style="font-family:var(--font-display);font-weight:800;color:${i===0?'var(--amber)':i===1?'var(--text-secondary)':i===2?'#cd7f32':'var(--text-muted)'}">${i+1}</td>
+          <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="background:linear-gradient(135deg,var(--primary),var(--purple))">${initials}</div><span class="td-name">${u.name}</span></div></td>
+          <td style="font-size:0.82rem;color:var(--text-secondary)">${u.major || '-'}</td>
+          <td style="font-weight:600">${u.review_count || 0} Ulasan</td>
+          <td><span style="color:var(--amber);font-weight:700"><i class="icon icon-xs c-amber" data-icon="star"></i> ${parseFloat(u.avg_rating).toFixed(1)}</span></td>
+          <td><span class="badge badge-green">Aktif</span></td>
+        </tr>`;
+      }).join('');
+      hydrateIcons(document.getElementById('top-users-tbody'));
+
+      const res = await API.Admin.getUsers(1);
+      const users = res.data.items || [];
       
       const recent = [...users].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 4);
       
@@ -137,26 +183,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="background:linear-gradient(135deg,var(--primary),var(--purple))">${initials}</div><span class="td-name">${u.name}</span></div></td>
           <td>${u.major || '-'}</td>
           <td style="font-size:0.78rem;color:var(--text-muted)">${new Date(u.created_at).toLocaleDateString()}</td>
-          <td><span class="badge badge-green">Aktif</span></td>
+          <td><span class="badge badge-${u.status === 'suspended' ? 'red' : 'green'}">${u.status === 'suspended' ? 'Suspended' : 'Aktif'}</span></td>
         </tr>`;
       }).join('');
-      
-      // We don't have the full score from just getUsers(), so we sort by whatever we have or just list them.
-      const top = [...users].slice(0, 5); // Fallback until backend gives score in listUsers
-      
-      document.getElementById('top-users-tbody').innerHTML = top.map((u,i) => {
-        const initials = u.name.substring(0,2).toUpperCase();
-        return `
-        <tr>
-          <td style="font-family:var(--font-display);font-weight:800;color:${i===0?'var(--amber)':i===1?'var(--text-secondary)':i===2?'#cd7f32':'var(--text-muted)'}">${i+1}</td>
-          <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar" style="background:linear-gradient(135deg,var(--primary),var(--purple))">${initials}</div><span class="td-name">${u.name}</span></div></td>
-          <td style="font-size:0.82rem;color:var(--text-secondary)">${u.major || '-'}</td>
-          <td style="font-weight:600">-</td>
-          <td><span style="color:var(--amber);font-weight:700"><i class="icon icon-xs c-amber" data-icon="star"></i> -</span> <span style="font-size:0.75rem;color:var(--text-muted)">(0)</span></td>
-          <td><span class="badge badge-green">Aktif</span></td>
-        </tr>`;
-      }).join('');
-      hydrateIcons(document.getElementById('top-users-tbody'));
   } catch(e) {
       console.error(e);
   }

@@ -167,30 +167,17 @@
             />
           </div>
         </div>
-        <div class="two-col-form">
-          <div class="form-group">
-            <label class="form-label">Jurusan <span>*</span></label>
-            <select class="form-control" required>
-              <option value="">Pilih Jurusan</option>
-              <option>Teknik Informatika</option>
-              <option>Sistem Informasi</option>
-              <option>Desain Komunikasi Visual</option>
-              <option>Manajemen Informatika</option>
-              <option>Teknik Elektro</option>
-              <option>Lainnya</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Angkatan <span>*</span></label>
-            <select class="form-control" required>
-              <option value="">Tahun</option>
-              <option>2024</option>
-              <option>2023</option>
-              <option>2022</option>
-              <option>2021</option>
-              <option>2020</option>
-            </select>
-          </div>
+        <div class="form-group">
+          <label class="form-label">Jurusan <span>*</span></label>
+          <select class="form-control" required id="reg-major">
+            <option value="">Pilih Jurusan</option>
+            <option value="Teknik Informatika">Teknik Informatika</option>
+            <option value="Sistem Informasi">Sistem Informasi</option>
+            <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+            <option value="Manajemen Informatika">Manajemen Informatika</option>
+            <option value="Teknik Elektro">Teknik Elektro</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
         </div>
         <div class="form-group">
           <label class="form-label">Password <span>*</span></label>
@@ -343,6 +330,7 @@
         const email = document.getElementById("reg-email").value;
         const pw1 = document.getElementById("reg-pw").value;
         const pw2 = document.getElementById("reg-pw2").value;
+        const major = document.getElementById("reg-major").value;
 
         if (pw1 !== pw2) {
           showToast("Error", "Pastikan kedua password sama.", "danger");
@@ -359,7 +347,8 @@
             name: fname + " " + lname,
             email: email,
             password: pw1,
-            password_confirmation: pw2
+            password_confirmation: pw2,
+            major: major
           });
           
           showToast("Berhasil", "Akun berhasil dibuat. Silakan periksa email Anda.", "success");

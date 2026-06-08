@@ -11,6 +11,7 @@ use App\Repositories\CollaborationRepository;
 use App\Repositories\ReviewRepository;
 use App\Repositories\SkillRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\ReportRepository;
 
 class AdminController
 {
@@ -19,6 +20,7 @@ class AdminController
     private CategoryRepository      $categories;
     private CollaborationRepository $collabs;
     private ReviewRepository        $reviews;
+    private ReportRepository        $reports;
 
     public function __construct()
     {
@@ -27,6 +29,7 @@ class AdminController
         $this->categories = new CategoryRepository();
         $this->collabs    = new CollaborationRepository();
         $this->reviews    = new ReviewRepository();
+        $this->reports    = new ReportRepository();
     }
 
     // ==============================================================
@@ -41,8 +44,8 @@ class AdminController
         $db = \App\Helpers\Database::getInstance();
 
         // Total counts
-        $totalUsers = (int)$db->query("SELECT COUNT(*) FROM users WHERE role = 'user'")->fetchColumn();
-        $totalSkills = (int)$db->query("SELECT COUNT(*) FROM skills WHERE is_active = 1")->fetchColumn();
+        $totalUsers = (int)$db->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        $totalSkills = (int)$db->query("SELECT COUNT(*) FROM skills")->fetchColumn();
 
         // Collaboration breakdown
         $collabStats = $this->collabs->countByStatus();
@@ -56,8 +59,11 @@ class AdminController
 
         // Recent registrations (last 7 days)
         $recentUsers = (int)$db->query(
-            "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+            "SELECT COUNT(*) FROM users WHERE create_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
         )->fetchColumn();
+
+        // Active reports
+        $activeReports = $this->reports->countActive();
 
         Response::success([
             'totals' => [
@@ -65,6 +71,7 @@ class AdminController
                 'skills'          => $totalSkills,
                 'recent_users'    => $recentUsers,
                 'collaborations'  => array_sum($collabStats),
+                'active_reports'  => $activeReports
             ],
             'collaboration_stats' => $collabStats,
             'popular_skills'      => $popularSkills,
@@ -91,10 +98,10 @@ class AdminController
 
         if ($search) {
             $stmt = $db->prepare(
-                "SELECT id, name, email, role, is_active, created_at
+                "SELECT id, name, email, STATUS AS status, create_at AS created_at
                  FROM users
                  WHERE name LIKE ? OR email LIKE ?
-                 ORDER BY created_at DESC
+                 ORDER BY create_at DESC
                  LIMIT ? OFFSET ?"
             );
             $like = '%' . $search . '%';
@@ -140,7 +147,6 @@ class AdminController
         $user   = $this->users->findById($userId);
 
         if (!$user) Response::notFound('User not found.');
-        if ($user['role'] === 'admin') Response::forbidden('Cannot suspend an admin.');
 
         $this->users->setActiveStatus($userId, false);
         Response::success(null, 'User suspended.');
@@ -167,7 +173,6 @@ class AdminController
         $user   = $this->users->findById($userId);
 
         if (!$user) Response::notFound('User not found.');
-        if ($user['role'] === 'admin') Response::forbidden('Cannot delete an admin account.');
 
         $this->users->delete($userId);
         Response::success(null, 'User deleted.');
@@ -261,6 +266,45 @@ class AdminController
 
         $items = $this->collabs->findAll($status, $page, $perPage);
         Response::success(['items' => $items, 'page' => $page]);
+    }
+
+    // ==============================================================
+    // REPORTS MANAGEMENT
+    // ==============================================================
+
+    // GET /api/admin/reports-list
+    public function listReports(): void
+    {
+        AuthMiddleware::admin();
+
+        $page    = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = 20;
+
+        $items = $this->reports->findAll($page, $perPage);
+        Response::success(['items' => $items, 'page' => $page]);
+    }
+
+    // PUT /api/admin/reports/{id}
+    public function updateReportStatus(array $params): void
+    {
+        AuthMiddleware::admin();
+
+        $body = $this->jsonBody();
+        $status = $body['status'] ?? '';
+        
+        if (!in_array($status, ['resolved', 'rejected'])) {
+            Response::validationError(['status' => ['Status must be resolved or rejected.']]);
+        }
+
+        $report = $this->reports->findById((int)$params['id']);
+        if (!$report) {
+            Response::notFound('Report not found.');
+        }
+
+        $adminId = (int)\App\Helpers\Session::get('user_id');
+        $this->reports->updateStatus((int)$params['id'], $status, $adminId);
+
+        Response::success(null, 'Report status updated successfully.');
     }
 
     // ----------------------------------------------------------------

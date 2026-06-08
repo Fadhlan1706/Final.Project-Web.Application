@@ -14,6 +14,7 @@ use App\Helpers\Router;
 Router::post('/api/auth/register',     [AuthController::class, 'register']);
 Router::post('/api/auth/verify-email', [AuthController::class, 'verifyEmail']);
 Router::post('/api/auth/login',        [AuthController::class, 'login']);
+Router::post('/api/auth/admin-login',  [AuthController::class, 'adminLogin']);
 Router::post('/api/auth/logout',       [AuthController::class, 'logout']);
 Router::get( '/api/auth/me',           [AuthController::class, 'me']);
 Router::put( '/api/auth/password',  [AuthController::class, 'changePassword']);
@@ -109,3 +110,7 @@ Router::delete('/api/admin/skills/{id}',                [AdminController::class,
 
 // Collaborations
 Router::get(   '/api/admin/collaborations',             [AdminController::class, 'listCollaborations']);
+
+// Reports
+Router::get(   '/api/admin/reports-list',               [AdminController::class, 'listReports']);
+Router::put(   '/api/admin/reports/{id}',               [AdminController::class, 'updateReportStatus']);

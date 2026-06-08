@@ -102,13 +102,14 @@ class UserRepository
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO users (name, email, password, is_verified, verification_code)
-             VALUES (:name, :email, :password, :is_verified, :verification_code)'
+            'INSERT INTO users (name, email, password, major, is_verified, verification_code)
+             VALUES (:name, :email, :password, :major, :is_verified, :verification_code)'
         );
         $stmt->execute([
             'name'              => $data['name'],
             'email'             => $data['email'],
             'password'          => $data['password'],
+            'major'             => $data['major'] ?? null,
             'is_verified'       => $data['is_verified'] ?? 0,
             'verification_code' => $data['verification_code'] ?? null,
         ]);
@@ -175,13 +176,14 @@ class UserRepository
     {
         $stmt = $this->db->prepare("
             SELECT
-                (SELECT COUNT(*) FROM skills WHERE userId = :uid) AS total_skills,
-                (SELECT COUNT(*) FROM collaborationRequests WHERE senderId = :uid OR receiverId = :uid) AS total_collabs,
-                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = :uid OR receiverId = :uid) AND STATUS = 'pending') AS pending_requests,
-                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = :uid OR receiverId = :uid) AND STATUS = 'completed') AS completed_collabs,
-                (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE reviewedUserId = :uid) AS avg_rating
+                (SELECT COUNT(*) FROM skills WHERE userId = ?) AS total_skills,
+                (SELECT COUNT(*) FROM collaborationRequests WHERE senderId = ? OR receiverId = ?) AS total_collabs,
+                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = ? OR receiverId = ?) AND STATUS = 'pending') AS pending_requests,
+                (SELECT COUNT(*) FROM collaborationRequests WHERE (senderId = ? OR receiverId = ?) AND STATUS = 'completed') AS completed_collabs,
+                (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE reviewedUserId = ?) AS avg_rating,
+                (SELECT COUNT(*) FROM reviews WHERE reviewedUserId = ?) AS review_count
         ");
-        $stmt->execute(['uid' => $userId]);
+        $stmt->execute(array_fill(0, 9, $userId));
         return $stmt->fetch();
     }
 }

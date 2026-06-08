@@ -30,7 +30,7 @@
         </div>
         <div class="dropdown-menu" id="profile-menu">
           <div class="dropdown-divider"></div>
-          <div class="dropdown-item danger" onclick="mockLogout()"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
+          <div class="dropdown-item danger" onclick="API.Auth.logout().then(() => { localStorage.removeItem('access_token'); localStorage.removeItem('user_data'); window.location.href = '../auth/admin-login.html'; })"><i class="icon icon-sm" data-icon="log-out"></i> Keluar</div>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@
     <a class="nav-link" href="dashboard.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="bar-chart-2"></i></span><span class="nav-label">Overview</span></a>
     <a class="nav-link" href="manage-users.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="users"></i></span><span class="nav-label">Kelola User</span></a>
     <a class="nav-link" href="categories.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="tag"></i></span><span class="nav-label">Kategori Skill</span></a>
-    <a class="nav-link active" href="reports.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="flag"></i></span><span class="nav-label">Laporan</span><span class="nav-badge" style="background:var(--red)">3</span></a>
+    <a class="nav-link active" href="reports.html"><span class="nav-icon"><i class="icon icon-sm" data-icon="flag"></i></span><span class="nav-label">Laporan</span></a>
     </aside>
 
   <main class="main-content page-enter">
@@ -111,24 +111,19 @@
 <div id="toast-container"></div>
 
 <script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/icons.js"></script>
 <script src="../../assets/js/main.js"></script>
 <script>
-let reports = [
-  { id:1, reporter:'Nasya Putri',    reporterInitials:'NP', reported:'Bram Susanto',    reportedInitials:'BS', type:'spam',       desc:'Mengirim request kolaborasi berulang kali dengan pesan yang sama.', date:'2 jam lalu',   status:'pending'   },
-  { id:2, reporter:'Arief Pratama',  reporterInitials:'AP', reported:'Akun X',           reportedInitials:'AX', type:'fake',       desc:'Profil menggunakan foto dan bio yang terlihat tidak asli/fiktif.',   date:'1 hari lalu',  status:'pending'   },
-  { id:3, reporter:'Laura Sitanggang',reporterInitials:'LS',reported:'Sinta Dewi',       reportedInitials:'SD', type:'harassment', desc:'Mengirim pesan tidak pantas setelah request kolaborasi ditolak.',    date:'3 hari lalu',  status:'pending'   },
-  { id:4, reporter:'Teo Hardianto',  reporterInitials:'TH', reported:'User Anonim',      reportedInitials:'UA', type:'other',      desc:'Mengklaim memiliki skill yang tidak sesuai dengan kenyataan.',       date:'1 minggu lalu',status:'resolved'  },
-  { id:5, reporter:'Sinta Dewi',     reporterInitials:'SD', reported:'Arief Pratama',    reportedInitials:'AP', type:'spam',       desc:'Mengirim banyak pesan promosi di luar konteks kolaborasi.',          date:'2 minggu lalu',status:'dismissed' },
-];
+let reports = [];
 
 const typeLabels = { spam:'Spam', fake:'Profil Palsu', harassment:'Pelecehan', other:'Lainnya' };
 const typeColors = { spam:'amber', fake:'red', harassment:'red', other:'gray' };
 
 function updateCounts() {
-  document.getElementById('count-pending-r').textContent   = reports.filter(r=>r.status==='pending').length;
-  document.getElementById('count-resolved-r').textContent  = reports.filter(r=>r.status==='resolved').length;
-  document.getElementById('count-dismissed-r').textContent = reports.filter(r=>r.status==='dismissed').length;
+  document.getElementById('count-pending-r').textContent   = reports.filter(r=>r.STATUS==='pending').length;
+  document.getElementById('count-resolved-r').textContent  = reports.filter(r=>r.STATUS==='resolved').length;
+  document.getElementById('count-dismissed-r').textContent = reports.filter(r=>r.STATUS==='rejected').length;
 }
 
 function renderReports() {
@@ -137,107 +132,139 @@ function renderReports() {
   const tp = document.getElementById('filter-report-type').value;
 
   const filtered = reports.filter(r => {
-    const matchQ  = !q  || r.reporter.toLowerCase().includes(q) || r.reported.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q);
-    const matchSt = !st || r.status === st;
-    const matchTp = !tp || r.type   === tp;
+    const matchQ  = !q  || r.reporter_name.toLowerCase().includes(q) || r.reported_name.toLowerCase().includes(q) || r.reason.toLowerCase().includes(q);
+    const matchSt = !st || r.STATUS === st;
+    const matchTp = !tp; // type filter not fully supported yet since it's just 'other' for now
     return matchQ && matchSt && matchTp;
   });
 
-  const statusBadge = { pending:'<span class="badge badge-amber"><i class="icon icon-xs" data-icon="clock"></i> Menunggu</span>', resolved:'<span class="badge badge-green">Selesai</span>', dismissed:'<span class="badge badge-gray">Diabaikan</span>' };
+  const statusBadge = { pending:'<span class="badge badge-amber"><i class="icon icon-xs" data-icon="clock"></i> Menunggu</span>', resolved:'<span class="badge badge-green">Selesai</span>', rejected:'<span class="badge badge-gray">Ditolak</span>' };
 
   const tbody = document.getElementById('reports-tbody');
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state" style="padding:28px">Tidak ada laporan ditemukan</div></td></tr>`;
     updateCounts(); return;
   }
-  tbody.innerHTML = filtered.map(r => `
+  tbody.innerHTML = filtered.map(r => {
+      const reporterInitials = r.reporter_name.substring(0,2).toUpperCase();
+      const reportedInitials = r.reported_name.substring(0,2).toUpperCase();
+      return `
     <tr>
       <td style="color:var(--text-muted);font-size:0.78rem">#${r.id}</td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--accent),var(--purple))">${r.reporterInitials}</div>
-          <span style="font-size:0.875rem;font-weight:500">${r.reporter}</span>
+          <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--accent),var(--purple))">${reporterInitials}</div>
+          <span style="font-size:0.875rem;font-weight:500">${r.reporter_name}</span>
         </div>
       </td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--red),#ff8787)">${r.reportedInitials}</div>
-          <span style="font-size:0.875rem;font-weight:500">${r.reported}</span>
+          <div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:11px;background:linear-gradient(135deg,var(--red),#ff8787)">${reportedInitials}</div>
+          <span style="font-size:0.875rem;font-weight:500">${r.reported_name}</span>
         </div>
       </td>
-      <td><span class="badge badge-${typeColors[r.type]}">${typeLabels[r.type]}</span></td>
+      <td><span class="badge badge-gray">Lainnya</span></td>
       <td style="max-width:200px;font-size:0.8rem;color:var(--text-secondary)">
-        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.desc}</div>
+        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.reason}</div>
       </td>
-      <td style="font-size:0.78rem;color:var(--text-muted)">${r.date}</td>
-      <td>${statusBadge[r.status] || ''}</td>
+      <td style="font-size:0.78rem;color:var(--text-muted)">${new Date(r.create_at).toLocaleDateString()}</td>
+      <td>${statusBadge[r.STATUS] || r.STATUS}</td>
       <td>
         <div style="display:flex;gap:5px">
           <button class="btn btn-secondary btn-sm" onclick="viewReport(${r.id})" title="Detail"><i class="icon icon-sm" data-icon="eye"></i></button>
-          ${r.status === 'pending' ? `
+          ${r.STATUS === 'pending' ? `
             <button class="btn btn-success btn-sm" onclick="resolveReport(${r.id})" title="Selesaikan"><i class="icon icon-sm c-green" data-icon="check-circle"></i></button>
-            <button class="btn btn-ghost btn-sm" onclick="dismissReport(${r.id})" title="Abaikan" style="color:var(--text-muted)"><i class="icon icon-sm c-muted" data-icon="eye-off"></i></button>
+            <button class="btn btn-ghost btn-sm" onclick="dismissReport(${r.id})" title="Tolak" style="color:var(--text-muted)"><i class="icon icon-sm c-muted" data-icon="eye-off"></i></button>
           ` : ''}
         </div>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
   updateCounts();
+  hydrateIcons(tbody);
 }
 
 function viewReport(id) {
   const r = reports.find(x => x.id === id);
   if (!r) return;
-  const statusBadge = { pending:'<span class="badge badge-amber"><i class="icon icon-xs" data-icon="clock"></i> Menunggu Tinjauan</span>', resolved:'<span class="badge badge-green">Diselesaikan</span>', dismissed:'<span class="badge badge-gray">Diabaikan</span>' };
+  const statusBadge = { pending:'<span class="badge badge-amber"><i class="icon icon-xs" data-icon="clock"></i> Menunggu Tinjauan</span>', resolved:'<span class="badge badge-green">Diselesaikan</span>', rejected:'<span class="badge badge-gray">Ditolak</span>' };
+  
+  const reporterInitials = r.reporter_name.substring(0,2).toUpperCase();
+  const reportedInitials = r.reported_name.substring(0,2).toUpperCase();
+  
   document.getElementById('report-detail-body').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-      ${statusBadge[r.status]}
-      <span class="badge badge-${typeColors[r.type]}">${typeLabels[r.type]}</span>
-      <span style="font-size:0.78rem;color:var(--text-muted);margin-left:auto">${r.date}</span>
+      ${statusBadge[r.STATUS] || r.STATUS}
+      <span class="badge badge-gray">Lainnya</span>
+      <span style="font-size:0.78rem;color:var(--text-muted);margin-left:auto">${new Date(r.create_at).toLocaleDateString()}</span>
     </div>
     <div style="display:flex;gap:16px;margin-bottom:20px">
       <div style="flex:1;background:var(--surface-2);border-radius:var(--radius);padding:14px">
         <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px">PELAPOR</div>
         <div style="display:flex;align-items:center;gap:10px">
-          <div class="avatar" style="background:linear-gradient(135deg,var(--accent),var(--purple))">${r.reporterInitials}</div>
-          <strong>${r.reporter}</strong>
+          <div class="avatar" style="background:linear-gradient(135deg,var(--accent),var(--purple))">${reporterInitials}</div>
+          <strong>${r.reporter_name}</strong>
         </div>
       </div>
       <div style="display:flex;align-items:center;font-size:20px;color:var(--text-muted)">→</div>
       <div style="flex:1;background:var(--red-glow);border:1px solid rgba(250,82,82,0.2);border-radius:var(--radius);padding:14px">
         <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px">DILAPORKAN</div>
         <div style="display:flex;align-items:center;gap:10px">
-          <div class="avatar" style="background:linear-gradient(135deg,var(--red),#ff8787)">${r.reportedInitials}</div>
-          <strong>${r.reported}</strong>
+          <div class="avatar" style="background:linear-gradient(135deg,var(--red),#ff8787)">${reportedInitials}</div>
+          <strong>${r.reported_name}</strong>
         </div>
       </div>
     </div>
     <div style="background:var(--surface-2);border-radius:var(--radius);padding:16px">
       <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px">KETERANGAN LAPORAN</div>
-      <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7">${r.desc}</p>
+      <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7">${r.reason}</p>
     </div>
   `;
-  document.getElementById('report-detail-footer').innerHTML = r.status === 'pending' ? `
+  document.getElementById('report-detail-footer').innerHTML = r.STATUS === 'pending' ? `
     <button class="btn btn-secondary" data-close-modal="report-detail-modal">Tutup</button>
-    <button class="btn btn-ghost" onclick="dismissReport(${r.id});closeModal('report-detail-modal')">Abaikan</button>
+    <button class="btn btn-ghost" onclick="dismissReport(${r.id});closeModal('report-detail-modal')">Tolak</button>
     <button class="btn btn-success" onclick="resolveReport(${r.id});closeModal('report-detail-modal')"><i class="icon icon-sm c-green" data-icon="check-circle"></i> Selesaikan</button>
   ` : `<button class="btn btn-secondary" data-close-modal="report-detail-modal">Tutup</button>`;
   openModal('report-detail-modal');
+  hydrateIcons(document.getElementById('report-detail-modal'));
 }
 
-function resolveReport(id) {
-  const r = reports.find(x => x.id === id);
-  if (r) { r.status = 'resolved'; renderReports(); showToast('Laporan Diselesaikan <i class="icon icon-sm c-green" data-icon="check-circle"></i>', `Laporan #${id} telah ditangani.`, 'success'); }
+async function resolveReport(id) {
+  try {
+      await API.Admin.updateReportStatus(id, 'resolved');
+      showToast('Laporan Diselesaikan', `Laporan #${id} telah ditangani.`, 'success');
+      fetchReports();
+  } catch(e) {
+      showToast('Gagal', e.message, 'danger');
+  }
 }
-function dismissReport(id) {
-  const r = reports.find(x => x.id === id);
-  if (r) { r.status = 'dismissed'; renderReports(); showToast('Laporan Diabaikan', `Laporan #${id} diabaikan.`, 'warning'); }
+async function dismissReport(id) {
+  try {
+      await API.Admin.updateReportStatus(id, 'rejected');
+      showToast('Laporan Ditolak', `Laporan #${id} telah ditolak.`, 'warning');
+      fetchReports();
+  } catch(e) {
+      showToast('Gagal', e.message, 'danger');
+  }
+}
+
+async function fetchReports() {
+    try {
+        const res = await API.Admin.getReportsList();
+        reports = res.data.items || [];
+        renderReports();
+    } catch(e) {
+        console.error(e);
+    }
 }
 
 document.getElementById('report-search').addEventListener('input', renderReports);
 document.getElementById('filter-report-status').addEventListener('change', renderReports);
 document.getElementById('filter-report-type').addEventListener('change', renderReports);
-document.addEventListener('DOMContentLoaded', renderReports);
+document.addEventListener('DOMContentLoaded', () => {
+    requireAuth('admin');
+    fetchReports();
+});
 </script>
 </body>
 </html>
