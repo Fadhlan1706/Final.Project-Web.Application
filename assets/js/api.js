@@ -104,6 +104,11 @@ const API = {
     getForUser: (id) => fetchAPI(`/api/users/${id}/reviews`, "GET"),
   },
 
+  // ================== REPORTS ==================
+  Reports: {
+    create: (data) => fetchAPI("/api/reports", "POST", data),
+  },
+
   // ================== ADMIN ==================
   Admin: {
     getReportsOverview: () => fetchAPI("/api/admin/reports", "GET"),

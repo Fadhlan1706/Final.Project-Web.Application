@@ -148,7 +148,7 @@ class AdminController
 
         if (!$user) Response::notFound('User not found.');
 
-        $this->users->setActiveStatus($userId, false);
+        $this->users->setStatus($userId, 'suspended');
         Response::success(null, 'User suspended.');
     }
 
@@ -160,7 +160,7 @@ class AdminController
         $userId = (int)$params['id'];
         if (!$this->users->findById($userId)) Response::notFound('User not found.');
 
-        $this->users->setActiveStatus($userId, true);
+        $this->users->setStatus($userId, 'active');
         Response::success(null, 'User restored.');
     }
 

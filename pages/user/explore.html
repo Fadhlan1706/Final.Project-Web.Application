@@ -236,6 +236,14 @@
               ></i>
               Minta Kolaborasi
             </button>
+            <button
+              class="btn btn-danger btn-sm mt-1"
+              id="btn-open-report"
+              style="gap: 6px; background: transparent; border-color: transparent; color: var(--red); padding: 4px 8px; font-size: 0.75rem;"
+            >
+              <i class="icon icon-xs c-red" data-icon="alert-triangle"></i>
+              Laporkan Pengguna
+            </button>
           </div>
         </div>
         <div class="modal-tabs">
@@ -381,6 +389,52 @@
     </div>
 
     <div id="toast-container"></div>
+
+    <!-- REPORT MODAL -->
+    <div class="modal-overlay" id="report-modal">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <span class="modal-title" style="display: flex; align-items: center; gap: 8px">
+            <i class="icon icon-sm c-red" data-icon="alert-triangle"></i> Laporkan Pengguna
+          </span>
+          <button class="modal-close" data-close-modal="report-modal">
+            <i class="icon icon-sm" data-icon="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+            Apakah kamu menemukan pelanggaran atau perilaku tidak pantas dari <strong id="report-partner-name"></strong>? Beritahu kami alasan laporan ini.
+          </div>
+          <form id="form-report">
+            <div class="form-group">
+              <label class="form-label">Alasan Laporan <span>*</span></label>
+              <textarea
+                class="form-control"
+                id="report-reason"
+                rows="4"
+                placeholder="Jelaskan alasan laporanmu secara rinci..."
+                required
+                minlength="10"
+              ></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-close-modal="report-modal"
+              >
+                Batal
+              </button>
+              <button type="submit" class="btn btn-danger" style="gap: 6px">
+                <i class="icon icon-sm c-white" data-icon="send"></i>
+                Kirim Laporan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script src="../../assets/js/theme.js"></script>
     <script src="../../assets/js/api.js"></script>
     <script src="../../assets/js/icons.js"></script>

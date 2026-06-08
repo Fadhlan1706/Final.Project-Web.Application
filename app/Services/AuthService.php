@@ -60,7 +60,7 @@ class AuthService
 
         $status = $user['status'] ?? $user['STATUS'] ?? 'active';
         if ($status === 'suspended') {
-            return ['success' => false, 'message' => 'Your account has been suspended.'];
+            return ['success' => false, 'message' => 'Akun Anda telah disuspend dan tidak bisa login lagi.'];
         }
 
         if (isset($user['is_verified']) && $user['is_verified'] == 0) {

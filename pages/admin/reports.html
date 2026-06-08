@@ -223,6 +223,7 @@ function viewReport(id) {
   document.getElementById('report-detail-footer').innerHTML = r.STATUS === 'pending' ? `
     <button class="btn btn-secondary" data-close-modal="report-detail-modal">Tutup</button>
     <button class="btn btn-ghost" onclick="dismissReport(${r.id});closeModal('report-detail-modal')">Tolak</button>
+    <button class="btn btn-danger" onclick="suspendReportedUser(${r.reportedUserId}, ${r.id});closeModal('report-detail-modal')"><i class="icon icon-sm c-white" data-icon="user-x"></i> Suspend User</button>
     <button class="btn btn-success" onclick="resolveReport(${r.id});closeModal('report-detail-modal')"><i class="icon icon-sm c-green" data-icon="check-circle"></i> Selesaikan</button>
   ` : `<button class="btn btn-secondary" data-close-modal="report-detail-modal">Tutup</button>`;
   openModal('report-detail-modal');
@@ -245,6 +246,18 @@ async function dismissReport(id) {
       fetchReports();
   } catch(e) {
       showToast('Gagal', e.message, 'danger');
+  }
+}
+
+async function suspendReportedUser(userId, reportId) {
+  if(!confirm('Anda yakin ingin men-suspend user ini? Akun mereka tidak akan bisa login lagi.')) return;
+  try {
+    await API.Admin.suspendUser(userId);
+    await API.Admin.updateReportStatus(reportId, 'resolved');
+    showToast('Sukses', 'User telah disuspend dan laporan diselesaikan.', 'success');
+    fetchReports();
+  } catch(e) {
+    showToast('Gagal', e.message, 'danger');
   }
 }
 

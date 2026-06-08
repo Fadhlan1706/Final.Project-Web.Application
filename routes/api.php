@@ -89,6 +89,11 @@ Router::get( '/api/reviews/top',           [ReviewController::class, 'topRated']
 Router::get( '/api/users/{id}/reviews',    [ReviewController::class, 'forUser']);
 
 // ====================================================================
+// REPORTS (User)
+// ====================================================================
+Router::post('/api/reports',               [\App\Controllers\ReportController::class, 'store']);
+
+// ====================================================================
 // ADMIN
 // ====================================================================
 Router::get(   '/api/admin/reports',                    [AdminController::class, 'reports']);

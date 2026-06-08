@@ -49,4 +49,19 @@ class ReportRepository
     {
         return (int)$this->db->query("SELECT COUNT(*) FROM reports WHERE STATUS = 'pending'")->fetchColumn();
     }
+
+    public function create(array $data): int
+    {
+        $stmt = $this->db->prepare('
+            INSERT INTO reports (handledByAdminId, reporterId, reportedUserId, reason, STATUS)
+            VALUES (?, ?, ?, ?, \'pending\')
+        ');
+        $stmt->execute([
+            $data['handled_by_admin_id'] ?? 1, // default to admin id 1 if not provided
+            $data['reporter_id'],
+            $data['reported_user_id'],
+            $data['reason']
+        ]);
+        return (int)$this->db->lastInsertId();
+    }
 }

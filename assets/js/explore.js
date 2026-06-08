@@ -246,6 +246,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if (selectedUser) openRequestModal(selectedUser.id);
   });
 
+  // Profile modal "Laporkan Pengguna" button
+  document.getElementById('btn-open-report')?.addEventListener('click', () => {
+    if (!selectedUser) return;
+    document.getElementById('report-partner-name').textContent = selectedUser.name;
+    document.getElementById('report-reason').value = '';
+    closeModal('profile-modal');
+    openModal('report-modal');
+  });
+
+  // ── SUBMIT REPORT ──
+  document.getElementById('form-report')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!selectedUser) return;
+    const reason = document.getElementById('report-reason').value.trim();
+    if (reason.length < 10) {
+      showToast('Error', 'Alasan terlalu singkat', 'warning');
+      return;
+    }
+    
+    try {
+      await API.Reports.create({
+        reported_user_id: selectedUser.id,
+        reason: reason
+      });
+      closeModal('report-modal');
+      showToast('Sukses', 'Laporan berhasil dikirim dan akan ditinjau oleh Admin', 'success');
+    } catch(err) {
+      showToast('Error', err.message, 'error');
+    }
+  });
+
   // ── SUBMIT REQUEST ──
   document.getElementById('form-request')?.addEventListener('submit', async (e) => {
     e.preventDefault();
