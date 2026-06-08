@@ -88,7 +88,7 @@ function renderUserProfile() {
       avatarElements.forEach(el => {
           if (session.profilePicture) {
               el.innerText = '';
-              el.style.backgroundImage = `url(http://localhost:8000${session.profilePicture})`;
+              el.style.backgroundImage = `url(${BASE_URL}${session.profilePicture})`;
               el.style.backgroundSize = 'cover';
               el.style.backgroundPosition = 'center';
               el.style.color = 'transparent';

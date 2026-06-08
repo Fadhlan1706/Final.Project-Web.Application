@@ -1,5 +1,5 @@
 // Sesuaikan port dengan yang kamu gunakan (misal: 8000 atau 8080)
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "https://skillswap.web.id";
 
 /**
  * Fungsi utama (wrapper) untuk melakukan HTTP Request ke Backend

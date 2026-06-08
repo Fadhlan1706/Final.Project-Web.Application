@@ -548,7 +548,7 @@
               const initials = currentUser.name.substring(0,2).toUpperCase();
               document.getElementById("top-avatar").innerText = currentUser.profilePicture ? '' : initials;
               if (currentUser.profilePicture) {
-                  document.getElementById("top-avatar").style.background = `url(http://localhost:8000${currentUser.profilePicture})`;
+                  document.getElementById("top-avatar").style.background = `url(${BASE_URL}${currentUser.profilePicture})`;
                   document.getElementById("top-avatar").style.backgroundSize = 'cover';
               }
               document.getElementById("top-name").innerText = currentUser.name;

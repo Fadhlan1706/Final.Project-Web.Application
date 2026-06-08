@@ -292,7 +292,7 @@
           const grid = document.getElementById("suggestions-grid");
           grid.innerHTML = expRes.data.slice(0, 3).map(u => {
             const initials = u.name.substring(0,2).toUpperCase();
-            const bgImage = u.profilePicture ? `background-image:url(http://localhost:8000${u.profilePicture});background-size:cover;background-position:center;color:transparent;` : 'background:linear-gradient(135deg,var(--primary),var(--purple))';
+            const bgImage = u.profilePicture ? `background-image:url(${BASE_URL}${u.profilePicture});background-size:cover;background-position:center;color:transparent;` : 'background:linear-gradient(135deg,var(--primary),var(--purple))';
             return `
               <div class="user-card" onclick="window.location='explore.html'">
                 <div class="user-card-header">

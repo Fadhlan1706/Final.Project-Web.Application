@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.innerHTML = users.map((u, i) => {
       const initials = u.name.substring(0, 2).toUpperCase();
       const bgImage = u.profilePicture 
-        ? `background-image:url(http://localhost:8000${u.profilePicture});background-size:cover;background-position:center;color:transparent;` 
+        ? `background-image:url(${BASE_URL}${u.profilePicture});background-size:cover;background-position:center;color:transparent;` 
         : `background:linear-gradient(135deg, var(--primary), var(--purple))`;
       
       let skillsHtml = '';
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const initials = selectedUser.name.substring(0, 2).toUpperCase();
     const bgImage = selectedUser.profilePicture 
-        ? `url(http://localhost:8000${selectedUser.profilePicture})` 
+        ? `url(${BASE_URL}${selectedUser.profilePicture})` 
         : `linear-gradient(135deg, var(--primary), var(--purple))`;
 
     // Populate header
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('req-partner-avatar').textContent = selectedUser.profilePicture ? '' : initials;
     
     if(selectedUser.profilePicture) {
-        document.getElementById('req-partner-avatar').style.background = `url(http://localhost:8000${selectedUser.profilePicture})`;
+        document.getElementById('req-partner-avatar').style.background = `url(${BASE_URL}${selectedUser.profilePicture})`;
         document.getElementById('req-partner-avatar').style.backgroundSize = 'cover';
     } else {
         document.getElementById('req-partner-avatar').style.background = `linear-gradient(135deg, var(--primary), var(--purple))`;
