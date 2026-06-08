@@ -23,7 +23,7 @@ function requireAuth(role) {
 
   // Jika tidak ada session nyata, lempar ke halaman login
   if (!session) {
-    window.location.replace("/frontend/pages/auth/login.html");
+    window.location.replace("/pages/auth/login.html");
     return false;
   }
 
@@ -34,8 +34,8 @@ function requireAuth(role) {
   if (role && userRole !== role) {
     const dest =
       userRole === "admin"
-        ? "/frontend/pages/admin/dashboard.html"
-        : "/frontend/pages/user/dashboard.html";
+        ? "/pages/admin/dashboard.html"
+        : "/pages/user/dashboard.html";
     window.location.replace(dest);
     return false;
   }
@@ -62,7 +62,7 @@ async function handleLogout() {
     localStorage.removeItem("user_data");
 
     // 3. Arahkan kembali ke halaman login
-    window.location.replace("/frontend/pages/auth/login.html");
+    window.location.replace("/pages/auth/login.html");
   }
 }
 

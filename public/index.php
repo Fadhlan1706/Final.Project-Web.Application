@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 define('ROOT', dirname(__DIR__));
 
-$envFile = dirname(ROOT) . '/.env';
+$envFile = ROOT . '/.env';
 if (file_exists($envFile)) {
     foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
         $line = trim($line);

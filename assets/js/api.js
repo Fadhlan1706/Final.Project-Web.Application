@@ -31,7 +31,7 @@ async function fetchAPI(endpoint, method = "GET", data = null) {
       if (response.status === 401 && !endpoint.includes("/api/auth/login")) {
          localStorage.removeItem("access_token");
          localStorage.removeItem("user_data");
-         window.location.replace("/frontend/pages/auth/login.html");
+         window.location.replace("/pages/auth/login.html");
       }
       throw new Error(result.message || "Terjadi kesalahan pada server");
     }
