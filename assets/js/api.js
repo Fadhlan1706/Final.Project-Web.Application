@@ -71,6 +71,9 @@ const API = {
   // ================== CATEGORIES ==================
   Categories: {
     getAll: () => fetchAPI("/api/categories", "GET"),
+    create: (data) => fetchAPI("/api/admin/categories", "POST", data),
+    update: (id, data) => fetchAPI(`/api/admin/categories/${id}`, "PUT", data),
+    delete: (id) => fetchAPI(`/api/admin/categories/${id}`, "DELETE"),
   },
 
   // ================== SKILLS ==================

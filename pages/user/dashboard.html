@@ -32,7 +32,7 @@
           </button>
           <button class="nav-btn">
             <i class="icon icon-sm c-muted" data-icon="bell"></i
-            ><span class="notif-badge">3</span>
+            >
           </button>
           <div class="profile-dropdown">
             <div class="profile-btn" id="profile-btn">
@@ -52,7 +52,7 @@
                 Kolaborasi</a
               >
               <div class="dropdown-divider"></div>
-              <div class="dropdown-item danger" onclick="mockLogout()">
+              <div class="dropdown-item danger" onclick="handleLogout()">
                 <i class="icon icon-sm" data-icon="log-out"></i> Keluar
               </div>
             </div>
@@ -143,18 +143,7 @@
             <div>
               <div id="stat-collab" class="stat-value">0</div>
               <div class="stat-label">Total Kolaborasi</div>
-              <div
-                class="stat-change up"
-                style="display: flex; align-items: center; gap: 4px"
-              >
-                <i
-                  class="icon icon-xs"
-                  data-icon="trending-up"
-                  data-color="green"
-                ></i>
-                2 bulan ini
               </div>
-            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon amber">
@@ -163,18 +152,7 @@
             <div>
               <div id="stat-rating" class="stat-value">0.0</div>
               <div class="stat-label">Skor Reputasi</div>
-              <div
-                class="stat-change up"
-                style="display: flex; align-items: center; gap: 4px"
-              >
-                <i
-                  class="icon icon-xs"
-                  data-icon="trending-up"
-                  data-color="green"
-                ></i>
-                0.2 naik
               </div>
-            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon green">
@@ -187,18 +165,7 @@
             <div>
               <div id="stat-completed" class="stat-value">0</div>
               <div class="stat-label">Selesai</div>
-              <div
-                class="stat-change up"
-                style="display: flex; align-items: center; gap: 4px"
-              >
-                <i
-                  class="icon icon-xs"
-                  data-icon="trending-up"
-                  data-color="green"
-                ></i>
-                1 bulan ini
               </div>
-            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon purple">
@@ -211,18 +178,7 @@
             <div>
               <div id="stat-reviews" class="stat-value">0</div>
               <div class="stat-label">Ulasan Diterima</div>
-              <div
-                class="stat-change up"
-                style="display: flex; align-items: center; gap: 4px"
-              >
-                <i
-                  class="icon icon-xs"
-                  data-icon="trending-up"
-                  data-color="green"
-                ></i>
-                3 baru
               </div>
-            </div>
           </div>
         </div>
 
@@ -262,28 +218,7 @@
             <div id="my-skills-list" style="display: flex; flex-direction: column; gap: 12px">
               <!-- Skills loaded dynamically -->
             </div>
-            <div
-              style="
-                margin-top: 20px;
-                padding-top: 16px;
-                border-top: 1px solid var(--border);
-              "
-            >
-              <div
-                style="
-                  font-size: 0.8rem;
-                  color: var(--text-muted);
-                  margin-bottom: 10px;
-                "
-              >
-                Ingin Dipelajari
-              </div>
-              <div style="display: flex; flex-wrap: wrap; gap: 6px">
-                <span class="skill-tag">React</span>
-                <span class="skill-tag">JavaScript</span>
-                <span class="skill-tag">Backend PHP</span>
-              </div>
-            </div>
+
             <a
               href="profile.html"
               class="btn btn-outline-primary btn-sm"
@@ -419,3 +354,4 @@
     </script>
   </body>
 </html>
+

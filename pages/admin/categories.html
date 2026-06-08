@@ -71,14 +71,6 @@
           <label class="form-label">Nama Kategori <span>*</span></label>
           <input class="form-control" id="cat-name" placeholder="Contoh: Machine Learning" required>
         </div>
-        <div class="form-group">
-          <label class="form-label">Emoji / Icon</label>
-          <input class="form-control" id="cat-icon" placeholder="Contoh: <i class="icon icon-sm" data-icon="cpu"></i>" maxlength="4">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Deskripsi</label>
-          <textarea class="form-control" id="cat-desc" rows="2" placeholder="Deskripsi singkat kategori ini..."></textarea>
-        </div>
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button type="button" class="btn btn-secondary" data-close-modal="cat-modal">Batal</button>
           <button type="submit" class="btn btn-primary" id="cat-submit-btn">+ Tambah</button>
@@ -116,8 +108,7 @@ function renderCategories(list) {
         </div>
       </div>
       <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:6px">${c.name}</div>
-      <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:14px;line-height:1.5">${c.description || '-'}</div>
-      <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px">
         <span class="badge badge-blue">Kategori Aktif</span>
       </div>
     </div>
@@ -126,31 +117,28 @@ function renderCategories(list) {
 
 function resetCatModal() {
   editingCatId = null;
-  document.getElementById('cat-modal-title').textContent = '+ Tambah Kategori';
+  document.getElementById('cat-modal-title').innerHTML = '+ Tambah Kategori';
   document.getElementById('cat-submit-btn').textContent  = '+ Tambah';
   document.getElementById('cat-edit-id').value = '';
   document.getElementById('cat-name').value    = '';
-  document.getElementById('cat-icon').value    = '';
-  document.getElementById('cat-desc').value    = '';
 }
 
 function editCategory(id) {
   const c = categories.find(x => x.id === id);
   if (!c) return;
   editingCatId = id;
-  document.getElementById('cat-modal-title').textContent = '<i class="icon icon-sm" data-icon="edit"></i> Edit Kategori';
-  document.getElementById('cat-submit-btn').textContent  = 'Simpan Simpan';
+  document.getElementById('cat-modal-title').innerHTML = '<i class="icon icon-sm" data-icon="edit"></i> Edit Kategori';
+  document.getElementById('cat-submit-btn').textContent  = 'Simpan';
   document.getElementById('cat-edit-id').value = id;
   document.getElementById('cat-name').value    = c.name;
-  document.getElementById('cat-desc').value    = c.description || '';
   openModal('cat-modal');
 }
 
 async function deleteCategory(id) {
-  if (!confirm("Yakin ingin menghapus kategori ini?")) return;
+  if (!confirm('Apakah Anda yakin ingin menghapus kategori ini?')) return;
   try {
     await API.Admin.deleteCategory(id);
-    showToast('Kategori Dihapus', `Kategori telah dihapus.`, 'warning');
+    showToast('Kategori Dihapus', 'Kategori berhasil dihapus.', 'warning');
     fetchCategories();
   } catch(e) {
     showToast('Gagal', e.message, 'danger');
@@ -160,14 +148,13 @@ async function deleteCategory(id) {
 async function saveCategory(e) {
   e.preventDefault();
   const name = document.getElementById('cat-name').value.trim();
-  const description = document.getElementById('cat-desc').value.trim();
 
   try {
     if (editingCatId) {
-      await API.Admin.updateCategory(editingCatId, { name, description });
+      await API.Admin.updateCategory(editingCatId, { name });
       showToast('Kategori Diperbarui', `${name} berhasil diperbarui.`, 'success');
     } else {
-      await API.Admin.createCategory({ name, description });
+      await API.Admin.createCategory({ name });
       showToast('Kategori Ditambahkan', `${name} berhasil ditambahkan.`, 'success');
     }
     closeModal('cat-modal');

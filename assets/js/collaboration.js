@@ -23,12 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderKanban() {
     if (!session) return;
     const statuses = ['pending', 'accepted', 'completed'];
+    
+    let totalPending = 0;
+    let totalAccepted = 0;
+    let totalCompleted = 0;
+
     statuses.forEach(status => {
       const col   = document.querySelector(`.kanban-col[data-status="${status}"] .kanban-cards`);
       const count = document.querySelector(`.kanban-col[data-status="${status}"] .kanban-col-count`);
       if (!col) return;
 
       const cards = allCollaborations.filter(c => c.status === status);
+      
+      if (status === 'pending') totalPending = cards.length;
+      if (status === 'accepted') totalAccepted = cards.length;
+      if (status === 'completed') totalCompleted = cards.length;
+
       if (count) count.textContent = cards.length;
 
       if (cards.length === 0) {
@@ -42,6 +52,15 @@ document.addEventListener('DOMContentLoaded', () => {
       col.innerHTML = cards.map(c => buildCard(c, status)).join('');
       bindCardEvents(col, status);
     });
+
+    const pendingEl = document.getElementById('count-pending');
+    if (pendingEl) pendingEl.textContent = totalPending;
+    
+    const inProgressEl = document.getElementById('count-inprogress');
+    if (inProgressEl) inProgressEl.textContent = totalAccepted;
+    
+    const completedEl = document.getElementById('count-completed');
+    if (completedEl) completedEl.textContent = totalCompleted;
   }
 
   function buildCard(c, status) {
@@ -121,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const newStatus = zone.closest('.kanban-col').dataset.status;
       if (draggedId && newStatus) {
          try {
-             const apiStatus = newStatus === 'in-progress' ? 'in_progress' : newStatus;
+             const apiStatus = newStatus === 'in-progress' || newStatus === 'accepted' ? 'accepted' : newStatus;
              await API.Collaborations.updateStatus(draggedId, { status: apiStatus });
              await loadAndRenderKanban();
              showToast('Status diperbarui', `Kartu dipindah ke ${statusLabel(newStatus)}`, 'success');
@@ -139,11 +158,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── ACTIONS ──
   window.updateCollabStatus = async function(id, status) {
       try {
-          const apiStatus = status === 'in-progress' ? 'in_progress' : status;
+          const apiStatus = status === 'in-progress' || status === 'accepted' ? 'accepted' : status;
           await API.Collaborations.updateStatus(id, { status: apiStatus });
           await loadAndRenderKanban();
           
-          if (status === 'in-progress') {
+          if (status === 'in-progress' || status === 'accepted') {
               showToast('Kolaborasi Diterima! 🎉', `Status menjadi Sedang Berjalan`, 'success');
           } else if (status === 'rejected') {
               showToast('Ditolak/Dibatalkan', `Kolaborasi telah dihentikan`, 'warning');

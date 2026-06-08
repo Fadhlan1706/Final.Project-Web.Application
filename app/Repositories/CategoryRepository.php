@@ -35,7 +35,7 @@ class CategoryRepository
             'INSERT INTO categories (categoryName) VALUES (:name)'
         );
         $stmt->execute([
-            'name' => $data['name'],
+            'name' => $data['name']
         ]);
         return (int)$this->db->lastInsertId();
     }

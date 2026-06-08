@@ -20,7 +20,7 @@
     <button class="navbar-toggle" id="sidebar-toggle"><i class="icon" data-icon="menu" data-color="secondary"></i></button>
     <div class="navbar-actions">
       <button class="nav-btn" id="theme-toggle"><i class="icon icon-sm c-muted" data-icon="moon"></i></button>
-      <button class="nav-btn"><i class="icon icon-sm c-muted" data-icon="bell"></i><span class="notif-badge">5</span></button>
+      <button class="nav-btn"><i class="icon icon-sm c-muted" data-icon="bell"></i></button>
       <div class="profile-dropdown">
         <div class="profile-btn" id="profile-btn">
           <div class="profile-avatar" style="background:linear-gradient(135deg,var(--red),#ff8787)">AD</div>
@@ -88,7 +88,7 @@
           <div style="display:flex;flex-direction:column;gap:8px">
             <a href="manage-users.html" class="btn btn-secondary" style="justify-content:flex-start;gap:10px"><i class="icon icon-sm" data-icon="users"></i> Kelola Pengguna</a>
             <a href="categories.html" class="btn btn-secondary" style="justify-content:flex-start;gap:10px"><i class="icon icon-sm" data-icon="tag"></i> Kelola Kategori Skill</a>
-            <a href="reports.html" class="btn btn-secondary" style="justify-content:flex-start;gap:10px"><i class="icon icon-sm" data-icon="flag"></i> Tinjau Laporan <span class="badge badge-red" style="margin-left:auto">3 baru</span></a>
+            <a href="reports.html" class="btn btn-secondary" style="justify-content:flex-start;gap:10px"><i class="icon icon-sm" data-icon="flag"></i> Tinjau Laporan <span class="badge badge-red" style="margin-left:auto;display:none;" id="dashboard-report-badge">0 baru</span></a>
           </div>
         </div>
         <div class="card">
@@ -132,12 +132,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('stat-users').innerText = overview.totals.users;
       document.getElementById('stat-recent-users').innerHTML = `<i class="icon icon-xs" data-icon="trending-up" data-color="green"></i> +${overview.totals.recent_users} minggu ini`;
       document.getElementById('stat-collabs').innerText = overview.totals.collaborations;
-      document.getElementById('stat-active-collabs').innerText = overview.collaboration_stats['in_progress'] || 0;
+      document.getElementById('stat-active-collabs').innerText = overview.collaboration_stats['accepted'] || 0;
       
       const topRated = overview.top_rated_users || [];
       const avg = topRated.length > 0 ? (topRated.reduce((sum, u) => sum + parseFloat(u.avg_rating), 0) / topRated.length).toFixed(1) : "0.0";
       document.getElementById('stat-rating').innerText = avg;
       document.getElementById('stat-reports').innerText = overview.totals.active_reports;
+      
+      const badge = document.getElementById('dashboard-report-badge');
+      if (overview.totals.active_reports > 0) {
+          badge.style.display = 'inline-block';
+          badge.innerText = overview.totals.active_reports + ' baru';
+      } else {
+          badge.style.display = 'none';
+      }
 
       // Update Activity (relative percentages)
       const maxUsers = 100;
@@ -146,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('act-users-bar').style.width = uPct + '%';
 
       const maxCollabs = 100;
-      const cActive = overview.collaboration_stats['in_progress'] || 0;
+      const cActive = overview.collaboration_stats['accepted'] || 0;
       const cPct = Math.min((cActive / maxCollabs) * 100, 100);
       document.getElementById('act-collabs').innerText = cActive;
       document.getElementById('act-collabs-bar').style.width = cPct + '%';

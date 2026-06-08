@@ -43,7 +43,7 @@
           </button>
           <button class="nav-btn">
             <i class="icon icon-sm c-muted" data-icon="bell"></i
-            ><span class="notif-badge">3</span>
+            >
           </button>
           <div class="profile-dropdown">
             <div class="profile-btn" id="profile-btn">
@@ -62,7 +62,7 @@
                 ><i class="icon icon-sm" data-icon="home"></i> Dashboard</a
               >
               <div class="dropdown-divider"></div>
-              <div class="dropdown-item danger" onclick="mockLogout()">
+              <div class="dropdown-item danger" onclick="handleLogout()">
                 <i class="icon icon-sm" data-icon="log-out"></i> Keluar
               </div>
             </div>
@@ -189,7 +189,7 @@
               color: var(--text-muted);
             "
             id="result-count"
-            >6 partner ditemukan</span
+            >Mencari partner...</span
           >
         </div>
 
@@ -208,9 +208,9 @@
               Teknik Informatika
             </div>
             <div class="modal-profile-score">
-              <span class="score-number" id="pm-score">4.8</span>
+              <span class="score-number" id="pm-score">0.0</span>
               <span id="pm-stars"></span>
-              <span class="score-count" id="pm-review-count">(23 ulasan)</span>
+              <span class="score-count" id="pm-review-count">(0 ulasan)</span>
             </div>
           </div>
           <div
@@ -282,23 +282,7 @@
                 id="pm-skills-list"
               ></div>
             </div>
-            <div>
-              <div
-                style="
-                  font-size: 0.75rem;
-                  text-transform: uppercase;
-                  letter-spacing: 0.08em;
-                  color: var(--text-muted);
-                  margin-bottom: 10px;
-                "
-              >
-                Ingin Dipelajari
-              </div>
-              <div
-                style="display: flex; flex-wrap: wrap; gap: 8px"
-                id="pm-want-learn"
-              ></div>
-            </div>
+
           </div>
           <div class="tab-panel" id="tab-reviews">
             <div id="pm-reviews"></div>

@@ -197,7 +197,6 @@ class AdminController
 
         $v = Validator::make($body, [
             'name'        => 'required|min:2|max:100',
-            'description' => 'max:255',
         ]);
         if ($v->fails()) Response::validationError($v->errors());
 
@@ -218,7 +217,6 @@ class AdminController
 
         $v = Validator::make($body, [
             'name'        => 'required|min:2|max:100',
-            'description' => 'max:255',
         ]);
         if ($v->fails()) Response::validationError($v->errors());
 

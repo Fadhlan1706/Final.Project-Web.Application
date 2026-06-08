@@ -161,9 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('pm-skills-list').innerHTML = '<span class="skill-tag">Belum ada skill</span>';
     }
 
-    // Since wantToLearn is not directly in the new schema (except as 'wanted' skills), handle if empty
-    document.getElementById('pm-want-learn').innerHTML = '<span class="skill-tag">Belum ada preferensi</span>';
-
     // Reviews tab
     const reviewsEl = document.getElementById('pm-reviews');
     try {

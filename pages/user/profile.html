@@ -93,7 +93,7 @@
           </button>
           <button class="nav-btn">
             <i class="icon icon-sm c-muted" data-icon="bell"></i
-            ><span class="notif-badge">3</span>
+            >
           </button>
           <div class="profile-dropdown">
             <div class="profile-btn" id="profile-btn">
@@ -112,7 +112,7 @@
                 ><i class="icon icon-sm" data-icon="home"></i> Dashboard</a
               >
               <div class="dropdown-divider"></div>
-              <div class="dropdown-item danger" id="logout-btn">
+              <div class="dropdown-item danger" id="logout-btn" onclick="handleLogout()">
                 <i class="icon icon-sm" data-icon="log-out"></i> Keluar
               </div>
             </div>
@@ -214,10 +214,10 @@
             >
               <i class="icon icon-sm" data-icon="star" data-color="amber"></i>
               <span id="top-score" style="font-family: var(--font-display); font-weight: 700"
-                >4.6</span
+                >0.0</span
               >
               <span id="top-reviews" style="color: var(--text-muted); font-size: 0.8rem"
-                >(12 ulasan)</span
+                >(0 ulasan)</span
               >
             </div>
             <div
@@ -237,7 +237,7 @@
                     font-size: 1.4rem;
                   "
                 >
-                  8
+                  0
                 </div>
                 <div style="font-size: 0.72rem; color: var(--text-muted)">
                   Kolaborasi
@@ -252,7 +252,7 @@
                     font-size: 1.4rem;
                   "
                 >
-                  5
+                  0
                 </div>
                 <div style="font-size: 0.72rem; color: var(--text-muted)">
                   Selesai
@@ -267,7 +267,7 @@
                     font-size: 1.4rem;
                   "
                 >
-                  3
+                  0
                 </div>
                 <div style="font-size: 0.72rem; color: var(--text-muted)">
                   Skill
@@ -347,41 +347,7 @@
               </form>
             </div>
 
-            <div class="card" style="margin-bottom: 20px">
-              <div class="card-header">
-                <span
-                  class="card-title"
-                  style="display: flex; align-items: center; gap: 8px"
-                  ><i class="icon icon-sm c-accent" data-icon="briefcase"></i>
-                  Ingin Dipelajari</span
-                >
-              </div>
-              <div
-                style="
-                  display: flex;
-                  flex-wrap: wrap;
-                  gap: 8px;
-                  margin-bottom: 14px;
-                "
-                id="want-learn-list"
-              >
-              </div>
-              <div style="display: flex; gap: 8px">
-                <input
-                  class="form-control"
-                  id="want-learn-input"
-                  placeholder="Tambah skill yang ingin dipelajari..."
-                  style="flex: 1"
-                />
-                <button
-                  class="btn btn-secondary"
-                  onclick="addWantLearn()"
-                  style="gap: 4px"
-                >
-                  <i class="icon icon-sm" data-icon="plus"></i> Tambah
-                </button>
-              </div>
-            </div>
+
 
             <!-- Ganti Password Card -->
             <div class="card">
@@ -500,6 +466,9 @@
                 <div style="flex: 1" onclick="setLevel('Advanced')">
                   <div class="skill-level-btn" id="lvl-advanced">Mahir</div>
                 </div>
+                <div style="flex: 1" onclick="setLevel('Master')">
+                  <div class="skill-level-btn" id="lvl-master">Pakar</div>
+                </div>
               </div>
               <input type="hidden" id="skill-level-val" value="Beginner" />
             </div>
@@ -556,7 +525,7 @@
       function setLevel(level) {
         selectedLevel = level;
         document.getElementById("skill-level-val").value = level;
-        ["Beginner", "Intermediate", "Advanced"].forEach((l) => {
+        ["Beginner", "Intermediate", "Advanced", "Master"].forEach((l) => {
           const el = document.getElementById("lvl-" + l.toLowerCase());
           if (!el) return;
           el.style.background = l === level ? "var(--accent-glow)" : "";
@@ -622,14 +591,16 @@
       function renderSkills() {
         const list = document.getElementById("skills-list");
         const levelColor = {
-          Advanced: "green",
-          Intermediate: "blue",
-          Beginner: "amber",
+          master: "purple",
+          advanced: "green",
+          intermediate: "blue",
+          beginner: "amber",
         };
         const levelText = {
-          Advanced: "Mahir",
-          Intermediate: "Menengah",
-          Beginner: "Pemula"
+          master: "Pakar",
+          advanced: "Mahir",
+          intermediate: "Menengah",
+          beginner: "Pemula"
         };
         if (!mySkills.length) {
           list.innerHTML = `<div class="empty-state" style="padding:32px 0"><div class="empty-state-icon"><i class="icon icon-2xl c-muted" data-icon="layers"></i></div><h3>Belum ada skill</h3><p>Tambahkan skill pertamamu!</p></div>`;
@@ -641,8 +612,8 @@
             (s, i) => `
             <div class="skill-row">
               <i class="icon icon-lg c-accent" data-icon="${catIcons[s.category_name] || "briefcase"}"></i>
-              <div style="flex:1"><div style="font-weight:500;font-size:0.9rem">${s.skillName}</div><div style="font-size:0.75rem;color:var(--text-muted)">${s.category_name}</div></div>
-              <span class="badge badge-${levelColor[s.skillLevel] || "gray"}">${levelText[s.skillLevel] || s.skillLevel}</span>
+              <div style="flex:1"><div style="font-weight:500;font-size:0.9rem">${s.name || s.skillName}</div><div style="font-size:0.75rem;color:var(--text-muted)">${s.category_name}</div></div>
+              <span class="badge badge-${levelColor[s.level || s.skillLevel] || "gray"}">${levelText[s.level || s.skillLevel] || (s.level || s.skillLevel)}</span>
               <button class="btn btn-ghost btn-icon btn-sm" onclick="editSkill(${i})" title="Edit"><i class="icon icon-sm c-secondary" data-icon="edit"></i></button>
               <button class="btn btn-ghost btn-icon btn-sm" onclick="deleteSkillAPI(${s.id})" title="Hapus"><i class="icon icon-sm c-red" data-icon="trash-2"></i></button>
             </div>
@@ -673,11 +644,17 @@
         if (!name) return;
         
         try {
+            const payload = {
+                name,
+                category_id,
+                level: selectedLevel.toLowerCase()
+            };
+            
             if (id) {
-                await API.Skills.update(id, { name, category_id, level: selectedLevel });
+                await API.Skills.update(id, payload);
                 showToast("Skill Diperbarui", "Skill berhasil diperbarui.", "success");
             } else {
-                await API.Skills.create({ name, category_id, level: selectedLevel });
+                await API.Skills.create(payload);
                 showToast("Skill Ditambahkan", "Skill berhasil ditambahkan!", "success");
             }
             closeModal("add-skill-modal");
@@ -695,13 +672,15 @@
         document.getElementById("skill-submit-btn").innerHTML =
           '<i class="icon icon-sm" data-icon="check" data-color="primary"></i> Simpan';
         document.getElementById("skill-id").value = s.id;
-        document.getElementById("skill-name").value = s.skillName;
+        document.getElementById("skill-name").value = s.name || s.skillName;
         
         // Find category id by name
-        const catObj = categories.find(c => c.name === s.categoryName);
+        const catObj = categories.find(c => c.name === s.category_name);
         if (catObj) document.getElementById("skill-category").value = catObj.id;
         
-        setLevel(s.skillLevel);
+        const lvlToUse = s.level || s.skillLevel;
+        const lvlCapitalized = lvlToUse.charAt(0).toUpperCase() + lvlToUse.slice(1);
+        setLevel(lvlCapitalized);
         openModal("add-skill-modal");
         hydrateIcons(document.getElementById("add-skill-modal"));
       }
@@ -754,28 +733,13 @@
         const inputs = form.querySelectorAll("input, textarea");
         inputs.forEach((i) => i.removeAttribute("readonly"));
         const select = document.getElementById("input-university");
-        select.removeAttribute("disabled");
+        if (select) select.removeAttribute("disabled");
 
         document.getElementById("save-profile-btn").style.display = "inline-flex";
         document.getElementById("edit-profile-btn").style.display = "none";
       }
 
-      function addWantLearn() {
-        const input = document.getElementById("want-learn-input");
-        const val = input.value.trim();
-        if (!val) return;
-        const list = document.getElementById("want-learn-list");
-        const span = document.createElement("span");
-        span.className = "skill-tag";
-        span.innerHTML =
-          val +
-          ' <button onclick="removeWantLearn(this)" style="background:none;color:var(--text-muted);margin-left:4px;font-size:12px;cursor:pointer;line-height:1"><i class="icon icon-sm" data-icon="x"></i></button>';
-        list.appendChild(span);
-        input.value = "";
-      }
-      function removeWantLearn(btn) {
-        btn.closest(".skill-tag").remove();
-      }
+
 
       async function changePassword(e) {
         e.preventDefault();

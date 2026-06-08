@@ -86,9 +86,8 @@ class SkillController
         $v = Validator::make($body, [
             'category_id' => 'required|integer',
             'name'        => 'required|min:2|max:100',
-            'level'       => 'required|in:beginner,intermediate,advanced',
-            'type'        => 'required|in:offered,wanted',
-            'description' => 'max:500',
+            'description' => 'max:1000',
+            'level'       => 'required|in:beginner,intermediate,advanced,master',
         ]);
 
         if ($v->fails()) Response::validationError($v->errors());
@@ -109,8 +108,8 @@ class SkillController
         $v = Validator::make($body, [
             'category_id' => 'required|integer',
             'name'        => 'required|min:2|max:100',
-            'level'       => 'required|in:beginner,intermediate,advanced',
-            'type'        => 'required|in:offered,wanted',
+            'description' => 'max:1000',
+            'level'       => 'required|in:beginner,intermediate,advanced,master',
         ]);
 
         if ($v->fails()) Response::validationError($v->errors());

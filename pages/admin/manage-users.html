@@ -385,18 +385,22 @@
     <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">${u.bio || 'Tidak ada bio.'}</div>
   `;
         const suspendBtn = document.getElementById("btn-suspend-user");
-        if (u.is_verified === 1) {
+        if (u.status === 'active') {
             suspendBtn.innerHTML = '<i class="icon icon-sm" data-icon="x"></i> Suspend User';
             suspendBtn.className = "btn btn-danger";
+            suspendBtn.onclick = () => {
+              toggleSuspend(id, true);
+              closeModal("user-detail-modal");
+            };
         } else {
             suspendBtn.innerHTML = '<i class="icon icon-sm c-green" data-icon="check-circle"></i> Aktifkan User';
             suspendBtn.className = "btn btn-success";
+            suspendBtn.onclick = () => {
+              toggleSuspend(id, false);
+              closeModal("user-detail-modal");
+            };
         }
         
-        suspendBtn.onclick = () => {
-          toggleSuspend(id);
-          closeModal("user-detail-modal");
-        };
         openModal("user-detail-modal");
         hydrateIcons(document.getElementById("user-detail-modal"));
       }

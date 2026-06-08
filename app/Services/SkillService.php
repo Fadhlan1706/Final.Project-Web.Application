@@ -58,7 +58,7 @@ class SkillService
         }
 
         // Ownership check
-        if ((int)$skill['user_id'] !== $userId) {
+        if ((int)$skill['userId'] !== $userId) {
             return ['success' => false, 'message' => 'Forbidden.', 'code' => 403];
         }
 
@@ -78,7 +78,7 @@ class SkillService
             return ['success' => false, 'message' => 'Skill not found.'];
         }
 
-        if (!$isAdmin && (int)$skill['user_id'] !== $userId) {
+        if (!$isAdmin && (int)$skill['userId'] !== $userId) {
             return ['success' => false, 'message' => 'Forbidden.', 'code' => 403];
         }
 

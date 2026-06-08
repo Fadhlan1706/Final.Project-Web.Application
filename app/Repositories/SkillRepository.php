@@ -110,50 +110,26 @@ class SkillRepository
     // Skill Matching
     // ----------------------------------------------------------------
 
-    /**
-     * Find users who OFFER skills that match what the current user WANTS,
-     * and who WANT skills that the current user OFFERS.
-     */
     public function findMatches(int $userId): array
     {
-        // Skills current user offers
-        $offeredStmt = $this->db->prepare(
-            "SELECT name FROM skills WHERE user_id = ? AND type = 'offered' AND is_active = 1"
-        );
-        $offeredStmt->execute([$userId]);
-        $offeredNames = $offeredStmt->fetchAll(PDO::FETCH_COLUMN);
-
-        // Skills current user wants
-        $wantedStmt = $this->db->prepare(
-            "SELECT name FROM skills WHERE user_id = ? AND type = 'wanted' AND is_active = 1"
-        );
-        $wantedStmt->execute([$userId]);
-        $wantedNames = $wantedStmt->fetchAll(PDO::FETCH_COLUMN);
-
-        if (empty($wantedNames)) return [];
-
-        $placeholders = implode(',', array_fill(0, count($wantedNames), '?'));
-
+        // Because "wanted" type doesn't exist, this function should just find users with high ratings
+        // that offer skills this user doesn't have, or just popular ones.
         $sql = "
             SELECT DISTINCT
                 u.id, u.name, u.avatar, u.bio, u.jurusan,
                 COALESCE(AVG(r.rating), 0) AS avg_rating,
-                GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ', ') AS matched_skills
+                GROUP_CONCAT(DISTINCT s.skillName ORDER BY s.skillName SEPARATOR ', ') AS matched_skills
             FROM skills s
-            JOIN users  u ON u.id = s.user_id
-            LEFT JOIN reviews r ON r.reviewee_id = u.id
-            WHERE s.type       = 'offered'
-              AND s.is_active  = 1
-              AND u.is_active  = 1
-              AND u.id        <> ?
-              AND s.name       IN ($placeholders)
+            JOIN users  u ON u.id = s.userId
+            LEFT JOIN reviews r ON r.target_user_id = u.id
+            WHERE u.id <> ?
             GROUP BY u.id, u.name, u.avatar, u.bio, u.jurusan
             ORDER BY avg_rating DESC
+            LIMIT 10
         ";
 
-        $bindings = array_merge([$userId], $wantedNames);
-        $stmt     = $this->db->prepare($sql);
-        $stmt->execute($bindings);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId]);
         return $stmt->fetchAll();
     }
 
@@ -195,7 +171,7 @@ class SkillRepository
             'category_id' => $data['category_id'],
             'name'        => $data['name'],
             'description' => $data['description'] ?? null,
-            'level'       => $data['level'],
+            'level'       => ucfirst(strtolower($data['level'])),
         ]);
         return (int)$this->db->lastInsertId();
     }
@@ -212,7 +188,7 @@ class SkillRepository
             'category_id' => $data['category_id'],
             'name'        => $data['name'],
             'description' => $data['description'] ?? null,
-            'level'       => $data['level'],
+            'level'       => ucfirst(strtolower($data['level'])),
             'id'          => $id,
         ]);
     }
