@@ -55,6 +55,11 @@ class UserRepository
         $conditions = ["u.STATUS = 'active'"];
         $bindings   = [];
 
+        if (!empty($filters['exclude_user'])) {
+            $conditions[] = 'u.id != ?';
+            $bindings[]   = (int)$filters['exclude_user'];
+        }
+
         if (!empty($filters['search'])) {
             $conditions[] = '(s.skillName LIKE ? OR u.NAME LIKE ?)';
             $bindings[]   = '%' . $filters['search'] . '%';

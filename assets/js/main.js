@@ -237,6 +237,11 @@ function initStarRating(containerId, onChange) {
       if(typeof onChange === 'function') onChange(currentVal);
     });
   });
+
+  container.addEventListener('reset-rating', () => {
+    currentVal = 0;
+    stars.forEach(st => st.classList.remove('active'));
+  });
 }
 function renderStars(score, max = 5) {
   let html = '';

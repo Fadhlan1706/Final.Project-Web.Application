@@ -116,14 +116,15 @@ class SkillRepository
         // that offer skills this user doesn't have, or just popular ones.
         $sql = "
             SELECT DISTINCT
-                u.id, u.name, u.avatar, u.bio, u.jurusan,
+                u.id, u.NAME AS name, u.profilePicture, u.bio, u.major,
                 COALESCE(AVG(r.rating), 0) AS avg_rating,
+                ROUND(80 + (COALESCE(AVG(r.rating), 0) * 4)) AS match_score,
                 GROUP_CONCAT(DISTINCT s.skillName ORDER BY s.skillName SEPARATOR ', ') AS matched_skills
             FROM skills s
             JOIN users  u ON u.id = s.userId
-            LEFT JOIN reviews r ON r.target_user_id = u.id
-            WHERE u.id <> ?
-            GROUP BY u.id, u.name, u.avatar, u.bio, u.jurusan
+            LEFT JOIN reviews r ON r.reviewedUserId = u.id
+            WHERE u.id <> ? AND u.STATUS = 'active'
+            GROUP BY u.id, u.NAME, u.profilePicture, u.bio, u.major
             ORDER BY avg_rating DESC
             LIMIT 10
         ";

@@ -49,6 +49,7 @@ Router::get('/api/explore', function (): void {
         'category_id' => $_GET['category_id'] ?? null,
         'level'       => $_GET['level']        ?? null,
         'min_rating'  => $_GET['min_rating']  ?? null,
+        'exclude_user'=> \App\Helpers\Session::get('user_id'),
     ];
     $page    = max(1, (int)($_GET['page'] ?? 1));
     $perPage = 12;

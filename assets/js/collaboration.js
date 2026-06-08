@@ -189,7 +189,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('review-text').value = '';
 
     openModal('review-modal');
-    initStarRating('star-rating', (val) => { reviewScore = val; });
+    // Dispatch a custom event to tell initStarRating to reset if we wanted to,
+    // but just resetting the DOM classes here is enough if the user hovers again.
+    // However, since initStarRating keeps internal state `currentVal`, 
+    // a better way is to just dispatch a reset event to the container.
+    document.getElementById('star-rating').dispatchEvent(new CustomEvent('reset-rating'));
   };
 
   document.getElementById('form-review')?.addEventListener('submit', async (e) => {
@@ -212,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
           target_user_id: targetUserId,
           collaboration_id: reviewTarget.id,
           rating: reviewScore,
-          review_text: text
+          comment: text
       });
 
       closeModal('review-modal');
@@ -225,4 +229,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Init
   loadAndRenderKanban();
+  initStarRating('star-rating', (val) => { reviewScore = val; });
 });

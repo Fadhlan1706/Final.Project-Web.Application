@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">Memuat...</div>';
       
       const response = await API.Explore.getTalents(params.toString());
-      filteredUsers = response.data.items || [];
+      filteredUsers = Array.isArray(response.data) ? response.data : (response.data?.items || []);
       renderGrid(filteredUsers);
     } catch (error) {
       console.error(error);
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewsEl = document.getElementById('pm-reviews');
     try {
         const reviewRes = await API.Reviews.getForUser(userId);
-        const reviews = reviewRes.data || [];
+        const reviews = reviewRes.data?.reviews || [];
         if (reviews.length === 0) {
           reviewsEl.innerHTML = '<div class="empty-state" style="padding:30px 0"><div class="empty-state-icon">💬</div><h3>Belum ada ulasan</h3></div>';
         } else {
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const payload = {
-         partner_id: selectedUser.id,
+         receiver_id: selectedUser.id,
          offered_skill_id: skillOfferedId,
          requested_skill_id: skillNeededId,
          message: msg
